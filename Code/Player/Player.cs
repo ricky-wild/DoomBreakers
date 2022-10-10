@@ -19,21 +19,23 @@ namespace DoomBreakers
         private IPlayerInput _playerInput;
         private IPlayerBehaviours _playerBehaviours;
         private IPlayerAnimator _playerAnimator;
+        private IPlayerSprite _playerSprite;
 
         private void InitializePlayer()
-		{
+        {
             _playerState = new PlayerStateMachine(state.IsIdle);
             _playerInput = new PlayerInput(_playerID);
             _playerBehaviours = new PlayerBehaviours(this.transform, this.GetComponent<Controller2D>());
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
+            _playerSprite = new PlayerSprite(this.GetComponent<SpriteRenderer>(), _playerID);
         }
 
-		private void Awake()
-		{
+        private void Awake()
+        {
             InitializePlayer();
-		}
+        }
 
-		void Start()
+        void Start()
         {
 
         }
@@ -46,11 +48,11 @@ namespace DoomBreakers
         }
 
         public void UpdateInput()
-		{
+        {
             _playerInput.ResetInput();
             _playerInput.UpdateInput();
-            switch(_playerInput.GetInputState())
-			{
+            switch (_playerInput.GetInputState())
+            {
                 case PlayerInput.inputState.Empty:
                     break;
                 case PlayerInput.inputState.Jump:
@@ -60,20 +62,23 @@ namespace DoomBreakers
                     _playerState.SetPlayerState(state.IsQuickAttack);
                     break;
             }
-            
-		}
+
+        }
 
         public void UpdateStateBehaviours()
-		{
-           switch (_playerState.GetPlayerState())
-			{
+        {
+            switch (_playerState.GetPlayerState())
+            {
                 case state.IsIdle:
+                    _playerAnimator.SetAnimationState(AnimationState.IdleAnim);
                     _playerBehaviours.IdleProcess();
                     break;
                 case state.IsJumping:
+                    _playerAnimator.SetAnimationState(AnimationState.JumpAnim);
                     _playerBehaviours.JumpProcess();
                     break;
                 case state.IsQuickAttack:
+                    _playerAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
                     _playerBehaviours.QuickAttackProcess();
                     break;
             }
@@ -81,7 +86,7 @@ namespace DoomBreakers
         }
 
         public void UpdateAnimator()
-		{
+        {
             _playerAnimator.UpdateAnimator();
         }
     }
