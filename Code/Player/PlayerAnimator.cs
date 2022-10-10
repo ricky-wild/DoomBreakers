@@ -21,25 +21,41 @@ namespace DoomBreakers
 		UpwardAtkAnim = 14,
 		DownwardAtkAnim = 15,
 		TiredAnim = 16,
-		DyingAnim = 17,
-		DeathAnim = 18
+		BrokenArmorAnim = 17,
+		JumpUpwardAtkAnim = 18,
+		FallenAnim = 19,
+		DyingAnim = 20,
+		DeathAnim = 21,
+		SmallHitAnim = 22
+	};
+
+	public enum AnimatorController
+	{
+		Player_with_nothing_controller = 0,
+		Player_with_broadsword_controller = 1,
+		Player_with_shield_controller = 2,
+		Player_with_broadsword_with_shield_controller = 3,
+		Player_with_broadsword_with_broadsword_controller = 4,
+		Player_with_longsword_controller = 5,
+		Player_with_longsword_with_shield_controller = 6
+
 	};
 
 	public class PlayerAnimator : IPlayerAnimator //MonoBehaviour, 
 	{
 		private Animator _animator;
+		private RuntimeAnimatorController _runtimeAnimatorController;
 		private AnimationState _animationState;
-		//private string _currentStateStr;
+		private AnimatorController _animatorController;
+		private string _animControllerFilepath; 
 
 		public PlayerAnimator(Animator animator)
 		{
 			_animator = animator;
+			_runtimeAnimatorController = _animator.runtimeAnimatorController;
 			_animationState = AnimationState.IdleAnim;
-			//_currentStateStr = "Idle";
-			//if(this.GetComponent<Animator>() != null)
-			//	_animator = this.GetComponent<Animator>();
-			//else
-			//	print("\nPlayerAnimator.cs= _animator Not Found/Assigned!");
+			_animatorController = AnimatorController.Player_with_nothing_controller;
+			_animControllerFilepath = "HumanAnimControllers/Unarmored/";
 		}
 		public void UpdateAnimator()
 		{
@@ -96,6 +112,18 @@ namespace DoomBreakers
 				case AnimationState.TiredAnim:
 					_animator.Play("Tired");
 					break;
+				case AnimationState.BrokenArmorAnim:
+					_animator.Play("BrokenArmor");
+					break;
+				case AnimationState.JumpUpwardAtkAnim:
+					_animator.Play("JumpSmallAttackUpward");
+					break;
+				case AnimationState.SmallHitAnim:
+					_animator.Play("Jabbed");
+					break;
+				case AnimationState.FallenAnim:
+					_animator.Play("Fallen");
+					break;
 				case AnimationState.DyingAnim:
 					_animator.Play("Dying");
 					break;
@@ -108,16 +136,41 @@ namespace DoomBreakers
 		{
 			_animationState = animationState;
 		}
+		public void SetAnimatorController(AnimatorController animatorController, bool withArmor)
+		{
+			_animatorController = animatorController;
 
-		//public void SetAnimationState(string animationState)
-		//{
-		//	if (animationState == _currentStateStr) //Guard Clause
-		//		return;
+			if(withArmor)
+				_animControllerFilepath = "HumanAnimControllers/Armored/";
+			else
+				_animControllerFilepath = "HumanAnimControllers/Unarmored/";
 
-		//	_animator.Play(animationState);//int stateNameHash
+			switch (_animatorController)
+			{
+				case AnimatorController.Player_with_nothing_controller:
+					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_nothing_controller") as RuntimeAnimatorController;
+					break;
+				case AnimatorController.Player_with_broadsword_controller:
+					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_sword_controller") as RuntimeAnimatorController;
+					break;
+				case AnimatorController.Player_with_shield_controller:
+					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_shield_controller") as RuntimeAnimatorController;
+					break;
+				case AnimatorController.Player_with_broadsword_with_shield_controller:
+					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_sword&shield_controller") as RuntimeAnimatorController;
+					break;
+				case AnimatorController.Player_with_broadsword_with_broadsword_controller:
+					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_sword&sword_controller") as RuntimeAnimatorController;
+					break;
+				case AnimatorController.Player_with_longsword_controller:
+					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_longsword_controller") as RuntimeAnimatorController;
+					break;
+				case AnimatorController.Player_with_longsword_with_shield_controller:
+					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_longsword&shield_controller") as RuntimeAnimatorController;
+					break;
+			}
+		}
 
-		//	_currentStateStr = animationState;
-		//}
 	}
 }
 

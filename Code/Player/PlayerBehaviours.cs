@@ -11,26 +11,19 @@ namespace DoomBreakers
 		private Controller2D _controller2D; 
 		private Vector3 _velocity;
 		private Transform _transform;
-		private float _targetVelocityX, _moveSpeed, _sprintSpeed;
+		private float _targetVelocityX, _moveSpeed, _sprintSpeed, _gravity;
 
 		public PlayerBehaviours(Transform t, Controller2D controller2D)
 		{
 			_controller2D = controller2D;
 			_transform = t;
+			_velocity = new Vector3();
 			_moveSpeed = 3.75f;//3.5f;
 			_sprintSpeed = 1.0f;
-		}
-
-		private void Initialize()
-		{
-			if (this.GetComponent<Controller2D>() != null)
-				_controller2D = this.GetComponent<Controller2D>();
-			else
-				print("\nPlayerBehaviours.cs= _controller2D Not Found/Assigned!");
-
-			_velocity = new Vector3();
 			_targetVelocityX = 1.0f;
+			_gravity = -(2 * 0.8f) / Mathf.Pow(0.25f, 2); //_gravity = -(3 * 0.8f) / Mathf.Pow(0.9f, 2);//this will create a moon like gravity effect
 		}
+
 		private void Awake()
 		{
 		}
@@ -142,6 +135,8 @@ namespace DoomBreakers
 		}
 		public void UpdateMovement(Vector2 input, IPlayerStateMachine playerStateMachine)
 		{
+			UpdateGravity();
+
 			if (!SafeToMove(playerStateMachine))//Guard Clause
 			{
 				input = Vector2.zero;
@@ -155,11 +150,17 @@ namespace DoomBreakers
 
 			UpdateTransform(input);
 		}
-		private void UpdateTransform(Vector2 input)
+		public void UpdateTransform(Vector2 input)
 		{
 			_controller2D.Move(_velocity * Time.deltaTime, input);
 		}
-
+		public void UpdateGravity()
+		{
+			if (!_controller2D.collisions.below)
+			{
+				_velocity.y += _gravity * Time.deltaTime;
+			}
+		}
 	}
 }
 
