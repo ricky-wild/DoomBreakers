@@ -22,25 +22,28 @@ namespace DoomBreakers
 		IsKnockBackAttack = 12,
 		IsDefencePrepare = 13,
 		IsDefenceRelease = 14,
-		IsHitByReleaseAttack = 15,
-		IsHitByQuickAttack = 16,
-		IsHitWhileDefending = 17,
-		IsQuickHitWhileDefending = 18,
-		IsHitByEnemyReleaseAttack = 19,
-		IsSlamOnGroundByEnemy = 20,
-		IsExhausted = 21,
-		IsDodgePrepare = 22,
-		IsDodgeRelease = 23,
-		IsSlamOnGround = 24,
-		IsLockedComboAttack = 25,
-		IsGainedEquipment = 26,
-		IsArmorBroken = 27,
-		IsRespawning = 28,
-		IsDialogue = 29
+		IsDefenceMoving = 15,
+		IsHitByReleaseAttack = 16,
+		IsHitByQuickAttack = 17,
+		IsHitWhileDefending = 18,
+		IsQuickHitWhileDefending = 19,
+		IsHitByEnemyReleaseAttack = 20,
+		IsSlamOnGroundByEnemy = 21,
+		IsExhausted = 22,
+		IsDodgeLPrepare = 23,
+		IsDodgeRPrepare = 24,
+		IsDodgeRelease = 25,
+		IsSlamOnGround = 26,
+		IsLockedComboAttack = 27,
+		IsGainedEquipment = 28,
+		IsArmorBroken = 29,
+		IsRespawning = 30,
+		IsDialogue = 31,
+		IsFalling = 32
 
 	};
 
-	public class PlayerStateMachine : MonoBehaviour, IPlayerStateMachine//: MonoBehaviour
+	public class PlayerStateMachine : IPlayerStateMachine//: MonoBehaviour
 	{
 
 		private state _state;
@@ -51,7 +54,7 @@ namespace DoomBreakers
 		}		
 		public void SetPlayerState(state state)
 		{
-			print("\nPlayerStateMachine.cs= state being set too, "+ state);
+			//print("\nPlayerStateMachine.cs= state being set too, "+ state);
 			_state = state;
 		}
 		public state GetPlayerState()

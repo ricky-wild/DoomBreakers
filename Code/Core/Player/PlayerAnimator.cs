@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 
 namespace DoomBreakers
 {
@@ -57,12 +58,13 @@ namespace DoomBreakers
 			_animatorController = AnimatorController.Player_with_nothing_controller;
 			_animControllerFilepath = "HumanAnimControllers/Unarmored/";
 		}
-		public void UpdateAnimator()
+		public void UpdateAnimator(IPlayerBehaviours playerBehaviour)
 		{
-			switch(_animationState)
+
+			switch (_animationState)
 			{
 				case AnimationState.IdleAnim:
-					_animator.Play("Idle");
+					_animator.Play("Idle");//, 0, 0.0f);
 					break;
 				case AnimationState.MoveAnim:
 					_animator.Play("Run");
@@ -71,13 +73,28 @@ namespace DoomBreakers
 					_animator.Play("Sprint");
 					break;
 				case AnimationState.JumpAnim:
-					_animator.Play("Jump");
+					_animator.Play("Jump");//, -1, 0.0f);//, -1, 0.0f);
 					break;
 				case AnimationState.AirJumpAnim:
 					_animator.Play("DblJump");
 					break;
 				case AnimationState.QuickAtkAnim:
-					_animator.Play("SmallAttack"); //SmallAttack2 - SmallAttack5
+					int quickAttackIndex = playerBehaviour.GetQuickAttackIndex();
+					switch(quickAttackIndex)
+					{
+						case 0:
+							_animator.Play("SmallAttack");//, -1, 0.0f); //SmallAttack2 - SmallAttack5
+							break;
+						case 1:
+							_animator.Play("SmallAttack2");//, -1, 0.0f);
+							break;
+						case 2:
+							_animator.Play("SmallAttack3");
+							break;
+						case 3:
+							_animator.Play("SmallAttack4");
+							break;
+					}
 					break;
 				case AnimationState.AirQuickAtkAnim:
 					_animator.Play("JumpAttack"); 
@@ -122,7 +139,7 @@ namespace DoomBreakers
 					_animator.Play("Jabbed");
 					break;
 				case AnimationState.FallenAnim:
-					_animator.Play("Fallen");
+					_animator.Play("Fall");
 					break;
 				case AnimationState.DyingAnim:
 					_animator.Play("Dying");
@@ -132,8 +149,17 @@ namespace DoomBreakers
 					break;
 			}
 		}
+		public AnimationState GetAnimationState()
+		{
+			return _animationState;
+		}
 		public void SetAnimationState(AnimationState animationState)
 		{
+			//if (_animationState == animationState)//Guard Clause
+			//	return;
+
+			//UpdateAnimator(); //.Play() once.
+
 			_animationState = animationState;
 		}
 		public void SetAnimatorController(AnimatorController animatorController, bool withArmor)

@@ -13,7 +13,15 @@ namespace DoomBreakers
 			Empty = 0,
 			Jump = 1,
 			Attack = 2,
-			Move = 3
+			Move = 3,
+			Defend = 4,
+			DefenceReleased = 5,
+			HoldAttack = 6,
+			ReleaseAttack = 7,
+			KnockBackAttack = 8,
+			DodgeL = 9,
+			DodgeR = 10,
+			UpwardAttack = 11
 		};
 		private inputState _inputState;
 		private Rewired.Player _rewirdInputPlayer;
@@ -43,17 +51,37 @@ namespace DoomBreakers
 			if (_rewirdInputPlayer == null)
 				return;
 
-			if (_rewirdInputPlayer.GetAnyButtonUp())
-				_inputVector2.x = 0.0f;
+
 
 			_inputVector2.x = _rewirdInputPlayer.GetAxis("MoveHorizontal");
-			//_input.x = _rewirdInputPlayer.GetAxis(0);
+			//_inputVector2.x = _rewirdInputPlayer.GetAxis(0);
+			//if (_inputVector2.x < 0.1f)
+			//	_inputVector2.x = _rewirdInputPlayer.GetAxis(1);
+
 			_inputVector2.y = _rewirdInputPlayer.GetAxis("MoveVertical");
 
 			if (_rewirdInputPlayer.GetButtonDown("Jump"))
 				_inputState = inputState.Jump; //_inputStates[inputState.Jump] = true;
 			if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.01f))
 				_inputState = inputState.Attack;
+			if (_rewirdInputPlayer.GetButtonDown("Defend"))
+				_inputState = inputState.Defend;
+			if (_rewirdInputPlayer.GetButtonUp("Defend"))
+				_inputState = inputState.DefenceReleased;
+			if (_rewirdInputPlayer.GetButtonTimedPressDown("Attack", 0.25f))//Power Attack
+				_inputState = inputState.HoldAttack;
+			if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.25f))
+				_inputState = inputState.ReleaseAttack;
+			if (_rewirdInputPlayer.GetButtonTimedPressUp("KnockBack", 0.01f))
+				_inputState = inputState.KnockBackAttack;
+			if (_rewirdInputPlayer.GetButtonDown("DodgeL"))
+				_inputState = inputState.DodgeL;
+			if (_rewirdInputPlayer.GetButtonDown("DodgeR"))
+				_inputState = inputState.DodgeR;
+
+
+			//if (_rewirdInputPlayer.GetAnyButtonUp())
+			//	_inputVector2.x = 0.0f;
 		}
 
 		public inputState GetInputState()

@@ -1,0 +1,171 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+namespace DoomBreakers
+{
+    [RequireComponent(typeof(Controller2D))]
+    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(SpriteRenderer))]
+    public class Player : MonoBehaviour, IPlayer
+    {
+        [Header("Player ID")]
+        [Tooltip("ID ranges from 0 to 3")]  //Max 4 players.
+        public int _playerID;               //Set in editor per player.
+
+        private IPlayerStateMachine _playerState;
+        private IPlayerInput _playerInput;
+        private IPlayerBehaviours _playerBehaviours;
+        private IPlayerAnimator _playerAnimator;
+        private IPlayerSprite _playerSprite;
+
+        private void InitializePlayer()
+		{
+            _playerState = new PlayerStateMachine(state.IsIdle);
+            _playerInput = new PlayerInput(_playerID);
+            _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
+            _playerSprite = new PlayerSprite(this.GetComponent<SpriteRenderer>(), _playerID);
+
+            //PlayerBehaviours.cs ALSO needs to inherit from MonoBehaviour.
+            //Creating a new Obj() constructor is not allowed under this case.
+            //In Unity anything using MonoBehaviour must be attached to an gameobject,
+            //or the script will just exist somewhere & won't work.
+            //_playerBehaviours = new PlayerBehaviours(this.transform, this.GetComponent<Controller2D>());
+            _playerBehaviours = this.gameObject.AddComponent<PlayerBehaviours>();
+            _playerBehaviours.Setup(this.transform, this.GetComponent<Controller2D>());
+        }
+
+		private void Awake()
+		{
+            InitializePlayer();
+		}
+
+		void Start()
+        {
+            _playerAnimator.SetAnimatorController(AnimatorController.Player_with_broadsword_with_shield_controller, false);
+        }
+
+        void Update()
+        {
+            UpdateInput();
+            UpdateStateBehaviours();
+            UpdateAnimator();
+            UpdatePrintMsg();
+        }
+
+        public void UpdateInput()
+		{
+            _playerInput.ResetInput();
+            _playerInput.UpdateInput();
+            switch(_playerInput.GetInputState())
+			{
+                case PlayerInput.inputState.Empty:
+                    //_playerState.SetPlayerState(state.IsIdle); //Cannot do this without interfering with other anims.
+                    break;
+                case PlayerInput.inputState.Jump:
+                    _playerState.SetPlayerState(state.IsJumping);
+                    break;
+                case PlayerInput.inputState.Attack:
+                    _playerState.SetPlayerState(state.IsQuickAttack);
+                    break;
+                case PlayerInput.inputState.HoldAttack:
+                    _playerState.SetPlayerState(state.IsAttackPrepare);
+                    break;
+                case PlayerInput.inputState.ReleaseAttack:
+                    _playerState.SetPlayerState(state.IsAttackRelease);
+                    break;
+                case PlayerInput.inputState.KnockBackAttack:
+                    _playerState.SetPlayerState(state.IsKnockBackAttack);
+                    break;
+                case PlayerInput.inputState.Defend:
+                    if(_playerInput.GetInputVector2().x != 0.0f)
+                        _playerState.SetPlayerState(state.IsDefenceMoving);
+                    else
+                        _playerState.SetPlayerState(state.IsDefencePrepare);
+                    break;
+                case PlayerInput.inputState.DefenceReleased:
+                    _playerState.SetPlayerState(state.IsDefenceRelease);
+                    break;
+                case PlayerInput.inputState.DodgeL:
+                    _playerState.SetPlayerState(state.IsDodgeLPrepare);
+                    break;
+                case PlayerInput.inputState.DodgeR:
+                    _playerState.SetPlayerState(state.IsDodgeRPrepare);
+                    break;
+            }
+            
+		}
+
+        public void UpdateStateBehaviours()
+		{
+            
+            switch (_playerState.GetPlayerState())
+			{
+                case state.IsIdle:
+                case state.IsDefenceRelease:
+                    _playerAnimator.SetAnimationState(AnimationState.IdleAnim);
+                    _playerBehaviours.IdleProcess();
+                    break;
+                case state.IsMoving:
+                    _playerAnimator.SetAnimationState(AnimationState.MoveAnim);
+                    break;
+                case state.IsJumping:                  
+                    if(_playerBehaviours.JumpProcess(_playerState))
+                        _playerAnimator.SetAnimationState(AnimationState.JumpAnim);
+                    break;
+                case state.IsFalling:
+                    _playerAnimator.SetAnimationState(AnimationState.FallenAnim);
+                    _playerBehaviours.FallProcess(_playerState);
+                    break;
+                case state.IsQuickAttack:
+                    _playerAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
+                    _playerBehaviours.QuickAttackProcess(_playerState, _playerSprite);
+                    break;
+                case state.IsAttackPrepare:
+                    _playerAnimator.SetAnimationState(AnimationState.HoldAtkAnim);
+                    _playerBehaviours.HoldAttackProcess(_playerState);
+                    break;
+                case state.IsAttackRelease:
+                    _playerAnimator.SetAnimationState(AnimationState.ReleaseAtkAnim);
+                    _playerBehaviours.ReleaseAttackProcess(_playerState);
+                    break;
+                case state.IsKnockBackAttack:
+                    _playerAnimator.SetAnimationState(AnimationState.KnockBackAtkAnim);
+                    _playerBehaviours.KnockbackAttackProcess(_playerState);
+                    break;
+                case state.IsDefencePrepare:
+                    _playerAnimator.SetAnimationState(AnimationState.DefendAnim);
+                    _playerBehaviours.IdleDefenceProcess(_playerState);
+                    break;
+                case state.IsDefenceMoving:
+                    _playerAnimator.SetAnimationState(AnimationState.DefendMoveAnim);
+                    _playerBehaviours.IdleDefenceProcess(_playerState);
+                    break;
+                case state.IsDodgeLPrepare:
+                    _playerAnimator.SetAnimationState(AnimationState.DodgeAnim);
+                    _playerBehaviours.DodgeProcess(_playerState, true, _playerSprite);
+                    break;
+                case state.IsDodgeRPrepare:
+                    _playerAnimator.SetAnimationState(AnimationState.DodgeAnim);
+                    _playerBehaviours.DodgeProcess(_playerState, false, _playerSprite);
+                    break;
+            }
+            _playerBehaviours.UpdateMovement(_playerInput.GetInputVector2(), _playerState, _playerSprite);//UpdateMovement();
+        }
+
+        public void UpdateAnimator()
+		{
+            _playerAnimator.UpdateAnimator(_playerBehaviours);
+        }
+
+        private void UpdatePrintMsg()
+		{
+            print("\n_playerState=" + _playerState.GetPlayerState());
+            //print("\n_animationState=" + _playerAnimator.GetAnimationState());
+            print("\n_playerInput.GetInputState()=" + _playerInput.GetInputState());
+        }
+    }
+}
+

@@ -60,14 +60,34 @@ namespace DoomBreakers
 		private SpriteRenderer _spriteRenderer;
 		private Texture2D _colorSwapTexture2D;
 		private Color[] _colorSwapTextureColors;
-		private int _playerID;
+		private int _playerID, _spriteFaceDirection;
 
 		public PlayerSprite(SpriteRenderer spriteRenderer, int playerID)
 		{
             _spriteRenderer = spriteRenderer;
 			_playerID = playerID;
+            _spriteFaceDirection = 1; //1 = face right, -1 = face left.
+            SetupTexture2DColorSwap();
         }
-
+        public int GetSpriteDirection()
+		{
+            return _spriteFaceDirection;
+        }
+        public void FlipSprite()
+		{
+            if(_spriteFaceDirection == 1) //Facing Right
+			{
+                _spriteFaceDirection = -1; //Then set to face left.
+                _spriteRenderer.flipX = true;
+                return;
+            }
+            if (_spriteFaceDirection == -1) //Facing Left
+            {
+                _spriteFaceDirection = 1; //Then set to face right.
+                _spriteRenderer.flipX = false;
+                return;
+            }
+        }
 		public void ApplyCustomTexture2DColours()
 		{
             SetupTexture2DColorSwap();
@@ -213,6 +233,18 @@ namespace DoomBreakers
                 _colorSwapTexture2D.SetPixel(i, 0, color);
             }
             _colorSwapTexture2D.Apply();
+        }
+
+        public void ResetTexture2DColor()
+        {
+            int texturePixelWidth = _colorSwapTexture2D.width;
+
+            for (int i = 0; i < texturePixelWidth; ++i)
+            {
+                _colorSwapTexture2D.SetPixel(i, 0, _colorSwapTextureColors[i]);
+            }
+            _colorSwapTexture2D.Apply();
+
         }
 
         private void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor)
