@@ -13,8 +13,9 @@ namespace DoomBreakers
 		private Transform _transform;
 		private float _targetVelocityX, _maxJumpVelocity, _moveSpeed, _sprintSpeed, _gravity;
 		private int _quickAttackIncrement; //4+ variations of this animation.
+		private bool _dodgedLeftFlag;
 
-		private ITimer _behaviourTimer, _spriteColourSwapTimer;
+		private ITimer _behaviourTimer, _dodgedTimer, _spriteColourSwapTimer;
 
 		public PlayerBehaviours(Transform t, Controller2D controller2D)
 		{
@@ -40,10 +41,13 @@ namespace DoomBreakers
 			_maxJumpVelocity = 14.0f;//13.25f;
 			_gravity = -(2 * 0.8f) / Mathf.Pow(0.25f, 2); //_gravity = -(3 * 0.8f) / Mathf.Pow(0.9f, 2);//this will create a moon like gravity effect
 			_quickAttackIncrement = 0;
+			_dodgedLeftFlag = false;
 
 			//_behaviourTimer = new Timer();
 			_behaviourTimer = this.gameObject.AddComponent<Timer>();
 			_behaviourTimer.Setup();
+			_dodgedTimer = this.gameObject.AddComponent<Timer>();
+			_dodgedTimer.Setup();
 			_spriteColourSwapTimer = this.gameObject.AddComponent<Timer>();
 			_spriteColourSwapTimer.Setup();
 		}
@@ -77,7 +81,7 @@ namespace DoomBreakers
 				return false;
 			}
 
-			_behaviourTimer.StartTimer(0.01f);
+			_behaviourTimer.StartTimer(0.001f);
 			
 			if (_behaviourTimer.HasTimerFinished())
 			{
@@ -152,23 +156,50 @@ namespace DoomBreakers
 				playerStateMachine.SetPlayerState(state.IsIdle);
 			}
 		}
-		public void DodgeProcess(IPlayerStateMachine playerStateMachine, bool dodgeLeft, IPlayerSprite playerSprite)
+		public void DodgeInitiatedProcess(IPlayerStateMachine playerStateMachine, bool dodgeLeft, IPlayerSprite playerSprite)
 		{
 			if (!SafeToDodge(playerStateMachine))//Guard clause.
 			{
 				//print("\nPlayerBehaviour.cs DodgeProcess()= NOT safe to dodge.");
 				return;
 			}
-
-			_spriteColourSwapTimer.StartTimer(0.1f);//flash sprite colour timer.
+			int faceDir = playerSprite.GetSpriteDirection();
+			if (dodgeLeft)
+			{
+				//_velocity.x -= 1.0f;
+				if (faceDir == -1)
+					playerSprite.FlipSprite();
+			}
+			if (!dodgeLeft)
+			{
+				//_velocity.x += 1.0f;
+				if (faceDir == 1)
+					playerSprite.FlipSprite();
+			}
+			_spriteColourSwapTimer.StartTimer(0.05f);//flash sprite colour timer.
 			if (_spriteColourSwapTimer.HasTimerFinished())
 				playerSprite.SetTexture2DColor(Color.white);
 
 			_behaviourTimer.StartTimer(1.4f/3);//anim time.
 			if (_behaviourTimer.HasTimerFinished())
 			{
-				playerSprite.ResetTexture2DColor();
+				_dodgedLeftFlag = dodgeLeft;
+				playerStateMachine.SetPlayerState(state.IsDodgeRelease);
+				playerSprite.ResetTexture2DColor();				
+			}
+		}
+		public void DodgeReleasedProcess(IPlayerStateMachine playerStateMachine)
+		{
+			if (_dodgedLeftFlag)
+				_velocity.x -= 30.0f;
+			else
+				_velocity.x += 30.0f;
+			_dodgedTimer.StartTimer(0.05f);
+			if (_dodgedTimer.HasTimerFinished())
+			{
+				//playerSprite.ResetTexture2DColor();
 				playerStateMachine.SetPlayerState(state.IsIdle);
+				return;
 			}
 		}
 		void Update()
@@ -202,7 +233,8 @@ namespace DoomBreakers
 			}
 			if (_targetVelocityX > 0f || _targetVelocityX < 0f && _controller2D.collisions.below)
 			{
-				if (playerStateMachine.GetPlayerState() != state.IsDefenceMoving) //Decided in Player.cs via UpdateInput()
+				if (playerStateMachine.GetPlayerState() != state.IsDefenceMoving || //Decided in Player.cs via UpdateInput()
+					playerStateMachine.GetPlayerState() != state.IsSprinting)
 					playerStateMachine.SetPlayerState(state.IsMoving);
 			}
 		}
@@ -218,6 +250,14 @@ namespace DoomBreakers
 				UpdateTransform(input);
 				return;
 			}
+
+
+	
+			if (playerStateMachine.GetPlayerState() == state.IsSprinting)
+				_sprintSpeed = 3.5f;
+			if (playerStateMachine.GetPlayerState() != state.IsSprinting)
+				_sprintSpeed = 1.0f;
+
 			_targetVelocityX = (input.x * (_moveSpeed * _sprintSpeed));
 			_velocity.x = _targetVelocityX;
 

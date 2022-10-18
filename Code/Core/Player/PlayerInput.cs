@@ -21,11 +21,13 @@ namespace DoomBreakers
 			KnockBackAttack = 8,
 			DodgeL = 9,
 			DodgeR = 10,
-			UpwardAttack = 11
+			UpwardAttack = 11,
+			Sprint = 12
 		};
 		private inputState _inputState;
 		private Rewired.Player _rewirdInputPlayer;
 		private Vector2 _inputVector2;
+		//private ITimer _spamPreventTimer;
 		//private Dictionary<inputState, bool> _inputStates = new Dictionary<inputState, bool>();
 
 
@@ -33,6 +35,7 @@ namespace DoomBreakers
 		{
 			_rewirdInputPlayer = ReInput.players.GetPlayer(playerID);
 			_inputVector2 = new Vector2();
+			//_spamPreventTimer = new Timer();
 
 			//Initialize input states
 			//_inputStates.Add(inputState.Empty, false);
@@ -78,8 +81,10 @@ namespace DoomBreakers
 				_inputState = inputState.DodgeL;
 			if (_rewirdInputPlayer.GetButtonDown("DodgeR"))
 				_inputState = inputState.DodgeR;
-
-
+			if (_rewirdInputPlayer.GetButtonDown("Sprint"))
+				_inputState = inputState.Sprint;
+			if (_rewirdInputPlayer.GetButtonUp("Sprint"))
+				ResetInput();
 			//if (_rewirdInputPlayer.GetAnyButtonUp())
 			//	_inputVector2.x = 0.0f;
 		}

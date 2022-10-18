@@ -67,7 +67,10 @@ namespace DoomBreakers
             return false;
 		}
 
-
+        public float GetTheWaitTime()
+		{
+            return _waitTime;
+		}
 
     }
 }

@@ -3,6 +3,7 @@ namespace DoomBreakers
 {
 	public interface IPlayerSprite
 	{
+
 		int GetSpriteDirection();
 		void FlipSprite();
 		void SetupTexture2DColorSwap();

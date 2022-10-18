@@ -7,6 +7,7 @@ namespace DoomBreakers
         void Setup();
         void StartTimer(float waitingTime);
         bool HasTimerFinished();
+        float GetTheWaitTime();
     }
 }
 

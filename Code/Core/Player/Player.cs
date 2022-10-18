@@ -35,6 +35,8 @@ namespace DoomBreakers
             //_playerBehaviours = new PlayerBehaviours(this.transform, this.GetComponent<Controller2D>());
             _playerBehaviours = this.gameObject.AddComponent<PlayerBehaviours>();
             _playerBehaviours.Setup(this.transform, this.GetComponent<Controller2D>());
+            //_playerInput = this.gameObject.AddComponent<PlayerInput>();
+            //_playerInput.Setup(_playerID);
         }
 
 		private void Awake()
@@ -89,10 +91,16 @@ namespace DoomBreakers
                     _playerState.SetPlayerState(state.IsDefenceRelease);
                     break;
                 case PlayerInput.inputState.DodgeL:
-                    _playerState.SetPlayerState(state.IsDodgeLPrepare);
+                    if(_playerState.GetPlayerState() != state.IsDodgeRelease)
+                        _playerState.SetPlayerState(state.IsDodgeLPrepare);
                     break;
                 case PlayerInput.inputState.DodgeR:
-                    _playerState.SetPlayerState(state.IsDodgeRPrepare);
+                    if (_playerState.GetPlayerState() != state.IsDodgeRelease)
+                        _playerState.SetPlayerState(state.IsDodgeRPrepare);
+                    break;
+                case PlayerInput.inputState.Sprint:
+                    if (_playerInput.GetInputVector2().x != 0.0f)
+                        _playerState.SetPlayerState(state.IsSprinting);
                     break;
             }
             
@@ -110,6 +118,9 @@ namespace DoomBreakers
                     break;
                 case state.IsMoving:
                     _playerAnimator.SetAnimationState(AnimationState.MoveAnim);
+                    break;
+                case state.IsSprinting:
+                    _playerAnimator.SetAnimationState(AnimationState.SprintAnim);
                     break;
                 case state.IsJumping:                  
                     if(_playerBehaviours.JumpProcess(_playerState))
@@ -145,11 +156,14 @@ namespace DoomBreakers
                     break;
                 case state.IsDodgeLPrepare:
                     _playerAnimator.SetAnimationState(AnimationState.DodgeAnim);
-                    _playerBehaviours.DodgeProcess(_playerState, true, _playerSprite);
+                    _playerBehaviours.DodgeInitiatedProcess(_playerState, true, _playerSprite);
                     break;
                 case state.IsDodgeRPrepare:
                     _playerAnimator.SetAnimationState(AnimationState.DodgeAnim);
-                    _playerBehaviours.DodgeProcess(_playerState, false, _playerSprite);
+                    _playerBehaviours.DodgeInitiatedProcess(_playerState, false, _playerSprite);
+                    break;
+                case state.IsDodgeRelease:
+                    _playerBehaviours.DodgeReleasedProcess(_playerState);
                     break;
             }
             _playerBehaviours.UpdateMovement(_playerInput.GetInputVector2(), _playerState, _playerSprite);//UpdateMovement();
@@ -163,7 +177,7 @@ namespace DoomBreakers
         private void UpdatePrintMsg()
 		{
             print("\n_playerState=" + _playerState.GetPlayerState());
-            //print("\n_animationState=" + _playerAnimator.GetAnimationState());
+            print("\n_animationState=" + _playerAnimator.GetAnimationState());
             print("\n_playerInput.GetInputState()=" + _playerInput.GetInputState());
         }
     }

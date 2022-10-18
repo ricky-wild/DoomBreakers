@@ -39,7 +39,8 @@ namespace DoomBreakers
 		IsArmorBroken = 29,
 		IsRespawning = 30,
 		IsDialogue = 31,
-		IsFalling = 32
+		IsFalling = 32,
+		IsSprinting = 33
 
 	};
 
@@ -55,6 +56,8 @@ namespace DoomBreakers
 		public void SetPlayerState(state state)
 		{
 			//print("\nPlayerStateMachine.cs= state being set too, "+ state);
+			if (_state == state) //Guard clause
+				return;
 			_state = state;
 		}
 		public state GetPlayerState()
