@@ -17,6 +17,7 @@ namespace DoomBreakers
 		bool JumpProcess(IPlayerStateMachine playerStateMachine);
 		void FallProcess(IPlayerStateMachine playerStateMachine);
 		void QuickAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite);
+		void UpwardAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite);
 		void IdleDefenceProcess(IPlayerStateMachine playerStateMachine);
 		void HoldAttackProcess(IPlayerStateMachine playerStateMachine);
 		void ReleaseAttackProcess(IPlayerStateMachine playerStateMachine);

@@ -9,23 +9,31 @@ namespace DoomBreakers
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(Collider2D))]
+    [RequireComponent(typeof(Rigidbody2D))]
     public class Player : MonoBehaviour, IPlayer
     {
         [Header("Player ID")]
         [Tooltip("ID ranges from 0 to 3")]  //Max 4 players.
         public int _playerID;               //Set in editor per player.
 
+        [Header("Player Attack Points")]
+        [Tooltip("Vectors that represent point of attack radius")]
+        public Transform[] _attackPoints; //1=quickATK, 2=powerATK, 3=upwardATK
+
         private IPlayerStateMachine _playerState;
         private IPlayerInput _playerInput;
         private IPlayerBehaviours _playerBehaviours;
         private IPlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
+        private IPlayerCollision _playerCollider;
 
         private void InitializePlayer()
 		{
             _playerState = new PlayerStateMachine(state.IsIdle);
             _playerInput = new PlayerInput(_playerID);
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
+            _playerCollider = new PlayerCollision(this.GetComponent<Collider2D>(), ref _attackPoints);
             //_playerSprite = new PlayerSprite(this.GetComponent<SpriteRenderer>(), _playerID);
 
             //PlayerBehaviours.cs ALSO needs to inherit from MonoBehaviour.
@@ -55,8 +63,9 @@ namespace DoomBreakers
         {
             UpdateInput();
             UpdateStateBehaviours();
+            UpdateCollisions();
             UpdateAnimator();
-            //UpdatePrintMsg();
+            UpdatePrintMsg();
         }
 
         public void UpdateInput()
@@ -74,6 +83,9 @@ namespace DoomBreakers
                     break;
                 case PlayerInput.inputState.Attack:
                     _playerState.SetPlayerState(state.IsQuickAttack);
+                    break;
+                case PlayerInput.inputState.UpwardAttack:
+                    _playerState.SetPlayerState(state.IsUpwardAttack);
                     break;
                 case PlayerInput.inputState.HoldAttack:
                     _playerState.SetPlayerState(state.IsAttackPrepare);
@@ -137,6 +149,10 @@ namespace DoomBreakers
                     _playerAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
                     _playerBehaviours.QuickAttackProcess(_playerState, _playerSprite);
                     break;
+                case state.IsUpwardAttack:
+                    _playerAnimator.SetAnimationState(AnimationState.UpwardAtkAnim);
+                    _playerBehaviours.UpwardAttackProcess(_playerState, _playerSprite);
+                    break;
                 case state.IsAttackPrepare:
                     _playerAnimator.SetAnimationState(AnimationState.HoldAtkAnim);
                     _playerBehaviours.HoldAttackProcess(_playerState);
@@ -179,11 +195,17 @@ namespace DoomBreakers
             _playerAnimator.UpdateAnimator(_playerBehaviours);
         }
 
+        public void UpdateCollisions()
+		{
+            _playerCollider.UpdateCollision(_playerState);
+		}
+
         private void UpdatePrintMsg()
 		{
             print("\n_playerState=" + _playerState.GetPlayerState());
             print("\n_animationState=" + _playerAnimator.GetAnimationState());
             print("\n_playerInput.GetInputState()=" + _playerInput.GetInputState());
+            print("\n_playerCollider=");
         }
     }
 }

@@ -116,9 +116,11 @@ namespace DoomBreakers
 		{
 
 
-			_spriteColourSwapTimer.StartTimer(0.1f);//flash sprite colour timer.
-			if (_spriteColourSwapTimer.HasTimerFinished())
-				playerSprite.SetTexture2DColor(Color.white);
+			//_spriteColourSwapTimer.StartTimer(0.1f);//flash sprite colour timer.
+			//if (_spriteColourSwapTimer.HasTimerFinished())
+			//	playerSprite.SetTexture2DColor(Color.white);
+
+			SetBehaviourTextureFlash(0.1f, playerSprite);
 
 			_behaviourTimer.StartTimer(0.133f);
 			if (_behaviourTimer.HasTimerFinished())
@@ -129,6 +131,21 @@ namespace DoomBreakers
 					_quickAttackIncrement++;
 				else
 					_quickAttackIncrement = 0;
+				playerStateMachine.SetPlayerState(state.IsIdle);
+			}
+		}
+		public void UpwardAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)
+		{
+			//_spriteColourSwapTimer.StartTimer(0.1f);//flash sprite colour timer.
+			//if (_spriteColourSwapTimer.HasTimerFinished())
+			//	playerSprite.SetTexture2DColor(Color.white);
+
+			SetBehaviourTextureFlash(0.1f, playerSprite);
+
+			_behaviourTimer.StartTimer(0.917f/2);//anim length
+			if (_behaviourTimer.HasTimerFinished())
+			{
+				playerSprite.ResetTexture2DColor();
 				playerStateMachine.SetPlayerState(state.IsIdle);
 			}
 		}
@@ -185,9 +202,10 @@ namespace DoomBreakers
 				if (faceDir == 1)
 					playerSprite.FlipSprite();
 			}
-			_spriteColourSwapTimer.StartTimer(0.05f);//flash sprite colour timer.
-			if (_spriteColourSwapTimer.HasTimerFinished())
-				playerSprite.SetTexture2DColor(Color.white);
+			//_spriteColourSwapTimer.StartTimer(0.05f);//flash sprite colour timer.
+			//if (_spriteColourSwapTimer.HasTimerFinished())
+			//	playerSprite.SetTexture2DColor(Color.white);
+			SetBehaviourTextureFlash(0.05f, playerSprite);
 
 			_behaviourTimer.StartTimer(1.4f/3);//anim time.
 			if (_behaviourTimer.HasTimerFinished())
@@ -308,6 +326,12 @@ namespace DoomBreakers
 		}
 
 
+		private void SetBehaviourTextureFlash(float time, IPlayerSprite playerSprite)
+		{
+			_spriteColourSwapTimer.StartTimer(time);//flash sprite colour timer.
+			if (_spriteColourSwapTimer.HasTimerFinished())
+				playerSprite.SetTexture2DColor(Color.white);
+		}
 
 
 		public bool SafeToJump(IPlayerStateMachine playerStateMachine)

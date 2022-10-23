@@ -76,7 +76,12 @@ namespace DoomBreakers
 			if (_rewirdInputPlayer.GetButtonDown("Jump"))
 				_inputState = inputState.Jump; //_inputStates[inputState.Jump] = true;
 			if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.01f))
-				_inputState = inputState.Attack;
+			{
+				if(_inputVector2.y > 0.44f)
+					_inputState = inputState.UpwardAttack;
+				else
+					_inputState = inputState.Attack;
+			}
 			if (_rewirdInputPlayer.GetButtonDown("Defend"))
 				_inputState = inputState.Defend;
 			if (_rewirdInputPlayer.GetButtonUp("Defend"))

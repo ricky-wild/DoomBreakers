@@ -6,6 +6,7 @@ namespace DoomBreakers
         void UpdateInput();
         void UpdateStateBehaviours();
         void UpdateAnimator();
+        void UpdateCollisions();
     }
 }
 
