@@ -56,13 +56,27 @@ namespace DoomBreakers
 		public void SetPlayerState(state state)
 		{
 			//print("\nPlayerStateMachine.cs= state being set too, "+ state);
-			if (_state == state) //Guard clause
+			if (!SafeToSetState(state)) //Guard clause
 				return;
 			_state = state;
 		}
 		public state GetPlayerState()
 		{
 			return _state;
+		}
+
+		private bool SafeToSetState(state state)
+		{
+			if (_state == state) //Guard clause don't assign the same state.
+				return false;
+
+			if (_state == state.IsFalling && state == state.IsJumping) //Prevents delayed jumping behaviour upon jump button spam
+				return false;
+			if (_state == state.IsFalling && state == state.IsMoving) //Prevents delayed jumping behaviour upon jump button spam
+				return false;
+
+
+			return true;
 		}
 
 		//public void UpdatePlayerStateBehaviours()

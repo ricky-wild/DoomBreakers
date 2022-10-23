@@ -4,7 +4,7 @@ using UnityEngine;
 namespace DoomBreakers
 {
 
-	public class PlayerSprite : IPlayerSprite //MonoBehaviour
+	public class PlayerSprite : MonoBehaviour, IPlayerSprite //
     {
 		public enum SpriteColourIndex
 		{
@@ -61,12 +61,41 @@ namespace DoomBreakers
 		private Texture2D _colorSwapTexture2D;
 		private Color[] _colorSwapTextureColors;
 		private int _playerID, _spriteFaceDirection;
+        private ITimer _colorSwappedTimer;
+        private bool _colorSwappedFlag;
 
-		public PlayerSprite(SpriteRenderer spriteRenderer, int playerID)
+        //private ITimer[] _weaponChargeTimer;// = new Timer[1];
+        private ITimer _weaponChargeTimer;
+        private const float _weaponChargeTime = 0.25f;
+        private int _weaponTimerIncrement;
+        private const int _weaponTimerIncrementMax = 10;
+        private bool _weaponChargeTimerFlag;
+
+        public PlayerSprite(SpriteRenderer spriteRenderer, int playerID)
 		{
             _spriteRenderer = spriteRenderer;
 			_playerID = playerID;
             _spriteFaceDirection = 1; //1 = face right, -1 = face left.
+
+            _weaponChargeTimerFlag = false;
+
+            SetupTexture2DColorSwap();
+        }
+        public void Setup(SpriteRenderer spriteRenderer, int playerID)
+		{
+            _spriteRenderer = spriteRenderer;
+            _playerID = playerID;
+            _spriteFaceDirection = 1; //1 = face right, -1 = face left.
+
+            _colorSwappedTimer = this.gameObject.AddComponent<Timer>();
+            _colorSwappedTimer.Setup();
+            _colorSwappedFlag = false;
+
+            _weaponChargeTimer = this.gameObject.AddComponent<Timer>();
+            _weaponChargeTimer.Setup();
+            _weaponTimerIncrement = 0;
+            _weaponChargeTimerFlag = false;
+
             SetupTexture2DColorSwap();
         }
         public int GetSpriteDirection()
@@ -232,6 +261,13 @@ namespace DoomBreakers
             {
                 _colorSwapTexture2D.SetPixel(i, 0, color);
             }
+
+            if(!_colorSwappedFlag) //Ensure we reset internally upon failure to do so externally (ie a state change)
+			{
+                _colorSwappedTimer.StartTimer(1.0f);
+                _colorSwappedFlag = true;
+            }
+            
             _colorSwapTexture2D.Apply();
         }
 
@@ -243,8 +279,102 @@ namespace DoomBreakers
             {
                 _colorSwapTexture2D.SetPixel(i, 0, _colorSwapTextureColors[i]);
             }
+
+            if (_colorSwappedFlag)
+                _colorSwappedFlag = false;
+            
             _colorSwapTexture2D.Apply();
 
+        }
+
+        private void UpdateColorTextureResetInternally()
+		{
+            //Ensure we reset internally upon failure to do so externally (ie a state change)
+            if (!_colorSwappedFlag)
+                return;
+
+            if (_colorSwappedTimer.HasTimerFinished())
+            {
+                ResetTexture2DColor();
+                _colorSwappedFlag = false;
+            }
+        }
+
+        void Update()
+		{
+            UpdateColorTextureResetInternally();
+
+            if (!_weaponChargeTimerFlag) //Guard Clause.
+                return;
+
+            UpdateWeaponChargeTextureFX();
+
+        }
+
+        private void UpdateWeaponChargeTextureFX()
+		{
+			if (_weaponChargeTimer.HasTimerFinished())
+			{
+                if (_weaponTimerIncrement < _weaponTimerIncrementMax)
+                    _weaponTimerIncrement++;
+                else
+                    _weaponTimerIncrement = 0;
+				_weaponChargeTimer.StartTimer(_weaponChargeTime);
+				
+			}
+
+            switch(_weaponTimerIncrement)
+			{
+                case 0:
+                    SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xffffff));
+                    break;
+                case 1:
+                    SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xfded91));
+                    break;
+                case 2:
+                    SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xfbce5e));
+                    break;
+                case 3:
+                    SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xfdac40));
+                    break;
+                case 4:
+                    SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xff6a2f));
+                    break;
+                case 5:
+                    SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xfdac40));
+                    break;
+                case 6:
+                    SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xfbce5e));
+                    break;
+                case 7:
+                    SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xfded91));
+                    break;
+                case 8:
+                    SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xe5f7ba));
+                    break;
+                case 9:
+                    SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xffffff));
+                    break;
+            }
+
+            _colorSwapTexture2D.Apply();
+        }
+
+        public void SetWeaponChargeTextureFXFlag(bool b)
+		{
+            if (_weaponChargeTimerFlag) //Guard clause, if already true don't bother.
+                return;
+
+            _weaponChargeTimerFlag = b;
+
+            if (!b)
+                return;
+
+            _weaponTimerIncrement = 0;
+            _weaponChargeTimer.StartTimer(_weaponChargeTime);
+
+            SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xe5f7ba));
+            _colorSwapTexture2D.Apply();
         }
 
         private void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor)

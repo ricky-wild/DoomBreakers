@@ -41,8 +41,18 @@ namespace DoomBreakers
 			//_inputStates.Add(inputState.Empty, false);
 			//_inputStates.Add(inputState.Jump, true);
 		}
+		public bool SafeToReset()
+		{
+			if (_inputState == inputState.Sprint)
+				return false;
+
+			return true;
+		}
 		public void ResetInput()
 		{
+			if (!SafeToReset())
+				return;
+
 			_inputState = inputState.Empty;
 			//foreach (var key in _inputStates.Keys.ToList())
 			//{
@@ -84,7 +94,7 @@ namespace DoomBreakers
 			if (_rewirdInputPlayer.GetButtonDown("Sprint"))
 				_inputState = inputState.Sprint;
 			if (_rewirdInputPlayer.GetButtonUp("Sprint"))
-				ResetInput();
+				_inputState = inputState.Empty;
 			//if (_rewirdInputPlayer.GetAnyButtonUp())
 			//	_inputVector2.x = 0.0f;
 		}

@@ -2,7 +2,7 @@
 
 namespace DoomBreakers
 {
-    interface ITimer 
+    public interface ITimer 
     {
         void Setup();
         void StartTimer(float waitingTime);

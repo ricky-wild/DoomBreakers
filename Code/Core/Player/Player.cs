@@ -26,7 +26,7 @@ namespace DoomBreakers
             _playerState = new PlayerStateMachine(state.IsIdle);
             _playerInput = new PlayerInput(_playerID);
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
-            _playerSprite = new PlayerSprite(this.GetComponent<SpriteRenderer>(), _playerID);
+            //_playerSprite = new PlayerSprite(this.GetComponent<SpriteRenderer>(), _playerID);
 
             //PlayerBehaviours.cs ALSO needs to inherit from MonoBehaviour.
             //Creating a new Obj() constructor is not allowed under this case.
@@ -35,6 +35,8 @@ namespace DoomBreakers
             //_playerBehaviours = new PlayerBehaviours(this.transform, this.GetComponent<Controller2D>());
             _playerBehaviours = this.gameObject.AddComponent<PlayerBehaviours>();
             _playerBehaviours.Setup(this.transform, this.GetComponent<Controller2D>());
+            _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
+            _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
             //_playerInput = this.gameObject.AddComponent<PlayerInput>();
             //_playerInput.Setup(_playerID);
         }
@@ -54,7 +56,7 @@ namespace DoomBreakers
             UpdateInput();
             UpdateStateBehaviours();
             UpdateAnimator();
-            UpdatePrintMsg();
+            //UpdatePrintMsg();
         }
 
         public void UpdateInput()
@@ -67,6 +69,7 @@ namespace DoomBreakers
                     //_playerState.SetPlayerState(state.IsIdle); //Cannot do this without interfering with other anims.
                     break;
                 case PlayerInput.inputState.Jump:
+                    //if(_playerState.GetPlayerState() != state.IsJumping || _playerState.GetPlayerState() != state.IsFalling)
                     _playerState.SetPlayerState(state.IsJumping);
                     break;
                 case PlayerInput.inputState.Attack:
@@ -114,7 +117,7 @@ namespace DoomBreakers
                 case state.IsIdle:
                 case state.IsDefenceRelease:
                     _playerAnimator.SetAnimationState(AnimationState.IdleAnim);
-                    _playerBehaviours.IdleProcess();
+                    _playerBehaviours.IdleProcess(_playerState);
                     break;
                 case state.IsMoving:
                     _playerAnimator.SetAnimationState(AnimationState.MoveAnim);
@@ -137,10 +140,12 @@ namespace DoomBreakers
                 case state.IsAttackPrepare:
                     _playerAnimator.SetAnimationState(AnimationState.HoldAtkAnim);
                     _playerBehaviours.HoldAttackProcess(_playerState);
+                    _playerSprite.SetWeaponChargeTextureFXFlag(true);
                     break;
                 case state.IsAttackRelease:
                     _playerAnimator.SetAnimationState(AnimationState.ReleaseAtkAnim);
                     _playerBehaviours.ReleaseAttackProcess(_playerState);
+                    _playerSprite.SetWeaponChargeTextureFXFlag(false);
                     break;
                 case state.IsKnockBackAttack:
                     _playerAnimator.SetAnimationState(AnimationState.KnockBackAtkAnim);

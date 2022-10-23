@@ -13,7 +13,7 @@ namespace DoomBreakers
 		bool SafeToDodge(IPlayerStateMachine playerStateMachine);
 		bool SafeToMove(IPlayerStateMachine playerStateMachine);
 		bool SafeToSetIdle(IPlayerStateMachine playerStateMachine);
-		void IdleProcess();
+		void IdleProcess(IPlayerStateMachine playerStateMachine);
 		bool JumpProcess(IPlayerStateMachine playerStateMachine);
 		void FallProcess(IPlayerStateMachine playerStateMachine);
 		void QuickAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite);

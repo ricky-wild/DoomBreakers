@@ -8,6 +8,7 @@ namespace DoomBreakers
 	interface IPlayerInput  //: MonoBehaviour
 	{
 		//void Setup(int playerID);
+		bool SafeToReset();
 		void ResetInput();
 		void UpdateInput();
 		inputState GetInputState();
