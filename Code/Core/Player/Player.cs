@@ -148,10 +148,12 @@ namespace DoomBreakers
                 case state.IsQuickAttack:
                     _playerAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
                     _playerBehaviours.QuickAttackProcess(_playerState, _playerSprite);
+                    _playerCollider.EnableAttackCollisions();
                     break;
                 case state.IsUpwardAttack:
                     _playerAnimator.SetAnimationState(AnimationState.UpwardAtkAnim);
                     _playerBehaviours.UpwardAttackProcess(_playerState, _playerSprite);
+                    _playerCollider.EnableAttackCollisions();
                     break;
                 case state.IsAttackPrepare:
                     _playerAnimator.SetAnimationState(AnimationState.HoldAtkAnim);
@@ -161,11 +163,13 @@ namespace DoomBreakers
                 case state.IsAttackRelease:
                     _playerAnimator.SetAnimationState(AnimationState.ReleaseAtkAnim);
                     _playerBehaviours.ReleaseAttackProcess(_playerState);
+                    _playerCollider.EnableAttackCollisions();
                     _playerSprite.SetWeaponChargeTextureFXFlag(false);
                     break;
                 case state.IsKnockBackAttack:
                     _playerAnimator.SetAnimationState(AnimationState.KnockBackAtkAnim);
                     _playerBehaviours.KnockbackAttackProcess(_playerState);
+                    _playerCollider.EnableAttackCollisions();
                     break;
                 case state.IsDefencePrepare:
                     _playerAnimator.SetAnimationState(AnimationState.DefendAnim);

@@ -103,10 +103,12 @@ namespace DoomBreakers
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2))) { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player3))) { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player4))) { }
+
+                    if (enemy.CompareTag(GetCompareTag(CompareTags.Enemy))) { }
                 }
 
             }
-
+            _attackCollisionEnabled = false;
         }
         public void ProcessCollisionFlags(Collider2D collision)
         {
@@ -127,9 +129,9 @@ namespace DoomBreakers
         void OnTriggerStay2D(Collider2D collision) { }
         void OnTriggerExit2D(Collider2D collision) { }
 
-        public bool GetAttackCollisionsFlag()
+        public void EnableAttackCollisions()
 		{
-            return _attackCollisionEnabled;
+            _attackCollisionEnabled = true; 
 		}
     }
 
