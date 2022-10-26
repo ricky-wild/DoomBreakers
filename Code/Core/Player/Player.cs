@@ -65,7 +65,7 @@ namespace DoomBreakers
             UpdateStateBehaviours();
             UpdateCollisions();
             UpdateAnimator();
-            UpdatePrintMsg();
+            //UpdatePrintMsg();
         }
 
         public void UpdateInput()
