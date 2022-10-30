@@ -112,7 +112,7 @@ namespace DoomBreakers
 			}
 
 		}
-		public void QuickAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)
+		public void QuickAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, IPlayerCollision playerCollider)
 		{
 
 
@@ -126,13 +126,17 @@ namespace DoomBreakers
 			if (_behaviourTimer.HasTimerFinished())
 			{
 				playerSprite.ResetTexture2DColor();
+				playerCollider.EnableAttackCollisions();
+
 				//Everything here is only processed once. This exists in Player.Update();
 				if (_quickAttackIncrement >= 0 && _quickAttackIncrement < 4)
 					_quickAttackIncrement++;
 				else
 					_quickAttackIncrement = 0;
 				playerStateMachine.SetPlayerState(state.IsIdle);
+				//return false;
 			}
+			//return true;
 		}
 		public void UpwardAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)
 		{

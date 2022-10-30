@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace DoomBreakers
 {
@@ -10,32 +13,54 @@ namespace DoomBreakers
     [RequireComponent(typeof(Rigidbody2D))]
     public class Bandit : MonoBehaviour, IEnemy
     {
-        [Header("Player ID")]
+        [Header("Bandit ID")]
         [Tooltip("ID ranges from 0 to ?")]  //Max ? enemies.
-        public int _enemyID;               //Set in editor per enemy?
+        public int _banditID;               //Set in editor per enemy?
 
         [Header("Enemy Attack Points")]
         [Tooltip("Vectors that represent point of attack radius")]
         public Transform[] _attackPoints; //1=quickATK, 2=powerATK, 3=upwardATK
 
         private IEnemyStateMachine _banditState;
-        //private IPlayerInput _playerInput;
         private IBanditBehaviours _banditBehaviours;
         private IBanditAnimator _banditAnimator;
-        //private IPlayerSprite _playerSprite;
-        //private IPlayerCollision _playerCollider;
+        private IBanditSprite _banditSprite;
+        private IBanditCollision _banditCollider;
+
+        private Action _eventListener;
 
         private void InitializeBandit()
         {
             _banditState = new EnemyStateMachine(state.IsIdle);
             _banditAnimator = new BanditAnimator(this.GetComponent<Animator>());
+            _banditCollider = new BanditCollision(this.GetComponent<Collider2D>(), ref _attackPoints);
+
+            _banditBehaviours = this.gameObject.AddComponent<BanditBehaviours>();
+            _banditBehaviours.Setup(this.transform, this.GetComponent<Controller2D>());
+            _banditSprite = this.gameObject.AddComponent<BanditSprite>();
+            _banditSprite.Setup(this.GetComponent<SpriteRenderer>(), _banditID);
+
+            _eventListener = new Action(TestMethod);
+            
         }
 
-        private void Awake()
+        private void TestMethod()
+		{
+            print("TestMethod() activated via event handler!");
+		}
+
+		private void OnEnable()
+		{
+            EventManager.StartListening("BanditHitByPlayer", _eventListener);
+        }
+		private void OnDisable()
+		{
+            EventManager.StopListening("BanditHitByPlayer", _eventListener);
+        }
+		private void Awake()
         {
             InitializeBandit();
         }
-
         void Start()
         {
             _banditAnimator.SetAnimatorController(BanditAnimatorController.Bandit_with_broadsword_controller);
@@ -43,8 +68,9 @@ namespace DoomBreakers
         void Update() 
         {
             UpdateStateBehaviours();
-            UpdateAnimator(); //Finish removing previous condition links within editor for remaining bandit anim controllers.
-            UpdatePrintMsg();
+            UpdateCollisions();
+            UpdateAnimator(); 
+            //UpdatePrintMsg();
         }
 
         public void UpdatePlayerPathFinding()
@@ -97,6 +123,7 @@ namespace DoomBreakers
                     break;
 
             }
+            _banditBehaviours.UpdateMovement(_banditState, _banditSprite);//UpdateMovement();
             //UpdateMovement();
         }
         public void UpdateAnimator()
@@ -105,8 +132,8 @@ namespace DoomBreakers
         }
         public void UpdateCollisions()
 		{
-
-		}
+            _banditCollider.UpdateCollision(_banditState);
+        }
 
         private void UpdatePrintMsg()
         {

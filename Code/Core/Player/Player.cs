@@ -45,8 +45,8 @@ namespace DoomBreakers
             _playerBehaviours.Setup(this.transform, this.GetComponent<Controller2D>());
             _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
             _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
-            //_playerInput = this.gameObject.AddComponent<PlayerInput>();
-            //_playerInput.Setup(_playerID);
+            //_playerCollider = this.gameObject.AddComponent<PlayerCollision>();
+            //_playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints);
         }
 
 		private void Awake()
@@ -147,8 +147,8 @@ namespace DoomBreakers
                     break;
                 case state.IsQuickAttack:
                     _playerAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
-                    _playerBehaviours.QuickAttackProcess(_playerState, _playerSprite);
-                    _playerCollider.EnableAttackCollisions();
+                    _playerBehaviours.QuickAttackProcess(_playerState, _playerSprite, _playerCollider);
+                    //_playerCollider.EnableAttackCollisions();
                     break;
                 case state.IsUpwardAttack:
                     _playerAnimator.SetAnimationState(AnimationState.UpwardAtkAnim);
@@ -210,6 +210,25 @@ namespace DoomBreakers
             print("\n_animationState=" + _playerAnimator.GetAnimationState());
             print("\n_playerInput.GetInputState()=" + _playerInput.GetInputState());
             print("\n_playerCollider=");
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            for (int i = 0; i < _attackPoints.Length; i++)
+            {
+                if (_attackPoints[i].position == null)
+                    return;
+            }
+
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(_attackPoints[0].position, 1.2f);
+            Gizmos.DrawWireSphere(_attackPoints[1].position, 1.6f);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(_attackPoints[2].position, 1.3f);
+
+            Gizmos.color = Color.white;
+            Gizmos.DrawWireSphere(this.gameObject.transform.position, 12.0f);
         }
     }
 }
