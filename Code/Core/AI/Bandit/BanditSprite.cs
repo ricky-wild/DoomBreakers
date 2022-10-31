@@ -128,8 +128,9 @@ namespace DoomBreakers
         {
             SetupTexture2DColorSwap();
 
+            int temp = 4;
             //switch (MenuManager._instance.GetPlayerCustomSkinId(_playerID))
-            switch (_banditID)
+            switch (temp)
             {
                 default: //STANDARD SKIN
                     SwapTexture2DColor(SpriteColourIndex.Hair, ColorFromInt(0x3b370c));    //HAIR
@@ -199,9 +200,9 @@ namespace DoomBreakers
                     break;
             }
 
-
+            temp = 1;
             //Base the colour variation of the enemy from the AI difficulty applied.
-            switch (_banditID)
+            switch (temp)
             {
                 case 0: //Default sprite colours.
                     SwapTexture2DColor(SpriteColourIndex.Bandit_Mask_Gloves_Boots, ColorFromInt(0x4e3624));

@@ -9,5 +9,6 @@ namespace DoomBreakers
         void UpdateStateBehaviours();
         void UpdateAnimator();
         void UpdateCollisions();
+        void ReportCollisionWithPlayer(IPlayerStateMachine playerStateMachine);
     }
 }

@@ -48,10 +48,16 @@ namespace DoomBreakers
 		}
 		public void HitByQuickAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
-			print("\nenemyStateMachine=" + enemyStateMachine.GetEnemyState());
-			print("\nattack hit processed successfully!");
-			enemyStateMachine.SetEnemyState(state.IsIdle);
-			print("\nenemyStateMachine=" + enemyStateMachine.GetEnemyState());
+
+			SetBehaviourTextureDamagedFlash(0.1f, banditSprite);
+			_behaviourTimer.StartTimer(0.133f);
+			if (_behaviourTimer.HasTimerFinished())
+			{
+				banditSprite.ResetTexture2DColor();
+				enemyStateMachine.SetEnemyState(state.IsIdle);
+			}
+			
+
 		}
 		void Update()
         {
@@ -128,6 +134,13 @@ namespace DoomBreakers
 					banditSprite.FlipSprite();
 				return;
 			}
+		}
+
+		private void SetBehaviourTextureDamagedFlash(float time, IBanditSprite banditSprite)
+		{
+			_spriteColourSwapTimer.StartTimer(time);//flash sprite colour timer.
+			if (_spriteColourSwapTimer.HasTimerFinished())
+				banditSprite.SetTexture2DColor(Color.red);
 		}
 	}
 

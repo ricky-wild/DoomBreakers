@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+//using System.Collections;
+//using System.Collections.Generic;
+using UnityEngine;
 
 namespace DoomBreakers
 {
@@ -22,7 +25,8 @@ namespace DoomBreakers
 
         private bool _attackCollisionEnabled;
 
-        private IEnemyStateMachine _banditStateRef;
+        //private Action _eventListener;
+       private IEnemyStateMachine _banditStateMachine;
 
         public BanditCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints)
         {
@@ -35,7 +39,11 @@ namespace DoomBreakers
 
             _collider2d.enabled = true;
             _attackCollisionEnabled = false;
+            //_eventListener = new Action(TestMethod);
         }
+        //public void TestMethod(){print("TestMethod() activated via event handler!");}
+        //public void SetOnEnabled() {//EventManager.StartListening("BanditHitByPlayer", _eventListener);}
+        //public void SetOnDisabled(){//EventManager.StopListening("BanditHitByPlayer", _eventListener);}
         public void SetupLayerMasks()
         {
             _enemyLayerMasks[0] = LayerMask.NameToLayer(_playerLayerMaskStr);
@@ -72,8 +80,8 @@ namespace DoomBreakers
         {
             UpdateDetectEnemyTargets(banditStateMachine);
 
-            if (_banditStateRef != banditStateMachine) //RegisterHitByAttack()
-                _banditStateRef = banditStateMachine;
+            if (_banditStateMachine != banditStateMachine) //RegisterHitByAttack()
+                _banditStateMachine = banditStateMachine;
         }
         public void UpdateDetectEnemyTargets(IEnemyStateMachine banditStateMachine)
         {
@@ -132,16 +140,18 @@ namespace DoomBreakers
             _attackCollisionEnabled = true;
         }
 
-        public void RegisterHitByAttack(IPlayerStateMachine playerStateMachine)
+        public IEnemyStateMachine RegisterHitByAttack(IPlayerStateMachine playerStateMachine)
 		{
             if (playerStateMachine.GetPlayerState() == state.IsQuickAttack)
-                _banditStateRef.SetEnemyState(state.IsHitByQuickAttack); 
+                _banditStateMachine.SetEnemyState(state.IsHitByQuickAttack); 
             if (playerStateMachine.GetPlayerState() == state.IsAttackRelease)
-                _banditStateRef.SetEnemyState(state.IsHitByReleaseAttack);
+                _banditStateMachine.SetEnemyState(state.IsHitByReleaseAttack);
             //if (playerStateMachine.GetPlayerState() == state.IsUpwardAttack)
-            //    _banditStateRef.SetEnemyState(state.IsHitByQuickAttack);
+            //    _banditStateMachine.SetEnemyState(state.IsHitByQuickAttack);
 
 
+
+            return _banditStateMachine;
         }
     }
 

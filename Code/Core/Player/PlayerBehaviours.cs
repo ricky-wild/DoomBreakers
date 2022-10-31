@@ -112,21 +112,16 @@ namespace DoomBreakers
 			}
 
 		}
-		public void QuickAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, IPlayerCollision playerCollider)
+		public void QuickAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)//, IPlayerCollision playerCollider)
 		{
 
 
-			//_spriteColourSwapTimer.StartTimer(0.1f);//flash sprite colour timer.
-			//if (_spriteColourSwapTimer.HasTimerFinished())
-			//	playerSprite.SetTexture2DColor(Color.white);
-
 			SetBehaviourTextureFlash(0.1f, playerSprite);
-
 			_behaviourTimer.StartTimer(0.133f);
 			if (_behaviourTimer.HasTimerFinished())
 			{
 				playerSprite.ResetTexture2DColor();
-				playerCollider.EnableAttackCollisions();
+				//playerCollider.EnableAttackCollisions();
 
 				//Everything here is only processed once. This exists in Player.Update();
 				if (_quickAttackIncrement >= 0 && _quickAttackIncrement < 4)
@@ -134,9 +129,7 @@ namespace DoomBreakers
 				else
 					_quickAttackIncrement = 0;
 				playerStateMachine.SetPlayerState(state.IsIdle);
-				//return false;
 			}
-			//return true;
 		}
 		public void UpwardAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)
 		{
@@ -206,9 +199,7 @@ namespace DoomBreakers
 				if (faceDir == 1)
 					playerSprite.FlipSprite();
 			}
-			//_spriteColourSwapTimer.StartTimer(0.05f);//flash sprite colour timer.
-			//if (_spriteColourSwapTimer.HasTimerFinished())
-			//	playerSprite.SetTexture2DColor(Color.white);
+
 			SetBehaviourTextureFlash(0.05f, playerSprite);
 
 			_behaviourTimer.StartTimer(1.4f/3);//anim time.

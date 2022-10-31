@@ -147,8 +147,8 @@ namespace DoomBreakers
                     break;
                 case state.IsQuickAttack:
                     _playerAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
-                    _playerBehaviours.QuickAttackProcess(_playerState, _playerSprite, _playerCollider);
-                    //_playerCollider.EnableAttackCollisions();
+                    _playerBehaviours.QuickAttackProcess(_playerState, _playerSprite);//, _playerCollider);
+                    _playerCollider.EnableAttackCollisions();
                     break;
                 case state.IsUpwardAttack:
                     _playerAnimator.SetAnimationState(AnimationState.UpwardAtkAnim);

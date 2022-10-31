@@ -118,11 +118,11 @@ namespace DoomBreakers
 
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Enemy))) 
                     {
-                        EventManager.TriggerEvent("BanditHitByPlayer");
+                        //EventManager.TriggerEvent("BanditHitByPlayer");
                         //_attackCollisionEnabled = false;
                         //return;
-                        //if (enemy.GetComponent<BanditCollision>() != null) //Guard clause.
-                        //    enemy.GetComponent<BanditCollision>().RegisterHitByAttack(playerStateMachine);
+                        if (enemy.GetComponent<Bandit>() != null) //Guard clause.
+                            enemy.GetComponent<Bandit>().ReportCollisionWithPlayer(playerStateMachine);//RegisterHitByAttack(playerStateMachine);
                     }
                 }
 
@@ -151,6 +151,10 @@ namespace DoomBreakers
         public void EnableAttackCollisions()
 		{
             _attackCollisionEnabled = true; 
+		}
+        public bool IsAttackCollisionsEnabled()
+		{
+            return _attackCollisionEnabled;
 		}
 
 

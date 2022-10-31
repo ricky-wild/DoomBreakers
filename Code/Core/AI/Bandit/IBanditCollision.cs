@@ -4,6 +4,9 @@ namespace DoomBreakers
 {
 	interface IBanditCollision //: MonoBehaviour
 	{
+		//void TestMethod();
+		//void SetOnEnabled();
+		//void SetOnDisabled();
 		void SetupLayerMasks();
 		void SetupAttackRadius();
 		void SetupCompareTags();
@@ -12,7 +15,7 @@ namespace DoomBreakers
 		void ProcessCollisionFlags(Collider2D collision);
 		void UpdateDetectEnemyTargets(IEnemyStateMachine banditStateMachine);
 		void EnableAttackCollisions();
-		void RegisterHitByAttack(IPlayerStateMachine playerStateMachine);
+		IEnemyStateMachine RegisterHitByAttack(IPlayerStateMachine playerStateMachine);
 	}
 }
 

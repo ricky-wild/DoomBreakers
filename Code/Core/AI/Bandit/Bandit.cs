@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿//using System;
+//using System.Collections;
+//using System.Collections.Generic;
 using UnityEngine;
 
 namespace DoomBreakers
@@ -27,7 +27,7 @@ namespace DoomBreakers
         private IBanditSprite _banditSprite;
         private IBanditCollision _banditCollider;
 
-        private Action _eventListener;
+
 
         private void InitializeBandit()
         {
@@ -40,24 +40,18 @@ namespace DoomBreakers
             _banditSprite = this.gameObject.AddComponent<BanditSprite>();
             _banditSprite.Setup(this.GetComponent<SpriteRenderer>(), _banditID);
 
-            _eventListener = new Action(TestMethod);
+
             
         }
-
-        private void TestMethod()
-		{
-            print("TestMethod() activated via event handler!");
-		}
-
-		private void OnEnable()
-		{
-            EventManager.StartListening("BanditHitByPlayer", _eventListener);
+        private void OnEnable()
+        {           
+            //_banditCollider.SetOnEnabled();//EventManager.StartListening("BanditHitByPlayer", _eventListener);
         }
-		private void OnDisable()
-		{
-            EventManager.StopListening("BanditHitByPlayer", _eventListener);
+        private void OnDisable()
+        {
+            //_banditCollider.SetOnDisabled();//EventManager.StopListening("BanditHitByPlayer", _eventListener);
         }
-		private void Awake()
+        private void Awake()
         {
             InitializeBandit();
         }
@@ -121,6 +115,10 @@ namespace DoomBreakers
                     _banditAnimator.SetAnimationState(AnimationState.DefendMoveAnim);
                     //_banditBehaviours.IdleDefenceProcess(_banditState);
                     break;
+                case state.IsHitByQuickAttack:
+                    _banditAnimator.SetAnimationState(AnimationState.SmallHitAnim);
+                    _banditBehaviours.HitByQuickAttackProcess(_banditState, _banditSprite);
+                    break;
 
             }
             _banditBehaviours.UpdateMovement(_banditState, _banditSprite);//UpdateMovement();
@@ -134,6 +132,10 @@ namespace DoomBreakers
 		{
             _banditCollider.UpdateCollision(_banditState);
         }
+        public void ReportCollisionWithPlayer(IPlayerStateMachine playerStateMachine)
+		{
+            _banditState = _banditCollider.RegisterHitByAttack(playerStateMachine);
+		}
 
         private void UpdatePrintMsg()
         {
