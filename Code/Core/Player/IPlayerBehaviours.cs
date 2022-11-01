@@ -6,7 +6,7 @@ namespace DoomBreakers
 	{
 		int GetQuickAttackIndex();
 		void Setup(Transform t, Controller2D controller2D);
-		void UpdateMovement(Vector2 input, IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite);
+		void UpdateMovement(Vector2 input, IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, IPlayerCollision playerCollider);
 		void UpdateTransform(Vector2 input);
 		void UpdateGravity(IPlayerStateMachine playerStateMachine);
 		bool SafeToJump(IPlayerStateMachine playerStateMachine);

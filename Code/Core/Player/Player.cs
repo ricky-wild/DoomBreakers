@@ -191,7 +191,7 @@ namespace DoomBreakers
                     _playerBehaviours.DodgeReleasedProcess(_playerState);
                     break;
             }
-            _playerBehaviours.UpdateMovement(_playerInput.GetInputVector2(), _playerState, _playerSprite);//UpdateMovement();
+            _playerBehaviours.UpdateMovement(_playerInput.GetInputVector2(), _playerState, _playerSprite, _playerCollider);//UpdateMovement();
         }
 
         public void UpdateAnimator()

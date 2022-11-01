@@ -21,6 +21,7 @@ namespace DoomBreakers
 
         private Transform[] _attackPoints;                              //1=quickATK, 2=powerATK, 3=upwardATK
         private float[] _attackRadius;// = new float[3];                //1=quickATK, 2=powerATK, 3=upwardATK
+        private Vector3 _vector;                                        //We simply use this cached vector to flip attack points when needed. See FlipAttackPoints(int dir)
 
         private LayerMask[] _enemyLayerMasks;// = new LayerMask[2];
         private const string _playerLayerMaskStr = "Player";
@@ -152,11 +153,39 @@ namespace DoomBreakers
 		{
             _attackCollisionEnabled = true; 
 		}
-        public bool IsAttackCollisionsEnabled()
+        //public bool IsAttackCollisionsEnabled()
+		//{
+        //    return _attackCollisionEnabled;
+		//}
+        public void FlipAttackPoints(int dir)
 		{
-            return _attackCollisionEnabled;
-		}
+            //Circles we draw(in editor) & detect enemies against. These must all be flipped 
+            //as this method will be called on player face direction change.
+            if (dir == 1)//Facing Right
+			{
+                for(int i = 0; i < _attackPoints.Length; i++)
+				{
+                    _vector = _attackPoints[i].localPosition;
+                    _vector.x = Mathf.Abs(_vector.x);
+                    _attackPoints[i].localPosition = _vector;
+                }
 
+
+                return;
+			}
+            if (dir == -1)//Facing Left
+            {
+                for (int i = 0; i < _attackPoints.Length; i++)
+				{
+                    _vector = _attackPoints[i].localPosition;
+                    _vector.x = -Mathf.Abs(_vector.x);
+                    _attackPoints[i].localPosition = _vector;
+                }
+
+
+                return;
+            }
+        }
 
     }
 

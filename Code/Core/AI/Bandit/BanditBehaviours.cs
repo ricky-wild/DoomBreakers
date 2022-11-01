@@ -46,6 +46,22 @@ namespace DoomBreakers
 		void Start()
 		{
 		}
+		public void IdleProcess(IEnemyStateMachine enemyStateMachine)
+		{
+			_velocity.x = 0f;
+			//_velocity.y = 0f;
+			//print("\n_velocity.y=" + Mathf.Abs(_velocity.y));
+			if (Mathf.Abs(_velocity.y) >= 3.0f)
+				enemyStateMachine.SetEnemyState(state.IsFalling);
+		}
+		public bool JumpProcess(IEnemyStateMachine enemyStateMachine)
+		{
+			return true;
+		}
+		public void FallProcess(IEnemyStateMachine enemyStateMachine)
+		{
+
+		}
 		public void HitByQuickAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
 
@@ -82,7 +98,7 @@ namespace DoomBreakers
 			if (enemyStateMachine.GetEnemyState() != state.IsSprinting)
 				_sprintSpeed = 1.0f;
 			//_targetVelocityX = (input.x * (_moveSpeed * _sprintSpeed));
-			_velocity.x = _targetVelocityX;
+			//_velocity.x = _targetVelocityX;
 
 			//print("\nx=" + _velocity.x);
 

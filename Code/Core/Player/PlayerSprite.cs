@@ -3,58 +3,63 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
-
-	public class PlayerSprite : MonoBehaviour, IPlayerSprite //
+    public enum SpriteColourIndex
     {
-		public enum SpriteColourIndex
-		{
-			//Supplying red colour value of each pixel we want to swap out for another.
+        //Supplying red colour value of each pixel we want to swap out for another.
 
-			Black = 0,
+        Black = 0,
 
-			Hair = 59,    //0x 3b370c
-			Skin_a = 226, //0x e2d87a  lightest
-			Skin_b = 208, //0x d0c774
-			Skin_c = 194, //0x c2ba6d
-			Skin_d = 177, //0x b1aa64 !!PART OF THE ARMOR!!  181 0Xb5b0b0
-			Skin_e = 153, //0x 999455  darkest
-			Cloth_a = 4,  //0x 0430ff 0030ff
-			Cloth_b = 11, //0x 0b279d ALSO Cape
+        Hair = 59,    //0x 3b370c
+        Skin_a = 226, //0x e2d87a  lightest
+        Skin_b = 208, //0x d0c774
+        Skin_c = 194, //0x c2ba6d
+        Skin_d = 177, //0x b1aa64 !!PART OF THE ARMOR!!  181 0Xb5b0b0
+        Skin_e = 153, //0x 999455  darkest
+        Cloth_a = 4,  //0x 0430ff 0030ff
+        Cloth_b = 11, //0x 0b279d ALSO Cape
 
-			ChargeFX = 5, //0X 00ff49
-			ChargeIndicator = 3, //0x 039029
+        ChargeFX = 5, //0X 00ff49
+        ChargeIndicator = 3, //0x 039029
 
-			Sword_Standard_a = 228, //0x e4e6c9
-			Sword_Standard_b = 211, //0x d3d6ab
-			Sword_Standard_c = 181, //0x b5b977
-			Sword_Standard_d = 156, //0x 9ca060
-			Sword_Standard_e = 203, //0x cbd092
-			Sword_Standard_handle_a = 97, //0x 61512f
-			Sword_Standard_handle_b = 108, //0x 6c5a34
+        Sword_Standard_a = 228, //0x e4e6c9
+        Sword_Standard_b = 211, //0x d3d6ab
+        Sword_Standard_c = 181, //0x b5b977
+        Sword_Standard_d = 156, //0x 9ca060
+        Sword_Standard_e = 203, //0x cbd092
+        Sword_Standard_handle_a = 97, //0x 61512f
+        Sword_Standard_handle_b = 108, //0x 6c5a34
 
-			Sword_2_Standard_a = 220, //0x dce6c9
-			Sword_2_Standard_b = 197, //0x c5d6ab
-			Sword_2_Standard_c = 200, //0x c8d092
-			Sword_2_Standard_d = 179, //0x b3b977
-			Sword_2_Standard_e = 159, //0x 9fa060
-			Sword_2_Standard_handle_a = 94, //0x 5e512f
-			Sword_2_Standard_handle_b = 106, //0x 6a5a34
+        Sword_2_Standard_a = 220, //0x dce6c9
+        Sword_2_Standard_b = 197, //0x c5d6ab
+        Sword_2_Standard_c = 200, //0x c8d092
+        Sword_2_Standard_d = 179, //0x b3b977
+        Sword_2_Standard_e = 159, //0x 9fa060
+        Sword_2_Standard_handle_a = 94, //0x 5e512f
+        Sword_2_Standard_handle_b = 106, //0x 6a5a34
 
-			Shield_Standard_a = 169, //0x a9a8a8
-			Shield_Standard_b = 124, //0x 7c7b7b
-			Shield_Standard_c = 53, //0x 353434
-			Shield_Standard_d = 79, //0x 4f1507
-			Shield_Standard_e = 130, //0x 823c3d
+        Shield_Standard_a = 169, //0x a9a8a8
+        Shield_Standard_b = 124, //0x 7c7b7b
+        Shield_Standard_c = 53, //0x 353434
+        Shield_Standard_d = 79, //0x 4f1507
+        Shield_Standard_e = 130, //0x 823c3d
 
-			Armor_Standard_a = 222, //0x dedede
-			Armor_Standard_b = 198, //0x c6c6c6
-			Armor_Standard_c = 190, //0x bebebe
-			Armor_Standard_d = 184, //0x b8b8b8
-			Armor_Standard_e = 181, //0x b5b0b0
-			Armor_Standard_f = 168, //0x a8a8a8
-			Armor_Standard_g = 123, //0x 7b7b7b
-			Armor_Standard_h = 52  //0x 343434        c f g h
-		}
+        Armor_Standard_a = 222, //0x dedede
+        Armor_Standard_b = 198, //0x c6c6c6
+        Armor_Standard_c = 190, //0x bebebe
+        Armor_Standard_d = 184, //0x b8b8b8
+        Armor_Standard_e = 181, //0x b5b0b0
+        Armor_Standard_f = 168, //0x a8a8a8
+        Armor_Standard_g = 123, //0x 7b7b7b
+        Armor_Standard_h = 52,  //0x 343434        c f g h
+
+        Bandit_Mask_Gloves_Boots = 78, //0x 4e3624
+        Bandit_Mask_Strap_Pants = 104, //0x 683a18
+        Bandit_Gloves_Boots_a = 51, //0x 332011
+        Bandit_Gloves_Boots_b = 45, //0x 2d190a
+        Bandit_Legs_Strap = 73, //0x 492911
+    }
+    public class PlayerSprite : MonoBehaviour, IPlayerSprite //
+    {
 		
 		private SpriteColourIndex _spriteColourIndex;
 		private SpriteRenderer _spriteRenderer;
@@ -122,8 +127,10 @@ namespace DoomBreakers
 		{
             SetupTexture2DColorSwap();
 
+            int temp = 5;
+
             //switch (MenuManager._instance.GetPlayerCustomSkinId(_playerID))
-            switch(_playerID)
+            switch(temp)
             {
                 default: //STANDARD SKIN
                     SwapTexture2DColor(SpriteColourIndex.Hair, ColorFromInt(0x3b370c));    //HAIR

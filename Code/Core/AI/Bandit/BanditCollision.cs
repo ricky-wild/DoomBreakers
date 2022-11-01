@@ -8,6 +8,13 @@ namespace DoomBreakers
 
     public class BanditCollision : MonoBehaviour, IBanditCollision
     {
+        public enum CollisionTargetPurpose
+		{
+            noPurpose = 0,
+            toPersue = 1,
+            toAttack = 2
+		};
+        private CollisionTargetPurpose _collisionTargetPurpose; //Flag for player collision purpose. UpdateDetectEnemyTargets()
 
         private CompareTags _compareTags;
 
@@ -39,6 +46,7 @@ namespace DoomBreakers
 
             _collider2d.enabled = true;
             _attackCollisionEnabled = false;
+            _collisionTargetPurpose = CollisionTargetPurpose.noPurpose;
             //_eventListener = new Action(TestMethod);
         }
         //public void TestMethod(){print("TestMethod() activated via event handler!");}
@@ -88,14 +96,22 @@ namespace DoomBreakers
             if (!_attackCollisionEnabled)
                 return;
 
+            DetermineTargetCollisionPurpose(banditStateMachine);
+
             for (int i = 0; i < _enemyLayerMasks.Length; i++)
             {
-                if (banditStateMachine.GetEnemyState() == state.IsQuickAttack)
-                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], _enemyLayerMasks[i]);
-                if (banditStateMachine.GetEnemyState() == state.IsAttackRelease)
-                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], _enemyLayerMasks[i]);
-                if (banditStateMachine.GetEnemyState() == state.IsUpwardAttack)
-                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], _enemyLayerMasks[i]);
+                if (_collisionTargetPurpose == CollisionTargetPurpose.toAttack)
+                {
+                    if (banditStateMachine.GetEnemyState() == state.IsQuickAttack)
+                        _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], _enemyLayerMasks[i]);
+                    if (banditStateMachine.GetEnemyState() == state.IsAttackRelease)
+                        _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], _enemyLayerMasks[i]);
+                    if (banditStateMachine.GetEnemyState() == state.IsUpwardAttack)
+                        _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], _enemyLayerMasks[i]);
+                }
+
+                if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
+                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, 12.0f, LayerMask.GetMask(_playerLayerMaskStr));
 
                 foreach (Collider2D enemy in _enemyTargetsHit)
                 {
@@ -115,6 +131,20 @@ namespace DoomBreakers
 
             }
             _attackCollisionEnabled = false;
+        }
+        private void DetermineTargetCollisionPurpose(IEnemyStateMachine banditStateMachine)
+		{
+
+            //For initial player detection purposes.
+            if (banditStateMachine.GetEnemyState() == state.IsQuickAttack)
+                _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
+            if (banditStateMachine.GetEnemyState() == state.IsAttackRelease)
+                _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
+            if (banditStateMachine.GetEnemyState() == state.IsUpwardAttack)
+                _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
+
+            if (banditStateMachine.GetEnemyState() == state.IsIdle)
+                _collisionTargetPurpose = CollisionTargetPurpose.toPersue;
         }
         public void ProcessCollisionFlags(Collider2D collision)
         {

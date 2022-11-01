@@ -78,7 +78,7 @@ namespace DoomBreakers
                 case state.IsIdle:
                 case state.IsDefenceRelease:
                     _banditAnimator.SetAnimationState(AnimationState.IdleAnim);
-                    //_banditBehaviours.IdleProcess(_banditState);
+                    _banditBehaviours.IdleProcess(_banditState);
                     break;
                 case state.IsMoving:
                     _banditAnimator.SetAnimationState(AnimationState.MoveAnim);

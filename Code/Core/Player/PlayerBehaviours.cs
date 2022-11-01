@@ -229,18 +229,25 @@ namespace DoomBreakers
 			//UpdateTransform(); Called In Player.cs to pass PlayerInput.cs through.
 		}
 
-		private void DetectFaceDirection(IPlayerSprite playerSprite)
+		private void DetectFaceDirection(IPlayerSprite playerSprite, IPlayerCollision playerCollider)
 		{
+			//print("\nplayerSprite.GetSpriteDirection()=" + playerSprite.GetSpriteDirection());
 			if (_velocity.x < 0f)
 			{
-				if(playerSprite.GetSpriteDirection() == 1)//Guard clause,only flip once.
+				if (playerSprite.GetSpriteDirection() == 1)//Guard clause,only flip once.
+				{
 					playerSprite.FlipSprite();
+					playerCollider.FlipAttackPoints(-1);
+				}
 				return;
 			}
 			if (_velocity.x > 0f)
 			{
 				if (playerSprite.GetSpriteDirection() == -1)
+				{
 					playerSprite.FlipSprite();
+					playerCollider.FlipAttackPoints(1);
+				}
 				return;
 			}
 		}
@@ -264,7 +271,7 @@ namespace DoomBreakers
 			}
 
 		}
-		public void UpdateMovement(Vector2 input, IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)
+		public void UpdateMovement(Vector2 input, IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, IPlayerCollision playerCollider)
 		{
 			//print("\nPlayerBehaviour.cs UpdateMovement() playerStateMachine=" + playerStateMachine.GetPlayerState());
 			UpdateGravity(playerStateMachine);
@@ -287,7 +294,7 @@ namespace DoomBreakers
 			//print("\nx=" + _velocity.x);
 			
 			DetectMovement(playerStateMachine);
-			DetectFaceDirection(playerSprite);
+			DetectFaceDirection(playerSprite, playerCollider);
 
 			UpdateTransform(input);
 		}
