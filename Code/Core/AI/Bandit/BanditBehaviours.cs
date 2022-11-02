@@ -46,11 +46,19 @@ namespace DoomBreakers
 		void Start()
 		{
 		}
-		public void IdleProcess(IEnemyStateMachine enemyStateMachine)
+		public void IdleProcess(IEnemyStateMachine enemyStateMachine, IBanditCollision banditCollider)
 		{
 			_velocity.x = 0f;
 			//_velocity.y = 0f;
 			//print("\n_velocity.y=" + Mathf.Abs(_velocity.y));
+
+			_behaviourTimer.StartTimer(1.5f);
+			if (_behaviourTimer.HasTimerFinished())
+			{
+				banditCollider.EnableTargetCollisionDetection(); //Begin player detection & trigger PersueTarget() Method here.
+			}
+			
+
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
 				enemyStateMachine.SetEnemyState(state.IsFalling);
 		}
@@ -62,10 +70,60 @@ namespace DoomBreakers
 		{
 
 		}
+		public void PersueTarget(IEnemyStateMachine enemyStateMachine, Transform targetTransform, IBanditSprite banditSprite)
+		{
+			if (targetTransform == null) //Guard Clause
+				return;
+
+			int trackingDir = 0; //Face direction either -1 left, or 1 right.
+
+			if (targetTransform.position.x > _transform.position.x)
+				trackingDir = 1;
+			if (targetTransform.position.x < _transform.position.x)
+				trackingDir = -1;
+
+			//if (banditSprite.GetSpriteDirection() == -1)
+			if(trackingDir == -1)
+			{
+				if (_transform.position.x > targetTransform.position.x + 1.0f)
+					_targetVelocityX = -(0.5f * (_moveSpeed * _sprintSpeed));
+				else
+					PersueTargetReached(enemyStateMachine);
+				return;
+			}
+			//if (banditSprite.GetSpriteDirection() == 1)
+			if (trackingDir == 1)
+			{
+				if (_transform.position.x < targetTransform.position.x - 1.0f)
+					_targetVelocityX = 0.5f * (_moveSpeed * _sprintSpeed);
+				else
+					PersueTargetReached(enemyStateMachine);
+				return;
+			}
+		}
+		private void PersueTargetReached(IEnemyStateMachine enemyStateMachine)
+		{
+			_targetVelocityX = 0f;
+			enemyStateMachine.SetEnemyState(state.IsQuickAttack);
+		}
+		public void QuickAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
+		{
+			SetBehaviourTextureFlash(0.1f, banditSprite, Color.white);
+			_behaviourTimer.StartTimer(0.133f);
+			if (_behaviourTimer.HasTimerFinished())
+			{
+				banditSprite.ResetTexture2DColor();
+				if (_quickAttackIncrement >= 0 && _quickAttackIncrement < 2)
+					_quickAttackIncrement++;
+				else
+					_quickAttackIncrement = 0;
+				enemyStateMachine.SetEnemyState(state.IsIdle);
+			}
+		}
 		public void HitByQuickAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
 
-			SetBehaviourTextureDamagedFlash(0.1f, banditSprite);
+			SetBehaviourTextureFlash(0.1f, banditSprite, Color.red);
 			_behaviourTimer.StartTimer(0.133f);
 			if (_behaviourTimer.HasTimerFinished())
 			{
@@ -98,7 +156,7 @@ namespace DoomBreakers
 			if (enemyStateMachine.GetEnemyState() != state.IsSprinting)
 				_sprintSpeed = 1.0f;
 			//_targetVelocityX = (input.x * (_moveSpeed * _sprintSpeed));
-			//_velocity.x = _targetVelocityX;
+			_velocity.x = _targetVelocityX;
 
 			//print("\nx=" + _velocity.x);
 
@@ -152,11 +210,11 @@ namespace DoomBreakers
 			}
 		}
 
-		private void SetBehaviourTextureDamagedFlash(float time, IBanditSprite banditSprite)
+		private void SetBehaviourTextureFlash(float time, IBanditSprite banditSprite, Color colour)
 		{
 			_spriteColourSwapTimer.StartTimer(time);//flash sprite colour timer.
 			if (_spriteColourSwapTimer.HasTimerFinished())
-				banditSprite.SetTexture2DColor(Color.red);
+				banditSprite.SetTexture2DColor(colour);
 		}
 	}
 

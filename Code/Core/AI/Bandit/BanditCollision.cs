@@ -20,6 +20,7 @@ namespace DoomBreakers
 
         private Collider2D _collider2d;
         private Collider2D[] _enemyTargetsHit;
+        private Transform _collidedTargetTransform;
 
         private Transform[] _attackPoints;                            //1=quickATK, 2=powerATK, 3=upwardATK
         private float[] _attackRadius = new float[3];                //1=quickATK, 2=powerATK, 3=upwardATK
@@ -30,7 +31,7 @@ namespace DoomBreakers
 
         private string[] _compareTagStrings = new string[10];
 
-        private bool _attackCollisionEnabled;
+        private bool _detectTargetCollisionEnabled;
 
         //private Action _eventListener;
        private IEnemyStateMachine _banditStateMachine;
@@ -45,7 +46,7 @@ namespace DoomBreakers
             SetupCompareTags();
 
             _collider2d.enabled = true;
-            _attackCollisionEnabled = false;
+            _detectTargetCollisionEnabled = false;
             _collisionTargetPurpose = CollisionTargetPurpose.noPurpose;
             //_eventListener = new Action(TestMethod);
         }
@@ -93,58 +94,66 @@ namespace DoomBreakers
         }
         public void UpdateDetectEnemyTargets(IEnemyStateMachine banditStateMachine)
         {
-            if (!_attackCollisionEnabled)
+            if (!_detectTargetCollisionEnabled)
                 return;
-
-            DetermineTargetCollisionPurpose(banditStateMachine);
 
             for (int i = 0; i < _enemyLayerMasks.Length; i++)
             {
-                if (_collisionTargetPurpose == CollisionTargetPurpose.toAttack)
-                {
-                    if (banditStateMachine.GetEnemyState() == state.IsQuickAttack)
-                        _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], _enemyLayerMasks[i]);
-                    if (banditStateMachine.GetEnemyState() == state.IsAttackRelease)
-                        _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], _enemyLayerMasks[i]);
-                    if (banditStateMachine.GetEnemyState() == state.IsUpwardAttack)
-                        _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], _enemyLayerMasks[i]);
-                }
-
-                if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
-                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, 12.0f, LayerMask.GetMask(_playerLayerMaskStr));
-
+                DetermineCollisionPurpose(banditStateMachine, i);
                 foreach (Collider2D enemy in _enemyTargetsHit)
                 {
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player)))
                     {
-
+                        SetCollisionPurpose(banditStateMachine, enemy);
                     }
-                    if (enemy.CompareTag(GetCompareTag(CompareTags.Player2))) { }
-                    if (enemy.CompareTag(GetCompareTag(CompareTags.Player3))) { }
-                    if (enemy.CompareTag(GetCompareTag(CompareTags.Player4))) { }
+                    if (enemy.CompareTag(GetCompareTag(CompareTags.Player2)))
+                        SetCollisionPurpose(banditStateMachine, enemy);
+                    if (enemy.CompareTag(GetCompareTag(CompareTags.Player3)))
+                        SetCollisionPurpose(banditStateMachine, enemy);
+                    if (enemy.CompareTag(GetCompareTag(CompareTags.Player4)))
+                        SetCollisionPurpose(banditStateMachine, enemy);
 
-                    if (enemy.CompareTag(GetCompareTag(CompareTags.Enemy)))
-                    {
-                        //enemy.GetComponent<BanditBehaviours>()
-                    }
+                    //if (enemy.CompareTag(GetCompareTag(CompareTags.Enemy))){}
                 }
 
             }
-            _attackCollisionEnabled = false;
+
+            _detectTargetCollisionEnabled = false;
         }
-        private void DetermineTargetCollisionPurpose(IEnemyStateMachine banditStateMachine)
+        private void SetCollisionPurpose(IEnemyStateMachine banditStateMachine, Collider2D collidedObj)
 		{
-
-            //For initial player detection purposes.
-            if (banditStateMachine.GetEnemyState() == state.IsQuickAttack)
-                _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
-            if (banditStateMachine.GetEnemyState() == state.IsAttackRelease)
-                _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
-            if (banditStateMachine.GetEnemyState() == state.IsUpwardAttack)
-                _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
-
-            if (banditStateMachine.GetEnemyState() == state.IsIdle)
-                _collisionTargetPurpose = CollisionTargetPurpose.toPersue;
+            _collidedTargetTransform = collidedObj.transform;
+            switch (_collisionTargetPurpose)
+            {
+                case CollisionTargetPurpose.toAttack:
+                    banditStateMachine.SetEnemyState(state.IsQuickAttack);
+                    break;
+                case CollisionTargetPurpose.toPersue:
+                    banditStateMachine.SetEnemyState(state.IsMoving);
+                    break;
+            }
+        }
+        private void DetermineCollisionPurpose(IEnemyStateMachine banditStateMachine, int i)
+        {
+            switch (banditStateMachine.GetEnemyState())
+            {
+                case state.IsQuickAttack:
+                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], _enemyLayerMasks[i]);
+                    _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
+                    break;
+                case state.IsAttackRelease:
+                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], _enemyLayerMasks[i]);
+                    _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
+                    break;
+                case state.IsUpwardAttack:
+                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], _enemyLayerMasks[i]);
+                    _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
+                    break;
+                case state.IsIdle:
+                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, 12.0f, LayerMask.GetMask(_playerLayerMaskStr));
+                    _collisionTargetPurpose = CollisionTargetPurpose.toPersue;
+                    break;
+            }
         }
         public void ProcessCollisionFlags(Collider2D collision)
         {
@@ -165,11 +174,10 @@ namespace DoomBreakers
         void OnTriggerStay2D(Collider2D collision) { }
         void OnTriggerExit2D(Collider2D collision) { }
 
-        public void EnableAttackCollisions()
+        public void EnableTargetCollisionDetection()
         {
-            _attackCollisionEnabled = true;
+            _detectTargetCollisionEnabled = true;
         }
-
         public IEnemyStateMachine RegisterHitByAttack(IPlayerStateMachine playerStateMachine)
 		{
             if (playerStateMachine.GetPlayerState() == state.IsQuickAttack)
@@ -183,6 +191,10 @@ namespace DoomBreakers
 
             return _banditStateMachine;
         }
+        public Transform GetCollidedTargetTransform()
+		{
+            return _collidedTargetTransform;
+		}
     }
 
 }

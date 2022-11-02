@@ -78,10 +78,11 @@ namespace DoomBreakers
                 case state.IsIdle:
                 case state.IsDefenceRelease:
                     _banditAnimator.SetAnimationState(AnimationState.IdleAnim);
-                    _banditBehaviours.IdleProcess(_banditState);
+                    _banditBehaviours.IdleProcess(_banditState, _banditCollider);
                     break;
                 case state.IsMoving:
                     _banditAnimator.SetAnimationState(AnimationState.MoveAnim);
+                    _banditBehaviours.PersueTarget(_banditState, _banditCollider.GetCollidedTargetTransform(), _banditSprite);
                     break;
                 case state.IsJumping:
                     //if (_banditBehaviours.JumpProcess(_banditState))
@@ -93,8 +94,8 @@ namespace DoomBreakers
                     break;
                 case state.IsQuickAttack:
                     _banditAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
-                    //_banditBehaviours.QuickAttackProcess(_banditState, _playerSprite);
-                    //_banditCollider.EnableAttackCollisions();
+                    _banditBehaviours.QuickAttackProcess(_banditState, _banditSprite);
+                    _banditCollider.EnableTargetCollisionDetection();
                     break;
                 case state.IsAttackPrepare:
                     _banditAnimator.SetAnimationState(AnimationState.HoldAtkAnim);
