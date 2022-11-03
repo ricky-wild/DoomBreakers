@@ -4,7 +4,7 @@ namespace DoomBreakers
 {
     public interface ITimer 
     {
-        void Setup();
+        void Setup(string timerTitle);
         void StartTimer(float waitingTime);
         bool HasTimerFinished();
         float GetTheWaitTime();

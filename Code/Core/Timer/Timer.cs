@@ -5,6 +5,9 @@ namespace DoomBreakers
 {
     public class Timer : MonoBehaviour, ITimer
     {
+        [SerializeField]
+        private string _timerTitle;
+
         private float _timeStamp;
         private float _waitTime;
         private bool _timeStamped, _timerCompleted;
@@ -17,8 +20,9 @@ namespace DoomBreakers
             _timerCompleted = false;
         }
 
-        public void Setup()
+        public void Setup(string timerTitle)
 		{
+            _timerTitle = timerTitle;
             _timeStamp = 0f;
             _waitTime = 0f;
             _timeStamped = false;

@@ -34,7 +34,7 @@ namespace DoomBreakers
         private bool _detectTargetCollisionEnabled;
 
         //private Action _eventListener;
-       private IEnemyStateMachine _banditStateMachine;
+        private IEnemyStateMachine _banditStateMachine;
 
         public BanditCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints)
         {
@@ -105,6 +105,8 @@ namespace DoomBreakers
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player)))
                     {
                         SetCollisionPurpose(banditStateMachine, enemy);
+                        //if (enemy.GetComponent<Player>() != null) //Guard clause.
+                        //    enemy.GetComponent<Player>().ReportCollisionWithEnemy(banditStateMachine);//RegisterHitByAttack();
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2)))
                         SetCollisionPurpose(banditStateMachine, enemy);
@@ -127,6 +129,8 @@ namespace DoomBreakers
             {
                 case CollisionTargetPurpose.toAttack:
                     banditStateMachine.SetEnemyState(state.IsQuickAttack);
+                    if (collidedObj.GetComponent<Player>() != null) //Guard clause.
+                        collidedObj.GetComponent<Player>().ReportCollisionWithEnemy(banditStateMachine);//RegisterHitByAttack();
                     break;
                 case CollisionTargetPurpose.toPersue:
                     banditStateMachine.SetEnemyState(state.IsMoving);

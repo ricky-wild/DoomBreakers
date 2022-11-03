@@ -15,6 +15,7 @@ namespace DoomBreakers
 		private int _quickAttackIncrement; //4+ variations of this animation.
 		private bool _dodgedLeftFlag;//, _jumpedFlag;
 
+		private float _quickAtkWaitTime;
 		private ITimer _behaviourTimer, _dodgedTimer, _spriteColourSwapTimer;
 
 		public PlayerBehaviours(Transform t, Controller2D controller2D)
@@ -42,15 +43,16 @@ namespace DoomBreakers
 			_gravity = -(2 * 0.8f) / Mathf.Pow(0.25f, 2); //_gravity = -(3 * 0.8f) / Mathf.Pow(0.9f, 2);//this will create a moon like gravity effect
 			_quickAttackIncrement = 0;
 			_dodgedLeftFlag = false;
+			_quickAtkWaitTime = 0.133f;
 			//_jumpedFlag = false;
 
 			//_behaviourTimer = new Timer();
 			_behaviourTimer = this.gameObject.AddComponent<Timer>();
-			_behaviourTimer.Setup();
+			_behaviourTimer.Setup("_behaviourTimer");
 			_dodgedTimer = this.gameObject.AddComponent<Timer>();
-			_dodgedTimer.Setup();
+			_dodgedTimer.Setup("_dodgedTimer");
 			_spriteColourSwapTimer = this.gameObject.AddComponent<Timer>();
-			_spriteColourSwapTimer.Setup();
+			_spriteColourSwapTimer.Setup("_spriteColourSwapTimer");
 		}
 
 		public int GetQuickAttackIndex()
@@ -116,8 +118,8 @@ namespace DoomBreakers
 		{
 
 
-			SetBehaviourTextureFlash(0.1f, playerSprite);
-			_behaviourTimer.StartTimer(0.133f);
+			SetBehaviourTextureFlash(0.1f, playerSprite, Color.white);
+			_behaviourTimer.StartTimer(_quickAtkWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
 			{
 				playerSprite.ResetTexture2DColor();
@@ -137,7 +139,7 @@ namespace DoomBreakers
 			//if (_spriteColourSwapTimer.HasTimerFinished())
 			//	playerSprite.SetTexture2DColor(Color.white);
 
-			SetBehaviourTextureFlash(0.1f, playerSprite);
+			SetBehaviourTextureFlash(0.1f, playerSprite, Color.white);
 
 			_behaviourTimer.StartTimer(0.917f/2);//anim length
 			if (_behaviourTimer.HasTimerFinished())
@@ -179,7 +181,7 @@ namespace DoomBreakers
 				playerStateMachine.SetPlayerState(state.IsIdle);
 			}
 		}
-		public void DodgeInitiatedProcess(IPlayerStateMachine playerStateMachine, bool dodgeLeft, IPlayerSprite playerSprite)
+		public void DodgeInitiatedProcess(IPlayerStateMachine playerStateMachine, bool dodgeLeft, IPlayerSprite playerSprite, IPlayerCollision playerCollider)
 		{
 			if (!SafeToDodge(playerStateMachine))//Guard clause.
 			{
@@ -191,16 +193,22 @@ namespace DoomBreakers
 			{
 				//_velocity.x -= 1.0f;
 				if (faceDir == -1)
+				{
 					playerSprite.FlipSprite();
+					playerCollider.FlipAttackPoints(1);
+				}
 			}
 			if (!dodgeLeft)
 			{
 				//_velocity.x += 1.0f;
 				if (faceDir == 1)
+				{
 					playerSprite.FlipSprite();
+					playerCollider.FlipAttackPoints(-1);
+				}
 			}
 
-			SetBehaviourTextureFlash(0.05f, playerSprite);
+			SetBehaviourTextureFlash(0.05f, playerSprite, Color.white);
 
 			_behaviourTimer.StartTimer(1.4f/3);//anim time.
 			if (_behaviourTimer.HasTimerFinished())
@@ -224,6 +232,21 @@ namespace DoomBreakers
 				return;
 			}
 		}
+		public void HitByQuickAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)
+		{
+			SetBehaviourTextureFlash(0.1f, playerSprite, Color.red);
+			_behaviourTimer.StartTimer(_quickAtkWaitTime);
+			if (_behaviourTimer.HasTimerFinished())
+			{
+				playerSprite.ResetTexture2DColor();
+				_targetVelocityX = 0f;
+				playerStateMachine.SetPlayerState(state.IsIdle);
+			}
+
+
+		}
+
+
 		void Update()
 		{
 			//UpdateTransform(); Called In Player.cs to pass PlayerInput.cs through.
@@ -328,7 +351,7 @@ namespace DoomBreakers
 		}
 
 
-		private void SetBehaviourTextureFlash(float time, IPlayerSprite playerSprite)
+		private void SetBehaviourTextureFlash(float time, IPlayerSprite playerSprite, Color colour)
 		{
 			_spriteColourSwapTimer.StartTimer(time);//flash sprite colour timer.
 			if (_spriteColourSwapTimer.HasTimerFinished())

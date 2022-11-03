@@ -80,6 +80,10 @@ namespace DoomBreakers
                     _banditAnimator.SetAnimationState(AnimationState.IdleAnim);
                     _banditBehaviours.IdleProcess(_banditState, _banditCollider);
                     break;
+                case state.IsWaiting:
+                    _banditAnimator.SetAnimationState(AnimationState.IdleAnim);
+                    _banditBehaviours.WaitingProcess(_banditState);
+                    break;
                 case state.IsMoving:
                     _banditAnimator.SetAnimationState(AnimationState.MoveAnim);
                     _banditBehaviours.PersueTarget(_banditState, _banditCollider.GetCollidedTargetTransform(), _banditSprite);
@@ -142,6 +146,25 @@ namespace DoomBreakers
         {
             print("\n_banditState=" + _banditState.GetEnemyState());
             print("\n_animationState=" + _banditAnimator.GetAnimationState());
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            for (int i = 0; i < _attackPoints.Length; i++)
+            {
+                if (_attackPoints[i].position == null)
+                    return;
+            }
+
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(_attackPoints[0].position, 1.2f);
+            Gizmos.DrawWireSphere(_attackPoints[1].position, 1.6f);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(_attackPoints[2].position, 1.3f);
+
+            Gizmos.color = Color.white;
+            Gizmos.DrawWireSphere(this.gameObject.transform.position, 12.0f);
         }
     }
 }

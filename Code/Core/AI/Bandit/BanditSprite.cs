@@ -39,11 +39,11 @@ namespace DoomBreakers
             _spriteFaceDirection = 1; //1 = face right, -1 = face left.
 
             _colorSwappedTimer = this.gameObject.AddComponent<Timer>();
-            _colorSwappedTimer.Setup();
+            _colorSwappedTimer.Setup("_colorSwappedTimer");
             _colorSwappedFlag = false;
 
             _weaponChargeTimer = this.gameObject.AddComponent<Timer>();
-            _weaponChargeTimer.Setup();
+            _weaponChargeTimer.Setup("_weaponChargeTimer");
             _weaponTimerIncrement = 0;
             _weaponChargeTimerFlag = false;
 
@@ -216,7 +216,7 @@ namespace DoomBreakers
 
             if (!_colorSwappedFlag) //Ensure we reset internally upon failure to do so externally (ie a state change)
             {
-                _colorSwappedTimer.StartTimer(1.0f);
+                _colorSwappedTimer.StartTimer(0.5f);
                 _colorSwappedFlag = true;
             }
 

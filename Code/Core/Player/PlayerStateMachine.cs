@@ -40,7 +40,8 @@ namespace DoomBreakers
 		IsRespawning = 30,
 		IsDialogue = 31,
 		IsFalling = 32,
-		IsSprinting = 33
+		IsSprinting = 33,
+		IsWaiting = 34
 
 	};
 

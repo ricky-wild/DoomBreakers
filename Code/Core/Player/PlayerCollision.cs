@@ -32,6 +32,8 @@ namespace DoomBreakers
         //private ITimer _cooldownTimer;
         private bool _attackCollisionEnabled;
 
+        private IPlayerStateMachine _playerStateMachine;
+
         public PlayerCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints)
         {
             _collider2d = collider2D;
@@ -129,6 +131,18 @@ namespace DoomBreakers
 
             }
             _attackCollisionEnabled = false;
+        }
+        public IPlayerStateMachine RegisterHitByAttack(IEnemyStateMachine enemyStateMachine)
+		{
+            if (enemyStateMachine.GetEnemyState() == state.IsQuickAttack)
+                _playerStateMachine.SetPlayerState(state.IsHitByQuickAttack);
+            if (enemyStateMachine.GetEnemyState() == state.IsAttackRelease)
+                _playerStateMachine.SetPlayerState(state.IsHitByReleaseAttack);
+
+
+
+
+            return _playerStateMachine;
         }
         public void ProcessCollisionFlags(Collider2D collision)
         {

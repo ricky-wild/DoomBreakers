@@ -181,14 +181,18 @@ namespace DoomBreakers
                     break;
                 case state.IsDodgeLPrepare:
                     _playerAnimator.SetAnimationState(AnimationState.DodgeAnim);
-                    _playerBehaviours.DodgeInitiatedProcess(_playerState, true, _playerSprite);
+                    _playerBehaviours.DodgeInitiatedProcess(_playerState, true, _playerSprite, _playerCollider);
                     break;
                 case state.IsDodgeRPrepare:
                     _playerAnimator.SetAnimationState(AnimationState.DodgeAnim);
-                    _playerBehaviours.DodgeInitiatedProcess(_playerState, false, _playerSprite);
+                    _playerBehaviours.DodgeInitiatedProcess(_playerState, false, _playerSprite, _playerCollider);
                     break;
                 case state.IsDodgeRelease:
                     _playerBehaviours.DodgeReleasedProcess(_playerState);
+                    break;
+                case state.IsHitByQuickAttack:
+                    _playerAnimator.SetAnimationState(AnimationState.SmallHitAnim);
+                    _playerBehaviours.HitByQuickAttackProcess(_playerState, _playerSprite);
                     break;
             }
             _playerBehaviours.UpdateMovement(_playerInput.GetInputVector2(), _playerState, _playerSprite, _playerCollider);//UpdateMovement();
@@ -203,6 +207,11 @@ namespace DoomBreakers
 		{
             _playerCollider.UpdateCollision(_playerState);
 		}
+        public void ReportCollisionWithEnemy(IEnemyStateMachine enemyStateMachine)
+		{
+            //_banditState = _banditCollider.RegisterHitByAttack(playerStateMachine);
+            _playerState = _playerCollider.RegisterHitByAttack(enemyStateMachine);
+        }
 
         private void UpdatePrintMsg()
 		{
