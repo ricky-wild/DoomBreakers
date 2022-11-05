@@ -105,10 +105,13 @@ namespace DoomBreakers
                 
                 if (playerStateMachine.GetPlayerState() == state.IsQuickAttack)
                     _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_enemyLayerMaskStr));
-                //if (playerStateMachine.GetPlayerState() == state.IsAttackRelease)
-                //    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], _enemyLayerMasks[i]);
+                if (playerStateMachine.GetPlayerState() == state.IsAttackRelease)
+                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], LayerMask.GetMask(_enemyLayerMaskStr));//_enemyLayerMasks[i]);
                 //if (playerStateMachine.GetPlayerState() == state.IsUpwardAttack)
                 //    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], _enemyLayerMasks[i]);
+
+                if (_enemyTargetsHit == null)
+                    break;
 
                 foreach (Collider2D enemy in _enemyTargetsHit)
 				{
@@ -132,18 +135,58 @@ namespace DoomBreakers
             }
             _attackCollisionEnabled = false;
         }
-        public IPlayerStateMachine RegisterHitByAttack(IEnemyStateMachine enemyStateMachine, IPlayerStateMachine playerStateMachine)
-		{
-            if (enemyStateMachine.GetEnemyState() == state.IsQuickAttack)
-                playerStateMachine.SetPlayerState(state.IsHitByQuickAttack);
-            if (enemyStateMachine.GetEnemyState() == state.IsAttackRelease)
-                playerStateMachine.SetPlayerState(state.IsHitByReleaseAttack);
+        public IPlayerStateMachine RegisterHitByAttack(IEnemyStateMachine enemyStateMachine, IPlayerStateMachine playerStateMachine,
+                                                IPlayerSprite playerSprite)
+
+        {
+            if(IsIgnoreDamage(playerStateMachine))
+                return playerStateMachine;
+
+            if (IsDefendingSelf(playerStateMachine))
+			{
+                if (enemyStateMachine.IsQuickAttack())
+                    playerStateMachine.SetPlayerState(state.IsQuickHitWhileDefending);
+                if (enemyStateMachine.IsPowerAttackRelease())
+                    playerStateMachine.SetPlayerState(state.IsHitWhileDefending);
+            }
+            if (!IsDefendingSelf(playerStateMachine))
+			{
+
+                if (enemyStateMachine.IsQuickAttack())
+                    playerStateMachine.SetPlayerState(state.IsHitByQuickAttack);
+                if (enemyStateMachine.IsPowerAttackRelease())
+                    playerStateMachine.SetPlayerState(state.IsHitByReleaseAttack);
+            }
 
 
 
             _playerStateMachine = playerStateMachine;
             return playerStateMachine;
         }
+        private bool IsDefendingSelf(IPlayerStateMachine playerStateMachine)
+		{
+            if (playerStateMachine.IsDefendingPrepare())
+                return true;
+            if (playerStateMachine.IsDefendingMoving())
+                return true;
+            if (playerStateMachine.IsQuickHitWhenDefending())
+                return true;
+            if (playerStateMachine.IsPowerHitWhenDefending())
+                return true;
+
+            return false;
+		}
+        private bool IsIgnoreDamage(IPlayerStateMachine playerStateMachine)
+		{
+            if (playerStateMachine.IsDodgeLeftPrepare())
+                return true;
+            if (playerStateMachine.IsDodgeRightPrepare())
+                return true;
+            if (playerStateMachine.IsDodgeRelease())
+                return true;
+
+            return false;
+		}
         public void ProcessCollisionFlags(Collider2D collision)
         {
             //if (collision.CompareTag("")) { }

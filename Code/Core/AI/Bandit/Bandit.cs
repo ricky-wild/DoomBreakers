@@ -94,7 +94,7 @@ namespace DoomBreakers
                     break;
                 case state.IsFalling:
                     _banditAnimator.SetAnimationState(AnimationState.FallenAnim);
-                    //_banditBehaviours.FallProcess(_banditState);
+                    _banditBehaviours.FallProcess(_banditState, _banditSprite);
                     break;
                 case state.IsQuickAttack:
                     _banditAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
@@ -123,6 +123,10 @@ namespace DoomBreakers
                 case state.IsHitByQuickAttack:
                     _banditAnimator.SetAnimationState(AnimationState.SmallHitAnim);
                     _banditBehaviours.HitByQuickAttackProcess(_banditState, _banditSprite);
+                    break;
+                case state.IsHitByReleaseAttack:
+                    _banditAnimator.SetAnimationState(AnimationState.PowerHitAnim);
+                    _banditBehaviours.HitByPowerAttackProcess(_banditState, _banditSprite);
                     break;
 
             }

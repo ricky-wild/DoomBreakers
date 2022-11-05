@@ -77,6 +77,9 @@ namespace DoomBreakers
 				case AnimationState.SmallHitAnim:
 					_animator.Play("Jabbed");
 					break;
+				case AnimationState.PowerHitAnim:
+					_animator.Play("Hit");
+					break;
 				case AnimationState.FallenAnim:
 					_animator.Play("Fall");
 					break;

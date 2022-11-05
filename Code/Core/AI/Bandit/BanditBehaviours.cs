@@ -10,7 +10,8 @@ namespace DoomBreakers
         private Controller2D _controller2D;
         private Vector3 _velocity;
         private Transform _transform;
-        private float _targetVelocityX, _maxJumpVelocity, _moveSpeed, _sprintSpeed, _gravity;
+        private float _targetVelocityX, _moveSpeed, _sprintSpeed, _gravity,
+			_maxJumpVelocity, _targetVelocityY, _maxPowerStruckVelocityY;
 
         private int _quickAttackIncrement; //2+ variations of this animation.
 		private int _attackCooldownCounter;
@@ -29,7 +30,9 @@ namespace DoomBreakers
 			_moveSpeed = 3.5f;//3.75f;
 			_sprintSpeed = 1.0f;
 			_targetVelocityX = 1.0f;
+			_targetVelocityY = 0f;
 			_maxJumpVelocity = 14.0f;//13.25f;
+			_maxPowerStruckVelocityY = 14.0f; //10.0f for lowest impact. 14.0f for average. 16.0f for maximum impact.
 			_gravity = -(2 * 0.8f) / Mathf.Pow(0.25f, 2); //_gravity = -(3 * 0.8f) / Mathf.Pow(0.9f, 2);//this will create a moon like gravity effect
 			_quickAttackIncrement = 0;
 			_attackCooldownCounter = 0;
@@ -94,9 +97,20 @@ namespace DoomBreakers
 		{
 			return true;
 		}
-		public void FallProcess(IEnemyStateMachine enemyStateMachine)
+		public void FallProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
+			_behaviourTimer.StartTimer(_quickAtkWaitTime);
+			if (_behaviourTimer.HasTimerFinished()) //So we only activate once.
+				SetBehaviourTextureFlash(_textureFlashTime, banditSprite, Color.white);
 
+			if (_controller2D.collisions.below) //Means we're finished jumping/falling.
+			{
+				_targetVelocityX = 0f;
+				_targetVelocityY = 0f;
+				_velocity.x = 0f;
+				_velocity.y = 0f;
+				enemyStateMachine.SetEnemyState(state.IsIdle);
+			}
 		}
 		public void PersueTarget(IEnemyStateMachine enemyStateMachine, Transform targetTransform, IBanditSprite banditSprite)
 		{
@@ -160,7 +174,6 @@ namespace DoomBreakers
 		}
 		public void HitByQuickAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
-
 			SetBehaviourTextureFlash(_textureFlashTime, banditSprite, Color.red);
 			_behaviourTimer.StartTimer(_quickAtkWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
@@ -169,7 +182,19 @@ namespace DoomBreakers
 				_targetVelocityX = 0f;
 				enemyStateMachine.SetEnemyState(state.IsIdle);
 			}
-			
+		}
+		public void HitByPowerAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
+		{
+			SetBehaviourTextureFlash(_textureFlashTime, banditSprite, Color.red);
+
+			if (_velocity.y >= _maxPowerStruckVelocityY) //Near peak of jump velocity, set falling state.
+			{
+				enemyStateMachine.SetEnemyState(state.IsFalling);
+			}
+			else
+			{
+				_velocity.y += _maxPowerStruckVelocityY / 4;// = 0f;
+			}
 
 		}
 		void Update()
@@ -182,24 +207,14 @@ namespace DoomBreakers
 			//print("\nPlayerBehaviour.cs UpdateMovement() playerStateMachine=" + playerStateMachine.GetPlayerState());
 			UpdateGravity(enemyStateMachine);
 
-			//if (!SafeToMove(playerStateMachine))//Guard Clause
-			//{
-			//	//print("\nPlayerBehaviour.cs UpdateMovement()= NOT SafeToMove()");
-			//	input = Vector2.zero;
-			//	UpdateTransform(input);
-			//	return;
-			//}
-
-			if (enemyStateMachine.GetEnemyState() == state.IsSprinting)
+			if (enemyStateMachine.IsSprinting())
 				_sprintSpeed = 1.75f;
-			if (enemyStateMachine.GetEnemyState() != state.IsSprinting)
+			if (!enemyStateMachine.IsSprinting())
 				_sprintSpeed = 1.0f;
 			//_targetVelocityX = (input.x * (_moveSpeed * _sprintSpeed));
 			_velocity.x = _targetVelocityX;
+			//_velocity.y = _targetVelocityY;
 
-			//print("\nx=" + _velocity.x);
-
-			//DetectMovement(enemyStateMachine);
 			DetectFaceDirection(banditSprite, banditCollider);
 
 			UpdateTransform();
@@ -213,22 +228,24 @@ namespace DoomBreakers
 			//print("\n_velocity.y=" + _velocity.y);
 			if (!_controller2D.collisions.below)
 			{
-				_velocity.y += _gravity * Time.deltaTime;
+				_targetVelocityY = _gravity * Time.deltaTime;
+				_velocity.y += _targetVelocityY;// _gravity * Time.deltaTime;
 
-				if (enemyStateMachine.GetEnemyState() != state.IsQuickAttack)
+				if (!enemyStateMachine.IsQuickAttack())
 					return;
-				if (enemyStateMachine.GetEnemyState() != state.IsJumping)
+				if (!enemyStateMachine.IsJumping())
+					return;
+				if (enemyStateMachine.IsPowerAttackHit())
 					return;
 
 				enemyStateMachine.SetEnemyState(state.IsFalling);
 			}
-			if (enemyStateMachine.GetEnemyState() == state.IsJumping)
+			if (enemyStateMachine.IsJumping())
 				return;
-			if (enemyStateMachine.GetEnemyState() == state.IsFalling)
-			{
-				//_velocity.y += _gravity * Time.deltaTime;
+			if (enemyStateMachine.IsFalling())
 				return;
-			}
+			if (enemyStateMachine.IsPowerAttackHit())
+				return;
 			if (_controller2D.collisions.below)
 				_velocity.y = 0f;
 		}
@@ -267,9 +284,17 @@ namespace DoomBreakers
 			if (targetTransform == null) //Guard Clause
 				return false;
 
-			if (enemyStateMachine.GetEnemyState() == state.IsHitByQuickAttack)
+			if (enemyStateMachine.IsQuickAttackHit())
 				return false;
-			if (enemyStateMachine.GetEnemyState() == state.IsQuickAttack)
+			if (enemyStateMachine.IsQuickAttack())
+				return false;
+			if (enemyStateMachine.IsPowerAttackHit())
+				return false;
+			if (enemyStateMachine.IsQuickHitWhenDefending())
+				return false;
+			if (enemyStateMachine.IsPowerHitWhenDefending())
+				return false;
+			if (enemyStateMachine.IsImpactHit())
 				return false;
 
 			return true;

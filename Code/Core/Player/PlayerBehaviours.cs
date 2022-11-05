@@ -135,9 +135,6 @@ namespace DoomBreakers
 		}
 		public void UpwardAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)
 		{
-			//_spriteColourSwapTimer.StartTimer(0.1f);//flash sprite colour timer.
-			//if (_spriteColourSwapTimer.HasTimerFinished())
-			//	playerSprite.SetTexture2DColor(Color.white);
 
 			SetBehaviourTextureFlash(0.1f, playerSprite, Color.white);
 
@@ -332,16 +329,16 @@ namespace DoomBreakers
 			{
 				_velocity.y += _gravity * Time.deltaTime;
 
-				if (playerStateMachine.GetPlayerState() != state.IsQuickAttack)
+				if (!playerStateMachine.IsQuickAttack())
 					return;
-				if (playerStateMachine.GetPlayerState() != state.IsJumping)
+				if (!playerStateMachine.IsJumping())
 					return;
 
 				playerStateMachine.SetPlayerState(state.IsFalling);
 			}
-			if (playerStateMachine.GetPlayerState() == state.IsJumping)
+			if (playerStateMachine.IsJumping())
 				return;
-			if (playerStateMachine.GetPlayerState() == state.IsFalling)
+			if (playerStateMachine.IsFalling())
 			{
 				//_velocity.y += _gravity * Time.deltaTime;
 				return;
@@ -390,79 +387,79 @@ namespace DoomBreakers
 		}
 		public bool SafeToDodge(IPlayerStateMachine playerStateMachine)
 		{
-			if (playerStateMachine.GetPlayerState() == state.IsDodgeRelease)
+			if (playerStateMachine.IsDodgeRelease())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsDefencePrepare)
+			if (playerStateMachine.IsDefendingPrepare())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsDefenceRelease)
+			if (playerStateMachine.IsDefendingRelease())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsDefenceMoving)
+			if (playerStateMachine.IsDefendingMoving())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsHitWhileDefending)
+			if (playerStateMachine.IsPowerHitWhenDefending())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsQuickHitWhileDefending)
+			if (playerStateMachine.IsQuickHitWhenDefending())
 				return false;
 
-			if (playerStateMachine.GetPlayerState() == state.IsDying)
+			if (playerStateMachine.IsDying())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsDead)
+			if (playerStateMachine.IsDead())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsGainedEquipment)
+			if (playerStateMachine.IsGainedEquipment())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsArmorBroken)
+			if (playerStateMachine.IsArmorDestroyed())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsAttackPrepare)
+			if (playerStateMachine.IsPowerAttackPrepare())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsAttackRelease)
+			if (playerStateMachine.IsPowerAttackRelease())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsSlamOnGround)
+			if (playerStateMachine.IsImpactHit())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsSlamOnGroundByEnemy)
+			//if (playerStateMachine.GetPlayerState() == state.IsSlamOnGroundByEnemy)//IsImpactHit()
+			//	return false;
+			//if (playerStateMachine.GetPlayerState() == state.IsLockedComboAttack)
+			//	return false;
+			if (playerStateMachine.IsRespawning())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsLockedComboAttack)
+			if (playerStateMachine.IsExhausted())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsRespawning)
-				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsExhausted)
-				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsDialogue)
-				return false;
+			//if (playerStateMachine.GetPlayerState() == state.IsDialogue)
+			//	return false;
 			return true;
 		}
 		public bool SafeToMove(IPlayerStateMachine playerStateMachine)
 		{
 			//print("\nPlayerBehaviour.cs SafeToMove() playerStateMachine=" + playerStateMachine.GetPlayerState());
 
-			if (playerStateMachine.GetPlayerState() == state.IsDying)
+			if (playerStateMachine.IsDying())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsDead)
+			if (playerStateMachine.IsDead())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsGainedEquipment)
+			if (playerStateMachine.IsGainedEquipment())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsArmorBroken)
+			if (playerStateMachine.IsArmorDestroyed())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsAttackPrepare)
+			if (playerStateMachine.IsPowerAttackPrepare())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsAttackRelease)
+			if (playerStateMachine.IsPowerAttackRelease())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsDodgeLPrepare)
+			if (playerStateMachine.IsDodgeLeftPrepare())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsDodgeRPrepare)
+			if (playerStateMachine.IsDodgeRightPrepare())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsDodgeRelease)
+			if (playerStateMachine.IsDodgeRelease())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsSlamOnGround)
+			if (playerStateMachine.IsImpactHit())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsSlamOnGroundByEnemy)
+			//if (playerStateMachine.GetPlayerState() == state.IsSlamOnGroundByEnemy)//IsImpactHit()
+			//	return false;
+			//if (playerStateMachine.GetPlayerState() == state.IsLockedComboAttack)
+			//	return false;
+			if (playerStateMachine.IsRespawning())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsLockedComboAttack)
+			if (playerStateMachine.IsExhausted())
 				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsRespawning)
-				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsExhausted)
-				return false;
-			if (playerStateMachine.GetPlayerState() == state.IsDialogue)
-				return false;
+			//if (playerStateMachine.GetPlayerState() == state.IsDialogue)
+			//	return false;
 
 			return true;
 		}

@@ -27,7 +27,8 @@ namespace DoomBreakers
 		FallenAnim = 19,
 		DyingAnim = 20,
 		DeathAnim = 21,
-		SmallHitAnim = 22
+		SmallHitAnim = 22,
+		PowerHitAnim = 23
 	};
 
 	public enum AnimatorController
@@ -137,6 +138,9 @@ namespace DoomBreakers
 					break;
 				case AnimationState.SmallHitAnim:
 					_animator.Play("Jabbed");
+					break;
+				case AnimationState.PowerHitAnim:
+					_animator.Play("Hit");
 					break;
 				case AnimationState.FallenAnim:
 					_animator.Play("Fall");

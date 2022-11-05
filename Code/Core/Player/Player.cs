@@ -179,6 +179,11 @@ namespace DoomBreakers
                     _playerAnimator.SetAnimationState(AnimationState.DefendMoveAnim);
                     _playerBehaviours.IdleDefenceProcess(_playerState);
                     break;
+                case state.IsQuickHitWhileDefending:
+                case state.IsHitWhileDefending:
+                    _playerAnimator.SetAnimationState(AnimationState.DefendHitAnim);
+                    _playerBehaviours.IdleDefenceProcess(_playerState);
+                    break;
                 case state.IsDodgeLPrepare:
                     _playerAnimator.SetAnimationState(AnimationState.DodgeAnim);
                     _playerBehaviours.DodgeInitiatedProcess(_playerState, true, _playerSprite, _playerCollider);
@@ -207,10 +212,9 @@ namespace DoomBreakers
 		{
             _playerCollider.UpdateCollision(_playerState);
 		}
-        public void ReportCollisionWithEnemy(IEnemyStateMachine enemyStateMachine)
+        public void ReportCollisionWithEnemy(IEnemyStateMachine enemyStateMachine)//, IBanditSprite banditSprite)
 		{
-            //_banditState = _banditCollider.RegisterHitByAttack(playerStateMachine);
-            _playerState = _playerCollider.RegisterHitByAttack(enemyStateMachine, _playerState);
+            _playerState = _playerCollider.RegisterHitByAttack(enemyStateMachine, _playerState, _playerSprite);
         }
 
         private void UpdatePrintMsg()
