@@ -12,7 +12,7 @@ namespace DoomBreakers
 		void UpdateCollision(IPlayerStateMachine playerStateMachine);
 		void ProcessCollisionFlags(Collider2D collision);
 		void UpdateDetectEnemyTargets(IPlayerStateMachine playerStateMachine);
-		IPlayerStateMachine RegisterHitByAttack(IEnemyStateMachine enemyStateMachine);
+		IPlayerStateMachine RegisterHitByAttack(IEnemyStateMachine enemyStateMachine, IPlayerStateMachine playerStateMachine);
 		void EnableAttackCollisions();
 		//bool IsAttackCollisionsEnabled();
 		void FlipAttackPoints(int dir);

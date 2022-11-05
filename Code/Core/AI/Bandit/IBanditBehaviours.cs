@@ -6,7 +6,7 @@ namespace DoomBreakers
 	{
 		int GetQuickAttackIndex();
 		void Setup(Transform t, Controller2D controller2D);
-		void UpdateMovement(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
+		void UpdateMovement(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite, IBanditCollision banditCollider);
 		void UpdateTransform();
 		void UpdateGravity(IEnemyStateMachine enemyStateMachine);
 		void IdleProcess(IEnemyStateMachine enemyStateMachine, IBanditCollision banditCollider);

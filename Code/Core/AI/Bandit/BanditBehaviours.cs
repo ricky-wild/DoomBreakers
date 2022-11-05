@@ -177,7 +177,7 @@ namespace DoomBreakers
 
         }
 
-        public void UpdateMovement(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
+        public void UpdateMovement(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite, IBanditCollision banditCollider)
 		{
 			//print("\nPlayerBehaviour.cs UpdateMovement() playerStateMachine=" + playerStateMachine.GetPlayerState());
 			UpdateGravity(enemyStateMachine);
@@ -200,7 +200,7 @@ namespace DoomBreakers
 			//print("\nx=" + _velocity.x);
 
 			//DetectMovement(enemyStateMachine);
-			DetectFaceDirection(banditSprite);
+			DetectFaceDirection(banditSprite, banditCollider);
 
 			UpdateTransform();
 		}
@@ -233,18 +233,24 @@ namespace DoomBreakers
 				_velocity.y = 0f;
 		}
 
-		private void DetectFaceDirection(IBanditSprite banditSprite)
+		private void DetectFaceDirection(IBanditSprite banditSprite, IBanditCollision banditCollider)
 		{
 			if (_velocity.x < 0f)
 			{
 				if (banditSprite.GetSpriteDirection() == 1)//Guard clause,only flip once.
+				{
 					banditSprite.FlipSprite();
+					banditCollider.FlipAttackPoints(-1);
+				}
 				return;
 			}
 			if (_velocity.x > 0f)
 			{
 				if (banditSprite.GetSpriteDirection() == -1)
+				{
 					banditSprite.FlipSprite();
+					banditCollider.FlipAttackPoints(1);
+				}
 				return;
 			}
 		}

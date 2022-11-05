@@ -24,6 +24,7 @@ namespace DoomBreakers
 
         private Transform[] _attackPoints;                            //1=quickATK, 2=powerATK, 3=upwardATK
         private float[] _attackRadius = new float[3];                //1=quickATK, 2=powerATK, 3=upwardATK
+        private Vector3 _vector;                                    //We simply use this cached vector to flip attack points when needed. See FlipAttackPoints(int dir)
 
         private LayerMask[] _enemyLayerMasks = new LayerMask[2];
         private const string _playerLayerMaskStr = "Player";
@@ -104,9 +105,12 @@ namespace DoomBreakers
                 {
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player)))
                     {
-                        SetCollisionPurpose(banditStateMachine, enemy);
-                        //if (enemy.GetComponent<Player>() != null) //Guard clause.
-                        //    enemy.GetComponent<Player>().ReportCollisionWithEnemy(banditStateMachine);//RegisterHitByAttack();
+                        _collidedTargetTransform = enemy.transform;
+                        if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
+                            return;
+
+                        if (enemy.GetComponent<Player>() != null) //Guard clause.
+                            enemy.GetComponent<Player>().ReportCollisionWithEnemy(banditStateMachine);//RegisterHitByAttack();
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2)))
                         SetCollisionPurpose(banditStateMachine, enemy);
@@ -139,10 +143,11 @@ namespace DoomBreakers
         }
         private void DetermineCollisionPurpose(IEnemyStateMachine banditStateMachine, int i)
         {
+            //Get
             switch (banditStateMachine.GetEnemyState())
             {
                 case state.IsQuickAttack:
-                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], _enemyLayerMasks[i]);
+                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_playerLayerMaskStr));
                     _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
                     break;
                 case state.IsAttackRelease:
@@ -155,6 +160,7 @@ namespace DoomBreakers
                     break;
                 case state.IsIdle:
                     _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, 12.0f, LayerMask.GetMask(_playerLayerMaskStr));
+                    banditStateMachine.SetEnemyState(state.IsMoving);
                     _collisionTargetPurpose = CollisionTargetPurpose.toPersue;
                     break;
             }
@@ -199,6 +205,36 @@ namespace DoomBreakers
 		{
             return _collidedTargetTransform;
 		}
+
+        public void FlipAttackPoints(int dir)
+        {
+            //Circles we draw(in editor) & detect enemies against. These must all be flipped 
+            //as this method will be called on enemy face direction change.
+            if (dir == 1)//Facing Right
+            {
+                for (int i = 0; i < _attackPoints.Length; i++)
+                {
+                    _vector = _attackPoints[i].localPosition;
+                    _vector.x = Mathf.Abs(_vector.x);
+                    _attackPoints[i].localPosition = _vector;
+                }
+
+
+                return;
+            }
+            if (dir == -1)//Facing Left
+            {
+                for (int i = 0; i < _attackPoints.Length; i++)
+                {
+                    _vector = _attackPoints[i].localPosition;
+                    _vector.x = -Mathf.Abs(_vector.x);
+                    _attackPoints[i].localPosition = _vector;
+                }
+
+
+                return;
+            }
+        }
     }
 
 }

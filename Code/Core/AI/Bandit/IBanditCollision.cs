@@ -17,6 +17,7 @@ namespace DoomBreakers
 		void EnableTargetCollisionDetection();
 		IEnemyStateMachine RegisterHitByAttack(IPlayerStateMachine playerStateMachine);
 		Transform GetCollidedTargetTransform();
+		void FlipAttackPoints(int dir);
 	}
 }
 

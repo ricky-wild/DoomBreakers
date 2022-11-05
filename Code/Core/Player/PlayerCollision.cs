@@ -132,17 +132,17 @@ namespace DoomBreakers
             }
             _attackCollisionEnabled = false;
         }
-        public IPlayerStateMachine RegisterHitByAttack(IEnemyStateMachine enemyStateMachine)
+        public IPlayerStateMachine RegisterHitByAttack(IEnemyStateMachine enemyStateMachine, IPlayerStateMachine playerStateMachine)
 		{
             if (enemyStateMachine.GetEnemyState() == state.IsQuickAttack)
-                _playerStateMachine.SetPlayerState(state.IsHitByQuickAttack);
+                playerStateMachine.SetPlayerState(state.IsHitByQuickAttack);
             if (enemyStateMachine.GetEnemyState() == state.IsAttackRelease)
-                _playerStateMachine.SetPlayerState(state.IsHitByReleaseAttack);
+                playerStateMachine.SetPlayerState(state.IsHitByReleaseAttack);
 
 
 
-
-            return _playerStateMachine;
+            _playerStateMachine = playerStateMachine;
+            return playerStateMachine;
         }
         public void ProcessCollisionFlags(Collider2D collision)
         {

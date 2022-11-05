@@ -126,7 +126,7 @@ namespace DoomBreakers
                     break;
 
             }
-            _banditBehaviours.UpdateMovement(_banditState, _banditSprite);//UpdateMovement();
+            _banditBehaviours.UpdateMovement(_banditState, _banditSprite, _banditCollider);//UpdateMovement();
             //UpdateMovement();
         }
         public void UpdateAnimator()

@@ -355,7 +355,7 @@ namespace DoomBreakers
 		{
 			_spriteColourSwapTimer.StartTimer(time);//flash sprite colour timer.
 			if (_spriteColourSwapTimer.HasTimerFinished())
-				playerSprite.SetTexture2DColor(Color.white);
+				playerSprite.SetTexture2DColor(colour);
 		}
 
 
