@@ -16,7 +16,8 @@ namespace DoomBreakers
 		void PersueTarget(IEnemyStateMachine enemyStateMachine, Transform targetTransform, IBanditSprite banditSprite);
 		void QuickAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
 		void HitByQuickAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
-		void HitByPowerAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
+		//void HitByPowerAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
+		void HitByPowerAttackProcess(ICollisionData collisionData);
 
 		bool SafeToPersueTarget(IEnemyStateMachine enemyStateMachine, Transform targetTransform);
 	}

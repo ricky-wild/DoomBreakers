@@ -126,7 +126,8 @@ namespace DoomBreakers
                     break;
                 case state.IsHitByReleaseAttack:
                     _banditAnimator.SetAnimationState(AnimationState.PowerHitAnim);
-                    _banditBehaviours.HitByPowerAttackProcess(_banditState, _banditSprite);
+                    _banditBehaviours.HitByPowerAttackProcess(_banditCollider.GetRecentCollision());
+                    //_banditBehaviours.HitByPowerAttackProcess(_banditState, _banditSprite);
                     break;
 
             }
@@ -141,9 +142,9 @@ namespace DoomBreakers
 		{
             _banditCollider.UpdateCollision(_banditState, _banditSprite);
         }
-        public void ReportCollisionWithPlayer(IPlayerStateMachine playerStateMachine)
+        public void ReportCollisionWithPlayer(ICollisionData collisionData)//IPlayerStateMachine playerStateMachine)
 		{
-            _banditState = _banditCollider.RegisterHitByAttack(playerStateMachine);
+            _banditState = _banditCollider.RegisterHitByAttack(collisionData);//playerStateMachine);
 		}
 
         private void UpdatePrintMsg()

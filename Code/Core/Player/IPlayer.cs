@@ -7,7 +7,8 @@ namespace DoomBreakers
         void UpdateStateBehaviours();
         void UpdateAnimator();
         void UpdateCollisions();
-        void ReportCollisionWithEnemy(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
+        //void ReportCollisionWithEnemy(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
+        void ReportCollisionWithEnemy(ICollisionData collisionData);
     }
 }
 

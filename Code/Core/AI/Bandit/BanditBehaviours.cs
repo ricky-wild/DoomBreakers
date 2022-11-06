@@ -32,7 +32,7 @@ namespace DoomBreakers
 			_targetVelocityX = 1.0f;
 			_targetVelocityY = 0f;
 			_maxJumpVelocity = 14.0f;//13.25f;
-			_maxPowerStruckVelocityY = 14.5f; //10.0f for lowest impact. 14.0f for average. 16.0f for maximum impact.
+			_maxPowerStruckVelocityY = 10.0f; //10.0f for lowest impact. 14.0f for average. 16.0f for maximum impact.
 			_gravity = -(2 * 0.8f) / Mathf.Pow(0.25f, 2); //_gravity = -(3 * 0.8f) / Mathf.Pow(0.9f, 2);//this will create a moon like gravity effect
 			_quickAttackIncrement = 0;
 			_attackCooldownCounter = 0;
@@ -183,33 +183,53 @@ namespace DoomBreakers
 				enemyStateMachine.SetEnemyState(state.IsIdle);
 			}
 		}
-		public void HitByPowerAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
+		public void HitByPowerAttackProcess(ICollisionData collisionData)//IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
-			SetBehaviourTextureFlash(_textureFlashTime, banditSprite, Color.red);
+			if (collisionData == null)
+				return;
 
-			_behaviourTimer.StartTimer(_quickAtkWaitTime);
-			if (_behaviourTimer.HasTimerFinished())
-			{
-				if (banditSprite.GetSpriteDirection() == -1)
-					_targetVelocityX = _maxJumpVelocity;
-				if (banditSprite.GetSpriteDirection() == 1)
-					_targetVelocityX = _maxJumpVelocity;
-			}
+			SetBehaviourTextureFlash(_textureFlashTime, collisionData.GetCachedBanditSprite(), Color.red);
+
+			int banditFaceDir = collisionData.GetCachedBanditSprite().GetSpriteDirection();
+			int playerFaceDir = collisionData.GetCachedPlayerSprite().GetSpriteDirection();
+			float multiplier = 1.2f;// 1.66f;
 
 			if (_velocity.y >= _maxPowerStruckVelocityY) //Near peak of jump velocity, set falling state.
 			{
-				enemyStateMachine.SetEnemyState(state.IsFalling);			
+				collisionData.GetCachedEnemyState().SetEnemyState(state.IsFalling);			
 			}
 			else
 			{
-				_velocity.y += _maxPowerStruckVelocityY / 8;// = 0f;
-				_velocity.x = _targetVelocityX;
+				_velocity.y += _maxPowerStruckVelocityY / 6;// = 0f;
+				_targetVelocityX = _moveSpeed * multiplier;
+
+				if (banditFaceDir == 1 && playerFaceDir == -1) //Enemy facing right & player facing left, knock enemy to the left.
+				{
+					_velocity.x -= _targetVelocityX;
+					return;
+				}
+				if (banditFaceDir == -1 && playerFaceDir == 1) //Enemy facing left & player facing right, knock enemy to the right.
+				{
+					_velocity.x += _targetVelocityX;
+					return;
+				}
+				if (banditFaceDir == 1 && playerFaceDir == 1) //Enemy facing right & player facing right behind enemy, knock enemy to the right.
+				{
+					_velocity.x += _targetVelocityX;
+					return;
+				}
+				if (banditFaceDir == -1 && playerFaceDir == -1) //Enemy facing left & player facing left behind enemy, knock enemy to the left.
+				{
+					_velocity.x -= _targetVelocityX;
+					return;
+				}
 			}
 		}
 		void Update()
         {
-
-        }
+			//print("\n_velocity.x=" + _velocity.x);
+			//print("\n_targetVelocityX=" + _targetVelocityX);
+		}
 
         public void UpdateMovement(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite, IBanditCollision banditCollider)
 		{
@@ -220,9 +240,16 @@ namespace DoomBreakers
 				_sprintSpeed = 1.75f;
 			if (!enemyStateMachine.IsSprinting())
 				_sprintSpeed = 1.0f;
-			//_targetVelocityX = (input.x * (_moveSpeed * _sprintSpeed));
-			_velocity.x = _targetVelocityX;
-			//_velocity.y = _targetVelocityY;
+
+
+
+
+			if(!enemyStateMachine.IsPowerAttackHit())// || !enemyStateMachine.IsFalling())
+			{
+				if(!enemyStateMachine.IsFalling())
+					_velocity.x = _targetVelocityX;
+			}
+
 
 			DetectFaceDirection(banditSprite, banditCollider);
 

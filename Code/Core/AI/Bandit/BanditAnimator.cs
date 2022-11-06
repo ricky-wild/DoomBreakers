@@ -36,18 +36,23 @@ namespace DoomBreakers
 			switch (_animationState)
 			{
 				case AnimationState.IdleAnim:
+					//_animator.speed = 1.0f;
 					_animator.Play("Idle");//, 0, 0.0f);
 					break;
 				case AnimationState.MoveAnim:
+					//_animator.speed = 9.0f;
 					_animator.Play("Run");
 					break;
 				case AnimationState.JumpAnim:
+					//_animator.speed = 1.0f;
 					_animator.Play("Jump");//, -1, 0.0f);//, -1, 0.0f);
 					break;
 				case AnimationState.AirJumpAnim:
+					//_animator.speed = 1.0f;
 					_animator.Play("DblJump");
 					break;
 				case AnimationState.QuickAtkAnim:
+					//_animator.speed = 1.2f;
 					int quickAttackIndex = banditBehaviour.GetQuickAttackIndex();
 					switch (quickAttackIndex)
 					{
@@ -60,34 +65,43 @@ namespace DoomBreakers
 					}
 					break;
 				case AnimationState.AirQuickAtkAnim:
+					//_animator.speed = 2.0f;
 					_animator.Play("JumpAttack");
 					break;
 				case AnimationState.HoldAtkAnim:
+					//_animator.speed = 1.5f;
 					_animator.Play("Attack");
 					break;
 				case AnimationState.ReleaseAtkAnim:
+					//_animator.speed = 1.5f;
 					_animator.Play("AtkRelease");
 					break;
 				case AnimationState.DefendAnim:
+					//_animator.speed = 1.0f;
 					_animator.Play("Defend");
 					break;
 				case AnimationState.DefendHitAnim:
+					//_animator.speed = 2.0f;
 					_animator.Play("DefHit");
 					break;
 				case AnimationState.SmallHitAnim:
+					//_animator.speed = 1.0f;
 					_animator.Play("Jabbed");
 					break;
 				case AnimationState.PowerHitAnim:
-					//_animator.speed = 1.0f;
+					//_animator.speed = 5.0f;
 					_animator.Play("Hit");
 					break;
 				case AnimationState.FallenAnim:
+					//_animator.speed = 1.0f;
 					_animator.Play("Fall");
 					break;
 				case AnimationState.DyingAnim:
+					//_animator.speed = 1.2f;
 					_animator.Play("Dying");
 					break;
 				case AnimationState.DeathAnim:
+					//_animator.speed = 1.0f;
 					_animator.Play("Dead");
 					break;
 			}

@@ -15,6 +15,7 @@ namespace DoomBreakers
             toAttack = 2
 		};
         private CollisionTargetPurpose _collisionTargetPurpose; //Flag for player collision purpose. UpdateDetectEnemyTargets()
+        private ICollisionData _collisionData;
 
         private CompareTags _compareTags;
 
@@ -49,6 +50,7 @@ namespace DoomBreakers
             _collider2d.enabled = true;
             _detectTargetCollisionEnabled = false;
             _collisionTargetPurpose = CollisionTargetPurpose.noPurpose;
+            _collisionData = new CollisionData();
             //_eventListener = new Action(TestMethod);
         }
         //public void TestMethod(){print("TestMethod() activated via event handler!");}
@@ -110,7 +112,12 @@ namespace DoomBreakers
                             return;
 
                         if (enemy.GetComponent<Player>() != null) //Guard clause.
-                            enemy.GetComponent<Player>().ReportCollisionWithEnemy(banditStateMachine, banditSprite);//RegisterHitByAttack();
+						{
+                            //_collisionData.RegisterCollision(null, banditStateMachine, null, banditSprite);
+                            _collisionData.PluginEnemyState(banditStateMachine);
+                            _collisionData.PluginBanditSprite(banditSprite);
+                            enemy.GetComponent<Player>().ReportCollisionWithEnemy(_collisionData);//banditStateMachine, banditSprite);//RegisterHitByAttack();
+                        }
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2))) { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player3))) { }
@@ -181,11 +188,11 @@ namespace DoomBreakers
         {
             _detectTargetCollisionEnabled = true;
         }
-        public IEnemyStateMachine RegisterHitByAttack(IPlayerStateMachine playerStateMachine)
-		{
-            if (playerStateMachine.IsQuickAttack())
+        public IEnemyStateMachine RegisterHitByAttack(ICollisionData collisionData)//IPlayerStateMachine playerStateMachine)
+        {
+            if (collisionData.GetCachedPlayerState().IsQuickAttack())
                 _banditStateMachine.SetEnemyState(state.IsHitByQuickAttack); 
-            if (playerStateMachine.IsPowerAttackRelease())
+            if (collisionData.GetCachedPlayerState().IsPowerAttackRelease())
                 _banditStateMachine.SetEnemyState(state.IsHitByReleaseAttack);
             //if (playerStateMachine.GetPlayerState() == state.IsUpwardAttack)
             //    _banditStateMachine.SetEnemyState(state.IsHitByQuickAttack);
@@ -228,6 +235,10 @@ namespace DoomBreakers
                 return;
             }
         }
+        public ICollisionData GetRecentCollision()
+		{
+            return _collisionData;
+		}
     }
 
 }

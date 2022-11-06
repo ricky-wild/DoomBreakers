@@ -15,9 +15,10 @@ namespace DoomBreakers
 		void ProcessCollisionFlags(Collider2D collision);
 		void UpdateDetectEnemyTargets(IEnemyStateMachine banditStateMachine, IBanditSprite banditSprite);
 		void EnableTargetCollisionDetection();
-		IEnemyStateMachine RegisterHitByAttack(IPlayerStateMachine playerStateMachine);
+		IEnemyStateMachine RegisterHitByAttack(ICollisionData collisionData);//IPlayerStateMachine playerStateMachine);
 		Transform GetCollidedTargetTransform();
 		void FlipAttackPoints(int dir);
+		ICollisionData GetRecentCollision();
 	}
 }
 
