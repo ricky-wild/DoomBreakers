@@ -86,14 +86,14 @@ namespace DoomBreakers
 
         void Update() { }
 
-        public void UpdateCollision(IEnemyStateMachine banditStateMachine)
+        public void UpdateCollision(IEnemyStateMachine banditStateMachine, IBanditSprite banditSprite)
         {
-            UpdateDetectEnemyTargets(banditStateMachine);
+            UpdateDetectEnemyTargets(banditStateMachine, banditSprite);
 
             if (_banditStateMachine != banditStateMachine) //RegisterHitByAttack()
                 _banditStateMachine = banditStateMachine;
         }
-        public void UpdateDetectEnemyTargets(IEnemyStateMachine banditStateMachine)
+        public void UpdateDetectEnemyTargets(IEnemyStateMachine banditStateMachine, IBanditSprite banditSprite)
         {
             if (!_detectTargetCollisionEnabled)
                 return;
@@ -110,7 +110,7 @@ namespace DoomBreakers
                             return;
 
                         if (enemy.GetComponent<Player>() != null) //Guard clause.
-                            enemy.GetComponent<Player>().ReportCollisionWithEnemy(banditStateMachine);//, banditSprite);//RegisterHitByAttack();
+                            enemy.GetComponent<Player>().ReportCollisionWithEnemy(banditStateMachine, banditSprite);//RegisterHitByAttack();
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2))) { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player3))) { }

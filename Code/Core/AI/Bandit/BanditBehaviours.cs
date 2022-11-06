@@ -32,7 +32,7 @@ namespace DoomBreakers
 			_targetVelocityX = 1.0f;
 			_targetVelocityY = 0f;
 			_maxJumpVelocity = 14.0f;//13.25f;
-			_maxPowerStruckVelocityY = 14.0f; //10.0f for lowest impact. 14.0f for average. 16.0f for maximum impact.
+			_maxPowerStruckVelocityY = 14.5f; //10.0f for lowest impact. 14.0f for average. 16.0f for maximum impact.
 			_gravity = -(2 * 0.8f) / Mathf.Pow(0.25f, 2); //_gravity = -(3 * 0.8f) / Mathf.Pow(0.9f, 2);//this will create a moon like gravity effect
 			_quickAttackIncrement = 0;
 			_attackCooldownCounter = 0;
@@ -187,15 +187,24 @@ namespace DoomBreakers
 		{
 			SetBehaviourTextureFlash(_textureFlashTime, banditSprite, Color.red);
 
+			_behaviourTimer.StartTimer(_quickAtkWaitTime);
+			if (_behaviourTimer.HasTimerFinished())
+			{
+				if (banditSprite.GetSpriteDirection() == -1)
+					_targetVelocityX = _maxJumpVelocity;
+				if (banditSprite.GetSpriteDirection() == 1)
+					_targetVelocityX = _maxJumpVelocity;
+			}
+
 			if (_velocity.y >= _maxPowerStruckVelocityY) //Near peak of jump velocity, set falling state.
 			{
-				enemyStateMachine.SetEnemyState(state.IsFalling);
+				enemyStateMachine.SetEnemyState(state.IsFalling);			
 			}
 			else
 			{
-				_velocity.y += _maxPowerStruckVelocityY / 4;// = 0f;
+				_velocity.y += _maxPowerStruckVelocityY / 8;// = 0f;
+				_velocity.x = _targetVelocityX;
 			}
-
 		}
 		void Update()
         {
@@ -295,6 +304,9 @@ namespace DoomBreakers
 			if (enemyStateMachine.IsPowerHitWhenDefending())
 				return false;
 			if (enemyStateMachine.IsImpactHit())
+				return false;
+
+			if (enemyStateMachine.IsFalling())
 				return false;
 
 			return true;

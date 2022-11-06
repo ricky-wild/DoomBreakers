@@ -32,7 +32,7 @@ namespace DoomBreakers
 		}
 		public void UpdateAnimator(IBanditBehaviours banditBehaviour)
 		{
-
+			
 			switch (_animationState)
 			{
 				case AnimationState.IdleAnim:
@@ -78,6 +78,7 @@ namespace DoomBreakers
 					_animator.Play("Jabbed");
 					break;
 				case AnimationState.PowerHitAnim:
+					//_animator.speed = 1.0f;
 					_animator.Play("Hit");
 					break;
 				case AnimationState.FallenAnim:

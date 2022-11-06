@@ -272,7 +272,7 @@ namespace DoomBreakers
 
             if(!_colorSwappedFlag) //Ensure we reset internally upon failure to do so externally (ie a state change)
 			{
-                _colorSwappedTimer.StartTimer(1.0f);
+                _colorSwappedTimer.StartTimer(0.5f);
                 _colorSwappedFlag = true;
             }
             

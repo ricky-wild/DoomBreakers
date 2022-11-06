@@ -136,7 +136,7 @@ namespace DoomBreakers
             _attackCollisionEnabled = false;
         }
         public IPlayerStateMachine RegisterHitByAttack(IEnemyStateMachine enemyStateMachine, IPlayerStateMachine playerStateMachine,
-                                                IPlayerSprite playerSprite)
+                                                IPlayerSprite playerSprite, IBanditSprite banditSprite)
 
         {
             if(IsIgnoreDamage(playerStateMachine))
@@ -145,9 +145,21 @@ namespace DoomBreakers
             if (IsDefendingSelf(playerStateMachine))
 			{
                 if (enemyStateMachine.IsQuickAttack())
-                    playerStateMachine.SetPlayerState(state.IsQuickHitWhileDefending);
+				{
+
+                    if (IsDefendingCorrectDirection(playerSprite, banditSprite))
+                        playerStateMachine.SetPlayerState(state.IsQuickHitWhileDefending);
+                    else
+                        playerStateMachine.SetPlayerState(state.IsHitByQuickAttack); //GREAT SUCCESS!
+
+                }
                 if (enemyStateMachine.IsPowerAttackRelease())
-                    playerStateMachine.SetPlayerState(state.IsHitWhileDefending);
+                {
+                    if (IsDefendingCorrectDirection(playerSprite, banditSprite))
+                        playerStateMachine.SetPlayerState(state.IsHitWhileDefending);
+                    else
+                        playerStateMachine.SetPlayerState(state.IsHitByReleaseAttack);
+                }
             }
             if (!IsDefendingSelf(playerStateMachine))
 			{
@@ -163,6 +175,23 @@ namespace DoomBreakers
             _playerStateMachine = playerStateMachine;
             return playerStateMachine;
         }
+        private bool IsDefendingCorrectDirection(IPlayerSprite playerSprite, IBanditSprite banditSprite)
+		{
+            //Detrmine which way the player is facing whilst defending & the enemy bandit is attacking.
+            //Why? Player doesn't successfully defend against enemy attack defending the wrong face direction.
+
+            int playerFaceDir = playerSprite.GetSpriteDirection();
+            int enemyFaceDir = banditSprite.GetSpriteDirection();
+
+            //Enemy would only ever be attacking if directly in front of player.
+            //So if player face direction is 1 (right) then enemy would have to be -1 (left) 
+            //case sceneria true for successful defence.
+            if (playerFaceDir == 1 && enemyFaceDir == -1 ||
+                playerFaceDir == -1 && enemyFaceDir == 1)
+                return true;
+
+            return false;
+		}
         private bool IsDefendingSelf(IPlayerStateMachine playerStateMachine)
 		{
             if (playerStateMachine.IsDefendingPrepare())

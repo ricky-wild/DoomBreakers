@@ -139,7 +139,7 @@ namespace DoomBreakers
         }
         public void UpdateCollisions()
 		{
-            _banditCollider.UpdateCollision(_banditState);
+            _banditCollider.UpdateCollision(_banditState, _banditSprite);
         }
         public void ReportCollisionWithPlayer(IPlayerStateMachine playerStateMachine)
 		{

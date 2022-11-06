@@ -11,9 +11,9 @@ namespace DoomBreakers
 		void SetupAttackRadius();
 		void SetupCompareTags();
 		string GetCompareTag(CompareTags compareTagId);
-		void UpdateCollision(IEnemyStateMachine banditStateMachine);
+		void UpdateCollision(IEnemyStateMachine banditStateMachine, IBanditSprite banditSprite);
 		void ProcessCollisionFlags(Collider2D collision);
-		void UpdateDetectEnemyTargets(IEnemyStateMachine banditStateMachine);
+		void UpdateDetectEnemyTargets(IEnemyStateMachine banditStateMachine, IBanditSprite banditSprite);
 		void EnableTargetCollisionDetection();
 		IEnemyStateMachine RegisterHitByAttack(IPlayerStateMachine playerStateMachine);
 		Transform GetCollidedTargetTransform();

@@ -13,7 +13,7 @@ namespace DoomBreakers
 		void ProcessCollisionFlags(Collider2D collision);
 		void UpdateDetectEnemyTargets(IPlayerStateMachine playerStateMachine);
 		IPlayerStateMachine RegisterHitByAttack(IEnemyStateMachine enemyStateMachine, IPlayerStateMachine playerStateMachine,
-												IPlayerSprite playerSprite);
+												IPlayerSprite playerSprite, IBanditSprite banditSprite);
 		void EnableAttackCollisions();
 		//bool IsAttackCollisionsEnabled();
 		void FlipAttackPoints(int dir);

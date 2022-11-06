@@ -212,9 +212,9 @@ namespace DoomBreakers
 		{
             _playerCollider.UpdateCollision(_playerState);
 		}
-        public void ReportCollisionWithEnemy(IEnemyStateMachine enemyStateMachine)//, IBanditSprite banditSprite)
+        public void ReportCollisionWithEnemy(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
-            _playerState = _playerCollider.RegisterHitByAttack(enemyStateMachine, _playerState, _playerSprite);
+            _playerState = _playerCollider.RegisterHitByAttack(enemyStateMachine, _playerState, _playerSprite, banditSprite);
         }
 
         private void UpdatePrintMsg()
