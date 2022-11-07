@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
-    interface IEnemy //: MonoBehaviour
+    public interface IEnemy //: MonoBehaviour
     {
         void UpdatePlayerPathFinding();
         void UpdateStateBehaviours();

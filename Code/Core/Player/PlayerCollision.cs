@@ -131,7 +131,9 @@ namespace DoomBreakers
                         if (enemy.GetComponent<Bandit>() != null) //Guard clause.
 						{
                             _collisionData.PluginPlayerState(playerStateMachine);
-                            enemy.GetComponent<Bandit>().ReportCollisionWithPlayer(_collisionData);//playerStateMachine);//RegisterHitByAttack(playerStateMachine);
+                            enemy.GetComponent<Bandit>().ReportCollisionWithPlayer(_collisionData);
+                            //Think of GetComponent as a check for interface implementation.
+                            //Unity is a component based architecture / OOP hybrid and using GetComponent is unavoidable.
                         }
                     }
                 }

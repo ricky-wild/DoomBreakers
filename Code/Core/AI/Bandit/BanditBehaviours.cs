@@ -11,7 +11,7 @@ namespace DoomBreakers
         private Vector3 _velocity;
         private Transform _transform;
         private float _targetVelocityX, _moveSpeed, _sprintSpeed, _gravity,
-			_maxJumpVelocity, _targetVelocityY, _maxPowerStruckVelocityY;
+			_maxJumpVelocity, _targetVelocityY, _maxPowerStruckVelocityY, _maxPowerStruckVelocityX;
 
         private int _quickAttackIncrement; //2+ variations of this animation.
 		private int _attackCooldownCounter;
@@ -33,6 +33,7 @@ namespace DoomBreakers
 			_targetVelocityY = 0f;
 			_maxJumpVelocity = 14.0f;//13.25f;
 			_maxPowerStruckVelocityY = 10.0f; //10.0f for lowest impact. 14.0f for average. 16.0f for maximum impact.
+			_maxPowerStruckVelocityX = 0.5f;
 			_gravity = -(2 * 0.8f) / Mathf.Pow(0.25f, 2); //_gravity = -(3 * 0.8f) / Mathf.Pow(0.9f, 2);//this will create a moon like gravity effect
 			_quickAttackIncrement = 0;
 			_attackCooldownCounter = 0;
@@ -201,7 +202,7 @@ namespace DoomBreakers
 			else
 			{
 				_velocity.y += _maxPowerStruckVelocityY / 6;// = 0f;
-				_targetVelocityX = _moveSpeed * multiplier;
+				_targetVelocityX = _maxPowerStruckVelocityX * multiplier;
 
 				if (banditFaceDir == 1 && playerFaceDir == -1) //Enemy facing right & player facing left, knock enemy to the left.
 				{

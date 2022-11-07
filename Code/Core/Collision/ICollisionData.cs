@@ -4,13 +4,13 @@ namespace DoomBreakers
 {
 	public interface ICollisionData //: MonoBehaviour
 	{
-		void RegisterCollision(IPlayerStateMachine playerStateMachine, IEnemyStateMachine enemyStateMachine,
-			IPlayerSprite playerSprite, IBanditSprite banditSprite);
+		void PluginPlayer(IPlayer player, int playerId);
 		void PluginPlayerState(IPlayerStateMachine playerStateMachine);
 		void PluginEnemyState(IEnemyStateMachine enemyStateMachine);
 		void PluginPlayerSprite(IPlayerSprite playerSprite);
 		void PluginBanditSprite(IBanditSprite banditSprite);
 
+		IPlayer GetCachedPlayer(int playerId);
 		IPlayerStateMachine GetCachedPlayerState();
 		IEnemyStateMachine GetCachedEnemyState();
 		IPlayerSprite GetCachedPlayerSprite();

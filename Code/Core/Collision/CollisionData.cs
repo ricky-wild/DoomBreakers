@@ -5,6 +5,7 @@ namespace DoomBreakers
 {
     public class CollisionData : ICollisionData //MonoBehaviour
     {
+        private IPlayer[] _cachedPlayer;
         private IPlayerStateMachine _cachedPlayerStateMachine;
         private IEnemyStateMachine _cachedEnemyStateMachine;
         private IPlayerSprite _cachedPlayerSprite;
@@ -13,18 +14,15 @@ namespace DoomBreakers
 
         public CollisionData()
 		{
-
+            _cachedPlayer = new IPlayer[4];
 		}
         void Start() { }
         void Update() { }
-        public void RegisterCollision(IPlayerStateMachine playerStateMachine, IEnemyStateMachine enemyStateMachine,
-            IPlayerSprite playerSprite, IBanditSprite banditSprite)
+
+        public void PluginPlayer(IPlayer player, int playerId)
 		{
-            _cachedPlayerStateMachine = playerStateMachine;
-            _cachedEnemyStateMachine = enemyStateMachine;
-            _cachedPlayerSprite = playerSprite;
-            _cachedBanditSprite = banditSprite;
-        }
+            _cachedPlayer[playerId] = player;
+		}
         public void PluginPlayerState(IPlayerStateMachine playerStateMachine)
 		{
             _cachedPlayerStateMachine = playerStateMachine;
@@ -43,7 +41,10 @@ namespace DoomBreakers
         }
 
 
-
+        public IPlayer GetCachedPlayer(int playerId)
+		{
+            return _cachedPlayer[playerId];
+		}
         public IPlayerStateMachine GetCachedPlayerState()
 		{
             return _cachedPlayerStateMachine;

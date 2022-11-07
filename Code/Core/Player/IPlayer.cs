@@ -1,7 +1,7 @@
 ﻿
 namespace DoomBreakers
 {
-    interface IPlayer //: MonoBehaviour
+    public interface IPlayer //: MonoBehaviour
     {
         void UpdateInput();
         void UpdateStateBehaviours();
