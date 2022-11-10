@@ -3,6 +3,13 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
+    public enum WeaponChargeHold
+	{
+        None = 0,
+        Minimal = 1,
+        Moderate = 2,
+        Maximal = 3,
+	};
     public enum SpriteColourIndex
     {
         //Supplying red colour value of each pixel we want to swap out for another.
@@ -70,11 +77,13 @@ namespace DoomBreakers
         private bool _colorSwappedFlag;
 
         //private ITimer[] _weaponChargeTimer;// = new Timer[1];
-        private ITimer _weaponChargeTimer;
+        private ITimer _weaponChargeTimer, _weaponChargeHoldTimer;
         private const float _weaponChargeTime = 0.25f;
         private int _weaponTimerIncrement;
         private const int _weaponTimerIncrementMax = 10;
         private bool _weaponChargeTimerFlag;
+
+        private WeaponChargeHold _weaponChargeHoldFlag; //Indicates how long the weapon charge went on for.
 
         public PlayerSprite(SpriteRenderer spriteRenderer, int playerID)
 		{
@@ -101,6 +110,11 @@ namespace DoomBreakers
             _weaponTimerIncrement = 0;
             _weaponChargeTimerFlag = false;
 
+            _weaponChargeHoldTimer = this.gameObject.AddComponent<Timer>();
+            _weaponChargeHoldTimer.Setup("_weaponChargeHoldTimer");
+
+            _weaponChargeHoldFlag = WeaponChargeHold.None;
+
             //SetupTexture2DColorSwap();
             ApplyCustomTexture2DColours();
         }
@@ -108,6 +122,10 @@ namespace DoomBreakers
 		{
             return _spriteFaceDirection;
         }
+        public WeaponChargeHold GetWeaponTexChargeFlag()
+		{
+            return _weaponChargeHoldFlag;
+		}
         public void FlipSprite()
 		{
             if(_spriteFaceDirection == 1) //Facing Right
@@ -242,6 +260,7 @@ namespace DoomBreakers
                     SwapTexture2DColor(SpriteColourIndex.Cloth_b, ColorFromInt(0xcff806)); //CLOTH B
                     break;
             }
+            _colorSwapTexture2D.Apply();
         }
 
 		public void SetupTexture2DColorSwap()
@@ -303,6 +322,7 @@ namespace DoomBreakers
 
             if (_colorSwappedTimer.HasTimerFinished())
             {
+                
                 ResetTexture2DColor();
                 _colorSwappedFlag = false;
             }
@@ -365,6 +385,53 @@ namespace DoomBreakers
                     break;
             }
 
+            
+            if(_weaponChargeHoldTimer.HasTimerFinished())
+			{
+                switch(_weaponChargeHoldFlag)
+				{
+                    case WeaponChargeHold.None:
+                        UpdateWeaponChargeIndicator(WeaponChargeHold.Minimal);
+                        break;
+                    case WeaponChargeHold.Minimal:
+                        UpdateWeaponChargeIndicator(WeaponChargeHold.Moderate);
+                        break;
+                    case WeaponChargeHold.Moderate:
+                        UpdateWeaponChargeIndicator(WeaponChargeHold.Maximal);
+                        break;
+                    case WeaponChargeHold.Maximal:
+                        UpdateWeaponChargeIndicator(WeaponChargeHold.None);
+                        break;
+                }
+                _weaponChargeHoldTimer.StartTimer(1.0f);
+            }
+
+            _colorSwapTexture2D.Apply();
+        }
+
+        private void UpdateWeaponChargeIndicator(WeaponChargeHold weaponChargeHold)
+		{
+            //if (_weaponChargeHoldFlag == WeaponChargeHold.Maximal)
+            //    return;
+
+            _weaponChargeHoldFlag = weaponChargeHold;
+
+            if (weaponChargeHold == WeaponChargeHold.None)
+            {
+                SwapTexture2DColor(SpriteColourIndex.ChargeIndicator, ColorFromInt(0xff0000));
+            }
+            if (weaponChargeHold == WeaponChargeHold.Minimal)
+			{
+                SwapTexture2DColor(SpriteColourIndex.ChargeIndicator, ColorFromInt(0x00ff00));
+			}
+            if (weaponChargeHold == WeaponChargeHold.Moderate)
+            {
+                SwapTexture2DColor(SpriteColourIndex.ChargeIndicator, ColorFromInt(0x0000ff));
+            }
+            if (weaponChargeHold == WeaponChargeHold.Maximal)
+            {
+                SwapTexture2DColor(SpriteColourIndex.ChargeIndicator, ColorFromInt(0xffffff));
+            }
             _colorSwapTexture2D.Apply();
         }
 
@@ -374,12 +441,16 @@ namespace DoomBreakers
                 return;
 
             _weaponChargeTimerFlag = b;
+            _weaponChargeHoldFlag = WeaponChargeHold.None;
 
             if (!b)
                 return;
 
+            //_weaponChargeHoldFlag = WeaponChargeHold.None;
             _weaponTimerIncrement = 0;
             _weaponChargeTimer.StartTimer(_weaponChargeTime);
+            _weaponChargeHoldTimer.StartTimer(1.0f);
+
 
             SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xe5f7ba));
             _colorSwapTexture2D.Apply();

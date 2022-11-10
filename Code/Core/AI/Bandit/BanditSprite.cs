@@ -186,6 +186,7 @@ namespace DoomBreakers
                     break;
 
             }
+            _colorSwapTexture2D.Apply();
         }
 
         public void SetupTexture2DColorSwap()

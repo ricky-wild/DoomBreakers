@@ -6,8 +6,9 @@ namespace DoomBreakers
 {
     public class BanditBehaviours : MonoBehaviour, IBanditBehaviours
     {
+		
 
-        private Controller2D _controller2D;
+		private Controller2D _controller2D;
         private Vector3 _velocity;
         private Transform _transform;
         private float _targetVelocityX, _moveSpeed, _sprintSpeed, _gravity,
@@ -18,16 +19,17 @@ namespace DoomBreakers
 		private int _attackCooldownLimit;
 		private float _textureFlashTime, _cooldownWaitTime, _idleWaitTime, _quickAtkWaitTime;
 
-		private IPlayerStateMachine _playerStateMachineRef;
+		private ICollisionData _collidedData;
 
         private ITimer _behaviourTimer, _cooldownTimer, _spriteColourSwapTimer;
 
-        public void Setup(Transform t, Controller2D controller2D)
+
+		public void Setup(Transform t, Controller2D controller2D)
         {
 			_controller2D = controller2D;
 			_transform = t;
 			_velocity = new Vector3();
-			_moveSpeed = 3.5f;//3.75f;
+			_moveSpeed = SetVariedMoveSpeed();
 			_sprintSpeed = 1.0f;
 			_targetVelocityX = 1.0f;
 			_targetVelocityY = 0f;
@@ -37,7 +39,7 @@ namespace DoomBreakers
 			_gravity = -(2 * 0.8f) / Mathf.Pow(0.25f, 2); //_gravity = -(3 * 0.8f) / Mathf.Pow(0.9f, 2);//this will create a moon like gravity effect
 			_quickAttackIncrement = 0;
 			_attackCooldownCounter = 0;
-			_attackCooldownLimit = 15;
+			_attackCooldownLimit = SetVariedAttackCooldownLimit();
 			_textureFlashTime = 0.1f;
 			_cooldownWaitTime = 3.0f;
 			_idleWaitTime = 1.5f;
@@ -51,6 +53,37 @@ namespace DoomBreakers
 			_cooldownTimer.Setup("_cooldownTimer");
 			_spriteColourSwapTimer = this.gameObject.AddComponent<Timer>();
 			_spriteColourSwapTimer.Setup("_spriteColourSwapTimer");
+		}
+		private float SetVariedMoveSpeed()
+		{
+			//3.5f is standard move speed.
+			
+			//Move speed must be applied at random within set range. This offers variation in between bandit movements in groups.
+			int rand = wildlogicgames.Utilities.GetRandomNumberInt(0, 6);
+
+			if (rand == 0)
+				return 3.0f;
+			if (rand == 1)
+				return 3.15f;
+			if (rand == 2)
+				return 3.25f;
+			if (rand == 3)
+				return 3.35f;
+			if (rand == 4)
+				return 3.45f;
+			if (rand == 5)
+				return 3.55f;
+			if (rand == 6)
+				return 3.65f;
+
+			return 3.5f;
+		}
+		private int SetVariedAttackCooldownLimit()
+		{
+			//15 is the set standard for furious quick attack jabs at player.
+
+			int rand = wildlogicgames.Utilities.GetRandomNumberInt(1, 15);
+			return rand;
 		}
         public int GetQuickAttackIndex()
 		{
@@ -98,14 +131,35 @@ namespace DoomBreakers
 		{
 			return true;
 		}
-		public void FallProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
+		public void FallProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite, int banditId)
 		{
 			_behaviourTimer.StartTimer(_quickAtkWaitTime);
 			if (_behaviourTimer.HasTimerFinished()) //So we only activate once.
 				SetBehaviourTextureFlash(_textureFlashTime, banditSprite, Color.white);
 
+			if(_collidedData != null)//if(_targetVelocityX == (_maxPowerStruckVelocityX * 1.2f))//float multiplier = 1.2f; from -> HitByPowerAttackProcess()
+			{
+				//Then we know the FallProcess() has begun after being power attack hit from player.
+				//We want to slow down the x velocity upon peak height. (as enemy is struck into air)
+
+				int banditFaceDir = _collidedData.GetCachedBanditSprite(banditId).GetSpriteDirection();
+				int playerFaceDir = _collidedData.GetCachedPlayerSprite(0).GetSpriteDirection();
+
+				float subtraction = _targetVelocityX / 2;
+
+				if (banditFaceDir == 1 && playerFaceDir == -1) //Enemy facing right & player facing left, knock enemy to the left.
+					_velocity.x -= subtraction;
+				if (banditFaceDir == -1 && playerFaceDir == 1) //Enemy facing left & player facing right, knock enemy to the right.
+					_velocity.x += subtraction;
+				if (banditFaceDir == 1 && playerFaceDir == 1) //Enemy facing right & player facing right behind enemy, knock enemy to the right.
+					_velocity.x += subtraction;
+				if (banditFaceDir == -1 && playerFaceDir == -1) //Enemy facing left & player facing left behind enemy, knock enemy to the left.
+					_velocity.x -= subtraction;
+			}
+
 			if (_controller2D.collisions.below) //Means we're finished jumping/falling.
 			{
+				_collidedData = null;
 				_targetVelocityX = 0f;
 				_targetVelocityY = 0f;
 				_velocity.x = 0f;
@@ -184,25 +238,48 @@ namespace DoomBreakers
 				enemyStateMachine.SetEnemyState(state.IsIdle);
 			}
 		}
-		public void HitByPowerAttackProcess(ICollisionData collisionData)//IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
+		public void HitByPowerAttackProcess(ICollisionData collisionData, int banditId)//IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
-			if (collisionData == null)
+			if (collisionData.SomeDataIsNull())// == null)
 				return;
 
-			SetBehaviourTextureFlash(_textureFlashTime, collisionData.GetCachedBanditSprite(), Color.red);
 
-			int banditFaceDir = collisionData.GetCachedBanditSprite().GetSpriteDirection();
-			int playerFaceDir = collisionData.GetCachedPlayerSprite().GetSpriteDirection();
+			SetBehaviourTextureFlash(_textureFlashTime, collisionData.GetCachedBanditSprite(banditId), Color.red);
+
+			int playerId = collisionData.GetLastCollidedPlayerID();
+			int banditFaceDir = collisionData.GetCachedBanditSprite(banditId).GetSpriteDirection();
+			int playerFaceDir = collisionData.GetCachedPlayerSprite(playerId).GetSpriteDirection();
+			WeaponChargeHold weaponChargeHoldFlag = collisionData.GetCachedPlayerSprite(playerId).GetWeaponTexChargeFlag();
 			float multiplier = 1.2f;// 1.66f;
-
-			if (_velocity.y >= _maxPowerStruckVelocityY) //Near peak of jump velocity, set falling state.
+			//print("\nweaponChargeHoldFlag =" + weaponChargeHoldFlag);
+			switch(weaponChargeHoldFlag)
 			{
-				collisionData.GetCachedEnemyState().SetEnemyState(state.IsFalling);			
+				case WeaponChargeHold.None:
+					multiplier = 0.75f;
+					break;
+				case WeaponChargeHold.Minimal:
+					multiplier = 1.2f;
+					break;
+				case WeaponChargeHold.Moderate:
+					multiplier = 1.5f;
+					break;
+				case WeaponChargeHold.Maximal:
+					multiplier = 1.9f;
+					break;
+			}
+
+			if (_velocity.y >= (_maxPowerStruckVelocityY + (multiplier/4)))//_maxPowerStruckVelocityY) //Near peak of jump velocity, set falling state.
+			{
+				if (_collidedData != collisionData)//== null)
+					_collidedData = collisionData;
+				_velocity.x = 0f;
+				collisionData.GetCachedEnemyState(banditId).SetEnemyState(state.IsFalling);
+				return;
 			}
 			else
 			{
-				_velocity.y += _maxPowerStruckVelocityY / 6;// = 0f;
-				_targetVelocityX = _maxPowerStruckVelocityX * multiplier;
+				_velocity.y += _maxPowerStruckVelocityY / 6;// (6-multiplier);// = 0f;
+				_targetVelocityX = _maxPowerStruckVelocityX * multiplier; //Carries on over to FallProcess() where appropriate.
 
 				if (banditFaceDir == 1 && playerFaceDir == -1) //Enemy facing right & player facing left, knock enemy to the left.
 				{

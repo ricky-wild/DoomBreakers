@@ -5,6 +5,7 @@ namespace DoomBreakers
 	{
 		void Setup(SpriteRenderer spriteRenderer, int playerID);
 		int GetSpriteDirection();
+		WeaponChargeHold GetWeaponTexChargeFlag();
 		void FlipSprite();
 		void SetupTexture2DColorSwap();
 		void ResetTexture2DColor();

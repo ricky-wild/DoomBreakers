@@ -210,14 +210,15 @@ namespace DoomBreakers
 
         public void UpdateCollisions()
 		{
-            _playerCollider.UpdateCollision(_playerState);
+            _playerCollider.UpdateCollision(_playerState, _playerSprite, _playerID);
 		}
-        public void ReportCollisionWithEnemy(ICollisionData collisionData)//IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
+        public void ReportCollisionWithEnemy(ICollisionData collisionData, int banditId)//IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
         {
             //_playerState = _playerCollider.RegisterHitByAttack(enemyStateMachine, _playerState, _playerSprite, banditSprite);
-            collisionData.PluginPlayerState(_playerState);
-            collisionData.PluginPlayerSprite(_playerSprite);
-            _playerState = _playerCollider.RegisterHitByAttack(collisionData);
+            collisionData.PluginPlayer(this, _playerID);
+            collisionData.PluginPlayerState(_playerState, _playerID);
+            collisionData.PluginPlayerSprite(_playerSprite, _playerID);
+            _playerState = _playerCollider.RegisterHitByAttack(collisionData, _playerID, banditId);
         }
 
         private void UpdatePrintMsg()

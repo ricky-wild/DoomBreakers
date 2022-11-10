@@ -89,27 +89,27 @@ namespace DoomBreakers
 
         void Update() 
         { }
-        public void UpdateCollision(IPlayerStateMachine playerStateMachine)
+        public void UpdateCollision(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId)
 		{
-            UpdateDetectEnemyTargets(playerStateMachine);
+            UpdateDetectEnemyTargets(playerStateMachine, playerSprite, playerId);
 
         }
-        public void UpdateDetectEnemyTargets(IPlayerStateMachine playerStateMachine)
+        public void UpdateDetectEnemyTargets(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId)
         {
             if (!_attackCollisionEnabled)
                 return;
 
-            //Collider2D[] enemyTargets = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], _enemyLayerMasks[0]);
-
             for (int i = 0; i < _enemyLayerMasks.Length; i++)
 			{
                 
-                if (playerStateMachine.GetPlayerState() == state.IsQuickAttack)
-                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_enemyLayerMaskStr));
-                if (playerStateMachine.GetPlayerState() == state.IsAttackRelease)
-                    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], LayerMask.GetMask(_enemyLayerMaskStr));//_enemyLayerMasks[i]);
+                //if (playerStateMachine.GetPlayerState() == state.IsQuickAttack)
+                //    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_enemyLayerMaskStr));
+                //if (playerStateMachine.GetPlayerState() == state.IsAttackRelease)
+                //    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], LayerMask.GetMask(_enemyLayerMaskStr));//_enemyLayerMasks[i]);
                 //if (playerStateMachine.GetPlayerState() == state.IsUpwardAttack)
                 //    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], _enemyLayerMasks[i]);
+
+                DetermineCollisionPurpose(playerStateMachine, i);
 
                 if (_enemyTargetsHit == null)
                     break;
@@ -125,60 +125,88 @@ namespace DoomBreakers
 
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Enemy))) 
                     {
+                        ProcessCollisionWithBandit(playerStateMachine, playerSprite, enemy, playerId);//, 0);
                         //EventManager.TriggerEvent("BanditHitByPlayer");
                         //_attackCollisionEnabled = false;
                         //return;
-                        if (enemy.GetComponent<Bandit>() != null) //Guard clause.
-						{
-                            _collisionData.PluginPlayerState(playerStateMachine);
-                            enemy.GetComponent<Bandit>().ReportCollisionWithPlayer(_collisionData);
-                            //Think of GetComponent as a check for interface implementation.
-                            //Unity is a component based architecture / OOP hybrid and using GetComponent is unavoidable.
-                        }
+                        //if (enemy.GetComponent<Bandit>() != null) //Guard clause.
+                        //{
+                        //    _collisionData.PluginPlayerState(playerStateMachine);
+                        //    enemy.GetComponent<Bandit>().ReportCollisionWithPlayer(_collisionData);
+                        //Think of GetComponent as a check for interface implementation.
+                        //Unity is a component based architecture / OOP hybrid and using GetComponent is unavoidable.
+                        //}
                     }
                 }
 
             }
             _attackCollisionEnabled = false;
         }
-
-        public IPlayerStateMachine RegisterHitByAttack(ICollisionData collisionData)
+        private void ProcessCollisionWithBandit(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, Collider2D enemy, int playerId)//, int enemyId)
         {
-            if(IsIgnoreDamage(collisionData.GetCachedPlayerState()))
-                return collisionData.GetCachedPlayerState();
+            if (enemy.GetComponent<Bandit>() == null) //Guard clause.
+                return;
 
-            if (IsDefendingSelf(collisionData.GetCachedPlayerState()))
+            _collisionData.PluginPlayerState(playerStateMachine, playerId);
+            _collisionData.PluginPlayerSprite(playerSprite, playerId);
+            enemy.GetComponent<Bandit>().ReportCollisionWithPlayer(_collisionData, playerId);//RegisterHitByAttack();
+
+        }
+        private void DetermineCollisionPurpose(IPlayerStateMachine playerStateMachine, int i)
+        {
+            if(playerStateMachine.IsQuickAttack())
 			{
-                if (collisionData.GetCachedEnemyState().IsQuickAttack())
+                _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_enemyLayerMaskStr));
+                return;
+			}
+            if(playerStateMachine.IsPowerAttackRelease())
+			{
+                _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], LayerMask.GetMask(_enemyLayerMaskStr));
+                return;
+            }
+            if(playerStateMachine.IsUpwardAttack())
+			{
+                _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], LayerMask.GetMask(_enemyLayerMaskStr));//_enemyLayerMasks[i]);
+                return;
+            }
+        }
+        public IPlayerStateMachine RegisterHitByAttack(ICollisionData collisionData, int playerId, int banditId)
+        {
+            if(IsIgnoreDamage(collisionData.GetCachedPlayerState(playerId)))
+                return collisionData.GetCachedPlayerState(playerId);
+
+            if (IsDefendingSelf(collisionData.GetCachedPlayerState(playerId)))
+			{
+                if (collisionData.GetCachedEnemyState(banditId).IsQuickAttack())
 				{
 
-                    if (IsDefendingCorrectDirection(collisionData.GetCachedPlayerSprite(), collisionData.GetCachedBanditSprite()))
-                        collisionData.GetCachedPlayerState().SetPlayerState(state.IsQuickHitWhileDefending);
+                    if (IsDefendingCorrectDirection(collisionData.GetCachedPlayerSprite(playerId), collisionData.GetCachedBanditSprite(banditId)))
+                        collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsQuickHitWhileDefending);
                     else
-                        collisionData.GetCachedPlayerState().SetPlayerState(state.IsHitByQuickAttack); //GREAT SUCCESS!
+                        collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsHitByQuickAttack); //GREAT SUCCESS!
 
                 }
-                if (collisionData.GetCachedEnemyState().IsPowerAttackRelease())
+                if (collisionData.GetCachedEnemyState(banditId).IsPowerAttackRelease())
                 {
-                    if (IsDefendingCorrectDirection(collisionData.GetCachedPlayerSprite(), collisionData.GetCachedBanditSprite()))
-                        collisionData.GetCachedPlayerState().SetPlayerState(state.IsHitWhileDefending);
+                    if (IsDefendingCorrectDirection(collisionData.GetCachedPlayerSprite(playerId), collisionData.GetCachedBanditSprite(banditId)))
+                        collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsHitWhileDefending);
                     else
-                        collisionData.GetCachedPlayerState().SetPlayerState(state.IsHitByReleaseAttack);
+                        collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsHitByReleaseAttack);
                 }
             }
-            if (!IsDefendingSelf(collisionData.GetCachedPlayerState()))
+            if (!IsDefendingSelf(collisionData.GetCachedPlayerState(playerId)))
 			{
 
-                if (collisionData.GetCachedEnemyState().IsQuickAttack())
-                    collisionData.GetCachedPlayerState().SetPlayerState(state.IsHitByQuickAttack);
-                if (collisionData.GetCachedEnemyState().IsPowerAttackRelease())
-                    collisionData.GetCachedPlayerState().SetPlayerState(state.IsHitByReleaseAttack);
+                if (collisionData.GetCachedEnemyState(banditId).IsQuickAttack())
+                    collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsHitByQuickAttack);
+                if (collisionData.GetCachedEnemyState(banditId).IsPowerAttackRelease())
+                    collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsHitByReleaseAttack);
             }
 
 
 
-            _playerStateMachine = collisionData.GetCachedPlayerState();
-            return collisionData.GetCachedPlayerState();
+            _playerStateMachine = collisionData.GetCachedPlayerState(playerId);
+            return collisionData.GetCachedPlayerState(playerId);
         }
         private bool IsDefendingCorrectDirection(IPlayerSprite playerSprite, IBanditSprite banditSprite)
 		{

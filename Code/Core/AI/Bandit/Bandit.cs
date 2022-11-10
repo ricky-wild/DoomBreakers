@@ -33,7 +33,7 @@ namespace DoomBreakers
         {
             _banditState = new EnemyStateMachine(state.IsIdle);
             _banditAnimator = new BanditAnimator(this.GetComponent<Animator>());
-            _banditCollider = new BanditCollision(this.GetComponent<Collider2D>(), ref _attackPoints);
+            _banditCollider = new BanditCollision(this.GetComponent<Collider2D>(), ref _attackPoints, _banditID);
 
             _banditBehaviours = this.gameObject.AddComponent<BanditBehaviours>();
             _banditBehaviours.Setup(this.transform, this.GetComponent<Controller2D>());
@@ -94,7 +94,7 @@ namespace DoomBreakers
                     break;
                 case state.IsFalling:
                     _banditAnimator.SetAnimationState(AnimationState.FallenAnim);
-                    _banditBehaviours.FallProcess(_banditState, _banditSprite);
+                    _banditBehaviours.FallProcess(_banditState, _banditSprite, _banditID);
                     break;
                 case state.IsQuickAttack:
                     _banditAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
@@ -126,7 +126,7 @@ namespace DoomBreakers
                     break;
                 case state.IsHitByReleaseAttack:
                     _banditAnimator.SetAnimationState(AnimationState.PowerHitAnim);
-                    _banditBehaviours.HitByPowerAttackProcess(_banditCollider.GetRecentCollision());
+                    _banditBehaviours.HitByPowerAttackProcess(_banditCollider.GetRecentCollision(), _banditID);
                     //_banditBehaviours.HitByPowerAttackProcess(_banditState, _banditSprite);
                     break;
 
@@ -142,9 +142,11 @@ namespace DoomBreakers
 		{
             _banditCollider.UpdateCollision(_banditState, _banditSprite);
         }
-        public void ReportCollisionWithPlayer(ICollisionData collisionData)//IPlayerStateMachine playerStateMachine)
+        public void ReportCollisionWithPlayer(ICollisionData collisionData, int playerId)//IPlayerStateMachine playerStateMachine)
 		{
-            _banditState = _banditCollider.RegisterHitByAttack(collisionData);//playerStateMachine);
+            collisionData.PluginEnemyState(_banditState, _banditID);
+            collisionData.PluginBanditSprite(_banditSprite, _banditID);
+            _banditState = _banditCollider.RegisterHitByAttack(collisionData, playerId);//playerStateMachine);
 		}
 
         private void UpdatePrintMsg()

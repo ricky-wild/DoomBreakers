@@ -12,12 +12,12 @@ namespace DoomBreakers
 		void IdleProcess(IEnemyStateMachine enemyStateMachine, IBanditCollision banditCollider);
 		void WaitingProcess(IEnemyStateMachine enemyStateMachine);
 		bool JumpProcess(IEnemyStateMachine enemyStateMachine);
-		void FallProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
+		void FallProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite, int banditId);
 		void PersueTarget(IEnemyStateMachine enemyStateMachine, Transform targetTransform, IBanditSprite banditSprite);
 		void QuickAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
 		void HitByQuickAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
 		//void HitByPowerAttackProcess(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite);
-		void HitByPowerAttackProcess(ICollisionData collisionData);
+		void HitByPowerAttackProcess(ICollisionData collisionData, int banditId);
 
 		bool SafeToPersueTarget(IEnemyStateMachine enemyStateMachine, Transform targetTransform);
 	}
