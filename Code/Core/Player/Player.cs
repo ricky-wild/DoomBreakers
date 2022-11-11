@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
-    [RequireComponent(typeof(Controller2D))]
-    [RequireComponent(typeof(Rigidbody2D))]
+
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(Controller2D))]
     public class Player : MonoBehaviour, IPlayer
     {
         [Header("Player ID")]

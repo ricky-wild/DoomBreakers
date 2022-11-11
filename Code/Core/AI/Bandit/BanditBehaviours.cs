@@ -36,7 +36,7 @@ namespace DoomBreakers
 			_maxJumpVelocity = 14.0f;//13.25f;
 			_maxPowerStruckVelocityY = 10.0f; //10.0f for lowest impact. 14.0f for average. 16.0f for maximum impact.
 			_maxPowerStruckVelocityX = 0.5f;
-			_gravity = -(2 * 0.8f) / Mathf.Pow(0.25f, 2); //_gravity = -(3 * 0.8f) / Mathf.Pow(0.9f, 2);//this will create a moon like gravity effect
+			_gravity = wildlogicgames.DoomBreakers.GetGravity();
 			_quickAttackIncrement = 0;
 			_attackCooldownCounter = 0;
 			_attackCooldownLimit = SetVariedAttackCooldownLimit();
