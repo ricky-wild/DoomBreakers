@@ -24,12 +24,15 @@ namespace DoomBreakers
         }
         public void UpdateGravity()
 		{
-
-		}
+            if (!_controller2D.collisions.below)
+                _velocity.y += _gravity * Time.deltaTime;
+            if (_controller2D.collisions.below)
+                _velocity.y = 0f;
+        }
         public void UpdateMovement()
 		{
 
-
+            UpdateGravity();
             UpdateTransform();
         }
         void Start() { }

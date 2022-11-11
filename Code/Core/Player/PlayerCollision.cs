@@ -9,7 +9,8 @@ namespace DoomBreakers
         Player3 = 2,
         Player4 = 3,
 
-        Enemy = 4
+        Enemy = 4,
+        Item = 5
     }
     public class PlayerCollision : MonoBehaviour, IPlayerCollision
     {
@@ -77,6 +78,8 @@ namespace DoomBreakers
             _compareTagStrings[3] = "Player4";
 
             _compareTagStrings[4] = "Enemy";
+
+            _compareTagStrings[5] = "Item";
         }
 
         public string GetCompareTag(CompareTags compareTagId)
@@ -249,9 +252,32 @@ namespace DoomBreakers
 
             return false;
 		}
+        private void ProcessCollisionWithSword(Collider2D collision)
+		{
+            if (collision.GetComponent<Sword>() == null)
+                return; //Then NOT a Sword. Get outta here!
+
+
+
+        }
+        private void ProcessCollisionWithShield(Collider2D collision)
+        {
+            if (collision.GetComponent<Shield>() == null)
+                return; //Then NOT a Shield. Get outta here!
+        }
+        private void ProcessCollisionWithArmor(Collider2D collision)
+        {
+            if (collision.GetComponent<Breastplate>() == null)
+                return; //Then NOT a Armor. Get outta here!
+        }
         public void ProcessCollisionFlags(Collider2D collision)
         {
-            //if (collision.CompareTag("")) { }
+            if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
+            {
+                ProcessCollisionWithSword(collision);
+                ProcessCollisionWithShield(collision);
+                ProcessCollisionWithArmor(collision);
+            }
             //if (collision.CompareTag("")) { }
             //if (collision.CompareTag("")) { }
             //if (collision.CompareTag("")) { }

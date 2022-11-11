@@ -251,24 +251,29 @@ namespace DoomBreakers
 			int playerFaceDir = collisionData.GetCachedPlayerSprite(playerId).GetSpriteDirection();
 			WeaponChargeHold weaponChargeHoldFlag = collisionData.GetCachedPlayerSprite(playerId).GetWeaponTexChargeFlag();
 			float multiplier = 1.2f;// 1.66f;
+			float heightCap = 0f;
 			//print("\nweaponChargeHoldFlag =" + weaponChargeHoldFlag);
 			switch(weaponChargeHoldFlag)
 			{
 				case WeaponChargeHold.None:
 					multiplier = 0.75f;
+					heightCap = 1.25f;
 					break;
 				case WeaponChargeHold.Minimal:
 					multiplier = 1.2f;
+					heightCap = 1.0f;
 					break;
 				case WeaponChargeHold.Moderate:
-					multiplier = 1.5f;
+					multiplier = 1.35f;
+					heightCap = 0.5f;
 					break;
 				case WeaponChargeHold.Maximal:
-					multiplier = 1.9f;
+					multiplier = 1.5f;
+					heightCap = 0.25f;
 					break;
 			}
 
-			if (_velocity.y >= (_maxPowerStruckVelocityY + (multiplier/4)))//_maxPowerStruckVelocityY) //Near peak of jump velocity, set falling state.
+			if (_velocity.y >= _maxPowerStruckVelocityY - heightCap)// + (multiplier/4)))//_maxPowerStruckVelocityY) //Near peak of jump velocity, set falling state.
 			{
 				if (_collidedData != collisionData)//== null)
 					_collidedData = collisionData;

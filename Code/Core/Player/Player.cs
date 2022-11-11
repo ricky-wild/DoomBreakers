@@ -27,6 +27,7 @@ namespace DoomBreakers
         private IPlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
         private IPlayerCollision _playerCollider;
+        private IPlayerEquipment _playerEquipment;
 
         private void InitializePlayer()
 		{
@@ -34,6 +35,7 @@ namespace DoomBreakers
             _playerInput = new PlayerInput(_playerID);
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
             _playerCollider = new PlayerCollision(this.GetComponent<Collider2D>(), ref _attackPoints);
+            _playerEquipment = new PlayerEquipment(PlayerEquip.Empty_None, PlayerEquip.Empty_None, PlayerEquip.Empty_None);
             //_playerSprite = new PlayerSprite(this.GetComponent<SpriteRenderer>(), _playerID);
 
             //PlayerBehaviours.cs ALSO needs to inherit from MonoBehaviour.

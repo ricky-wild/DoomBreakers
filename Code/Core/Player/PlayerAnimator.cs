@@ -5,6 +5,11 @@ namespace DoomBreakers
 {
 	public enum AnimationState
 	{
+		IdleLongsword = -4,
+		IdleBreastplate = -3,
+		IdleShield = -2,
+		IdleSword = -1,
+
 		IdleAnim = 0,
 		MoveAnim = 1,
 		SprintAnim = 2,
@@ -39,7 +44,9 @@ namespace DoomBreakers
 		Player_with_broadsword_with_shield_controller = 3,
 		Player_with_broadsword_with_broadsword_controller = 4,
 		Player_with_longsword_controller = 5,
-		Player_with_longsword_with_shield_controller = 6
+		Player_with_longsword_with_shield_controller = 6,
+
+		Weapon_equipment_to_pickup = 7
 
 	};
 
