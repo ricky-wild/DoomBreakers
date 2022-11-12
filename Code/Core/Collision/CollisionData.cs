@@ -5,6 +5,7 @@ namespace DoomBreakers
 {
     public class CollisionData : ICollisionData //MonoBehaviour
     {
+        private Transform _collidedTargetTransform;
         private int _lastCollidedPlayerId;
         private IPlayer[] _cachedPlayer;
         private IPlayerStateMachine[] _cachedPlayerStateMachine;
@@ -51,6 +52,10 @@ namespace DoomBreakers
 		{
             _cachedBanditSprite[enemyId] = banditSprite;
         }
+        public void PluginTargetTransform(Transform transform)
+		{
+            _collidedTargetTransform = transform;
+		}
 
 
         public IPlayer GetCachedPlayer(int playerId)
@@ -76,6 +81,10 @@ namespace DoomBreakers
         public IBanditSprite GetCachedBanditSprite(int enemyId)
 		{
             return _cachedBanditSprite[enemyId];//.GetSpriteDirection();
+		}
+        public Transform GetCachedTargetTransform()
+		{
+            return _collidedTargetTransform;
 		}
 
 

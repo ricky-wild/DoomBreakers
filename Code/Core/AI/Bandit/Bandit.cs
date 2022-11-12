@@ -86,7 +86,7 @@ namespace DoomBreakers
                     break;
                 case state.IsMoving:
                     _banditAnimator.SetAnimationState(AnimationState.MoveAnim);
-                    _banditBehaviours.PersueTarget(_banditState, _banditCollider.GetCollidedTargetTransform(), _banditSprite);
+                    _banditBehaviours.PersueTarget(_banditState, _banditCollider.GetRecentCollision(), _banditSprite);
                     break;
                 case state.IsJumping:
                     //if (_banditBehaviours.JumpProcess(_banditState))

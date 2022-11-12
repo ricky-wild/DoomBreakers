@@ -4,7 +4,7 @@ namespace DoomBreakers
 {
 	public interface IPlayerCollision //: MonoBehaviour
 	{
-		//void Setup(Collider2D collider2D, ref Transform[] arrayAtkPoints);
+		void Setup(Collider2D collider2D, ref Transform[] arrayAtkPoints);
 		void SetupLayerMasks();
 		void SetupAttackRadius();
 		void SetupCompareTags();
@@ -12,7 +12,7 @@ namespace DoomBreakers
 		void UpdateCollision(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId, IPlayerEquipment playerEquipment);
 		void ProcessCollisionFlags(Collider2D collision);
 		void UpdateDetectEnemyTargets(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId);
-		void UpdateDetectItemTargets(IPlayerEquipment playerEquipment);
+		void UpdateDetectItemTargets(IPlayerEquipment playerEquipment, IPlayerStateMachine playerStateMachine);
 		IPlayerStateMachine RegisterHitByAttack(ICollisionData collisionData, int playerId, int banditId);
 		void EnableAttackCollisions();
 		//bool IsAttackCollisionsEnabled();

@@ -76,6 +76,8 @@ namespace DoomBreakers
 				return false;
 			if (_state == state.IsFalling && state == state.IsMoving) //Prevents delayed jumping behaviour upon jump button spam
 				return false;
+			if (_state == state.IsGainedEquipment && state == state.IsHitByQuickAttack) //Prevents failure of equipment pickup process.
+				return false;
 
 
 			return true;

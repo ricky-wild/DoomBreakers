@@ -167,22 +167,23 @@ namespace DoomBreakers
 				enemyStateMachine.SetEnemyState(state.IsIdle);
 			}
 		}
-		public void PersueTarget(IEnemyStateMachine enemyStateMachine, Transform targetTransform, IBanditSprite banditSprite)
+		public void PersueTarget(IEnemyStateMachine enemyStateMachine, ICollisionData collisionData, IBanditSprite banditSprite)
 		{
-			if (!SafeToPersueTarget(enemyStateMachine, targetTransform)) //Guard Clause
+			if (!SafeToPersueTarget(enemyStateMachine, collisionData.GetCachedTargetTransform(), 
+				collisionData.GetCachedPlayerState(collisionData.GetLastCollidedPlayerID())))//Guard Clause
 				return;
 
 			int trackingDir = 0; //Face direction either -1 left, or 1 right.
 
-			if (targetTransform.position.x > _transform.position.x)
+			if (collisionData.GetCachedTargetTransform().position.x > _transform.position.x)
 				trackingDir = 1;
-			if (targetTransform.position.x < _transform.position.x)
+			if (collisionData.GetCachedTargetTransform().position.x < _transform.position.x)
 				trackingDir = -1;
 
 			//if (banditSprite.GetSpriteDirection() == -1)
 			if(trackingDir == -1)
 			{
-				if (_transform.position.x > targetTransform.position.x + 1.0f)
+				if (_transform.position.x > collisionData.GetCachedTargetTransform().position.x + 1.0f)
 					_targetVelocityX = -(0.5f * (_moveSpeed * _sprintSpeed));
 				else
 					PersueTargetReached(enemyStateMachine);
@@ -191,7 +192,7 @@ namespace DoomBreakers
 			//if (banditSprite.GetSpriteDirection() == 1)
 			if (trackingDir == 1)
 			{
-				if (_transform.position.x < targetTransform.position.x - 1.0f)
+				if (_transform.position.x < collisionData.GetCachedTargetTransform().position.x - 1.0f)
 					_targetVelocityX = 0.5f * (_moveSpeed * _sprintSpeed);
 				else
 					PersueTargetReached(enemyStateMachine);
@@ -398,10 +399,18 @@ namespace DoomBreakers
 				banditSprite.SetTexture2DColor(colour);
 		}
 
-		public bool SafeToPersueTarget(IEnemyStateMachine enemyStateMachine, Transform targetTransform)
+		public bool SafeToPersueTarget(IEnemyStateMachine enemyStateMachine, Transform targetTransform, IPlayerStateMachine playerStateMachine)
 		{
 			if (targetTransform == null) //Guard Clause
+			{
+				enemyStateMachine.SetEnemyState(state.IsIdle);
 				return false;
+			}
+			if (playerStateMachine != null)
+			{
+				if (playerStateMachine.IsGainedEquipment())
+					return false;
+			}
 
 			if (enemyStateMachine.IsQuickAttackHit())
 				return false;
@@ -415,6 +424,7 @@ namespace DoomBreakers
 				return false;
 			if (enemyStateMachine.IsImpactHit())
 				return false;
+
 
 			if (enemyStateMachine.IsFalling())
 				return false;

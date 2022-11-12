@@ -9,6 +9,7 @@ namespace DoomBreakers
 		void PluginEnemyState(IEnemyStateMachine enemyStateMachine, int banditId);
 		void PluginPlayerSprite(IPlayerSprite playerSprite, int playerId);
 		void PluginBanditSprite(IBanditSprite banditSprite, int banditId);
+		void PluginTargetTransform(Transform transform);
 
 		IPlayer GetCachedPlayer(int playerId);
 		int GetLastCollidedPlayerID();
@@ -16,6 +17,7 @@ namespace DoomBreakers
 		IEnemyStateMachine GetCachedEnemyState(int banditId);
 		IPlayerSprite GetCachedPlayerSprite(int playerId);
 		IBanditSprite GetCachedBanditSprite(int banditId);
+		Transform GetCachedTargetTransform();
 
 
 		bool SomeDataIsNull();

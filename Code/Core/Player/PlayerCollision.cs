@@ -12,6 +12,7 @@ namespace DoomBreakers
         Enemy = 4,
         Item = 5
     }
+
     public class PlayerCollision : MonoBehaviour, IPlayerCollision
     {
         private ICollisionData _collisionData;
@@ -38,8 +39,9 @@ namespace DoomBreakers
         private IPlayerStateMachine _playerStateMachine;
         private IPlayerEquipment _playerEquipment;
 
-        public PlayerCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints)
-        {
+        //public PlayerCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints) { }
+        public void Setup(Collider2D collider2D, ref Transform[] arrayAtkPoints)
+		{
             _collider2d = collider2D;
             _attackPoints = arrayAtkPoints;
 
@@ -99,7 +101,7 @@ namespace DoomBreakers
         public void UpdateCollision(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId, IPlayerEquipment playerEquipment)
 		{
             UpdateDetectEnemyTargets(playerStateMachine, playerSprite, playerId);
-            UpdateDetectItemTargets(playerEquipment);
+            UpdateDetectItemTargets(playerEquipment, playerStateMachine);
         }
         public void UpdateDetectEnemyTargets(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId)
         {
@@ -256,12 +258,16 @@ namespace DoomBreakers
 
             return false;
 		}
-        public void UpdateDetectItemTargets(IPlayerEquipment playerEquipment)
+        public void UpdateDetectItemTargets(IPlayerEquipment playerEquipment, IPlayerStateMachine playerStateMachine)
         {
+            if (_playerEquipment == null)
+                _playerEquipment = playerEquipment; //For ProcessCollisionFlags() Item use.
+
             if (!_itemCollisionEnabled)
                 return;
 
             playerEquipment = _playerEquipment; //Any changes made apply to original parent class, Player.cs.
+            playerStateMachine.SetPlayerState(state.IsGainedEquipment);
 
             _itemCollisionEnabled = false;
         }
@@ -270,6 +276,7 @@ namespace DoomBreakers
             if (collision.GetComponent<Sword>() == null)
                 return; //Then NOT a Sword. Get outta here!
 
+            //_playerEquipment = collision.GetComponent<PlayerEquipment>();
             _playerEquipment.ApplySword(collision.GetComponent<Sword>().GetSwordType(), collision.GetComponent<Sword>()._swordID);
             collision.GetComponent<Sword>().Destroy();
 

@@ -20,11 +20,12 @@ namespace DoomBreakers
 		void UpwardAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite);
 		void IdleDefenceProcess(IPlayerStateMachine playerStateMachine);
 		void HoldAttackProcess(IPlayerStateMachine playerStateMachine);
-		void ReleaseAttackProcess(IPlayerStateMachine playerStateMachine);
+		void ReleaseAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite);
 		void KnockbackAttackProcess(IPlayerStateMachine playerStateMachine);
 		void DodgeInitiatedProcess(IPlayerStateMachine playerStateMachine, bool dodgeLeft, IPlayerSprite playerSprite, IPlayerCollision playerCollider);
 		void DodgeReleasedProcess(IPlayerStateMachine playerStateMachine);
 		void HitByQuickAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite);
+		bool EquipmentGainedProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite);
 	}
 }
 

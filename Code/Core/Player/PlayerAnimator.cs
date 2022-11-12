@@ -33,7 +33,8 @@ namespace DoomBreakers
 		DyingAnim = 20,
 		DeathAnim = 21,
 		SmallHitAnim = 22,
-		PowerHitAnim = 23
+		PowerHitAnim = 23,
+		EquipmentGained = 24
 	};
 
 	public enum AnimatorController
@@ -157,6 +158,9 @@ namespace DoomBreakers
 					break;
 				case AnimationState.DeathAnim:
 					_animator.Play("Dead");
+					break;
+				case AnimationState.EquipmentGained:
+					_animator.Play("EquipAquired");
 					break;
 			}
 		}

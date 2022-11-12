@@ -4,7 +4,7 @@ using UnityEngine;
 namespace DoomBreakers
 {
 
-    public class BanditSprite : MonoBehaviour, IBanditSprite //
+    public class BanditSprite : Sprite, IBanditSprite //
     {
 
         private SpriteColourIndex _spriteColourIndex;
@@ -30,7 +30,7 @@ namespace DoomBreakers
 
             _weaponChargeTimerFlag = false;
 
-            SetupTexture2DColorSwap();
+            SetupTexture2DColorSwap(0);
         }
         public void Setup(SpriteRenderer spriteRenderer, int banditID)
         {
@@ -50,11 +50,11 @@ namespace DoomBreakers
             //SetupTexture2DColorSwap();
             ApplyCustomTexture2DColours();
         }
-        public int GetSpriteDirection()
+        public override int GetSpriteDirection()
         {
             return _spriteFaceDirection;
         }
-        public void FlipSprite()
+        public override void FlipSprite()
         {
             if (_spriteFaceDirection == 1) //Facing Right
             {
@@ -71,7 +71,7 @@ namespace DoomBreakers
         }
         public void ApplyCustomTexture2DColours()
         {
-            SetupTexture2DColorSwap();
+            SetupTexture2DColorSwap(0);
 
             int temp = 2;
             //switch (MenuManager._instance.GetPlayerCustomSkinId(_playerID))
@@ -189,7 +189,7 @@ namespace DoomBreakers
             _colorSwapTexture2D.Apply();
         }
 
-        public void SetupTexture2DColorSwap()
+        public override void  SetupTexture2DColorSwap(int texId)
         {
             _colorSwapTexture2D = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
             _colorSwapTexture2D.filterMode = FilterMode.Point;
@@ -207,7 +207,7 @@ namespace DoomBreakers
 
         }
 
-        public void SetTexture2DColor(Color color)
+        public override void SetTexture2DColor(Color color)
         {
             int texturePixelWidth = _colorSwapTexture2D.width;
             for (int i = 0; i < texturePixelWidth; ++i)
@@ -224,7 +224,7 @@ namespace DoomBreakers
             _colorSwapTexture2D.Apply();
         }
 
-        public void ResetTexture2DColor()
+        public override void ResetTexture2DColor()
         {
             int texturePixelWidth = _colorSwapTexture2D.width;
 
@@ -330,13 +330,13 @@ namespace DoomBreakers
             _colorSwapTexture2D.Apply();
         }
 
-        private void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor)
+        public override void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor)
         {
             _colorSwapTextureColors[(int)indexOfColourToSwap] = replacementColor;
             _colorSwapTexture2D.SetPixel((int)indexOfColourToSwap, 0, replacementColor);
         }
 
-        private static Color ColorFromInt(int c, float alpha = 1.0f)
+        public override Color ColorFromInt(int c, float alpha = 1.0f)
         {
             int r = (c >> 16) & 0x000000FF;
             int g = (c >> 8) & 0x000000FF;
@@ -348,7 +348,7 @@ namespace DoomBreakers
             return ret;
         }
 
-        private static Color ColorFromIntRGB(int r, int g, int b)
+        public override Color ColorFromIntRGB(int r, int g, int b)
         {
             return new Color((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, 1.0f);
         }

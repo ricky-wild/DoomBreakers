@@ -34,7 +34,6 @@ namespace DoomBreakers
             _playerState = new PlayerStateMachine(state.IsIdle);
             _playerInput = new PlayerInput(_playerID);
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
-            _playerCollider = new PlayerCollision(this.GetComponent<Collider2D>(), ref _attackPoints);
             _playerEquipment = new PlayerEquipment(PlayerEquipType.Empty_None, PlayerEquipType.Empty_None, PlayerEquipType.Empty_None);
             //_playerSprite = new PlayerSprite(this.GetComponent<SpriteRenderer>(), _playerID);
 
@@ -47,8 +46,8 @@ namespace DoomBreakers
             _playerBehaviours.Setup(this.transform, this.GetComponent<Controller2D>());
             _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
             _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
-            //_playerCollider = this.gameObject.AddComponent<PlayerCollision>();
-            //_playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints);
+            _playerCollider = this.gameObject.AddComponent<PlayerCollision>(); //Required for OnTriggerEnter2D()
+            _playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints);
         }
 
 		private void Awake()
@@ -90,9 +89,13 @@ namespace DoomBreakers
                     _playerState.SetPlayerState(state.IsUpwardAttack);
                     break;
                 case PlayerInput.inputState.HoldAttack:
+                    if (_playerState.IsJumping() || _playerState.IsFalling())
+                        return;
                     _playerState.SetPlayerState(state.IsAttackPrepare);
                     break;
                 case PlayerInput.inputState.ReleaseAttack:
+                    if (_playerState.IsJumping() || _playerState.IsFalling())
+                        return;
                     _playerState.SetPlayerState(state.IsAttackRelease);
                     break;
                 case PlayerInput.inputState.KnockBackAttack:
@@ -116,8 +119,13 @@ namespace DoomBreakers
                         _playerState.SetPlayerState(state.IsDodgeRPrepare);
                     break;
                 case PlayerInput.inputState.Sprint:
-                    if (_playerInput.GetInputVector2().x != 0.0f)
-                        _playerState.SetPlayerState(state.IsSprinting);
+                    if (_playerInput.GetInputVector2().x == 0.0f)// || _playerState.IsGainedEquipment())
+                        return;
+                    if(_playerState.IsGainedEquipment())
+                        return;
+                    if (_playerState.IsJumping() || _playerState.IsFalling())
+                        return;
+                    _playerState.SetPlayerState(state.IsSprinting);
                     break;
             }
             
@@ -164,7 +172,7 @@ namespace DoomBreakers
                     break;
                 case state.IsAttackRelease:
                     _playerAnimator.SetAnimationState(AnimationState.ReleaseAtkAnim);
-                    _playerBehaviours.ReleaseAttackProcess(_playerState);
+                    _playerBehaviours.ReleaseAttackProcess(_playerState, _playerSprite);
                     _playerCollider.EnableAttackCollisions();
                     _playerSprite.SetWeaponChargeTextureFXFlag(false);
                     break;
@@ -200,6 +208,17 @@ namespace DoomBreakers
                 case state.IsHitByQuickAttack:
                     _playerAnimator.SetAnimationState(AnimationState.SmallHitAnim);
                     _playerBehaviours.HitByQuickAttackProcess(_playerState, _playerSprite);
+                    break;
+                case state.IsGainedEquipment:
+                    _playerAnimator.SetAnimationState(AnimationState.EquipmentGained);
+                    if(!_playerBehaviours.EquipmentGainedProcess(_playerState, _playerSprite))
+                    { }
+                    else
+					{
+                        //Finished. Update the animators controller as appropriate and change state.
+                        _playerAnimator.SetAnimatorController(_playerEquipment);
+                        _playerState.SetPlayerState(state.IsIdle);
+					}
                     break;
             }
             _playerBehaviours.UpdateMovement(_playerInput.GetInputVector2(), _playerState, _playerSprite, _playerCollider);//UpdateMovement();

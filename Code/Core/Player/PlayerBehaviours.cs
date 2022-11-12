@@ -15,7 +15,7 @@ namespace DoomBreakers
 		private int _quickAttackIncrement; //4+ variations of this animation.
 		private bool _dodgedLeftFlag;//, _jumpedFlag;
 
-		private float _quickAtkWaitTime;
+		private float _quickAtkWaitTime, _gainedEquipWaitTime;
 		private ITimer _behaviourTimer, _dodgedTimer, _spriteColourSwapTimer;
 
 		public PlayerBehaviours(Transform t, Controller2D controller2D)
@@ -44,6 +44,7 @@ namespace DoomBreakers
 			_quickAttackIncrement = 0;
 			_dodgedLeftFlag = false;
 			_quickAtkWaitTime = 0.133f;
+			_gainedEquipWaitTime = 1.5f;
 			//_jumpedFlag = false;
 
 			//_behaviourTimer = new Timer();
@@ -160,10 +161,11 @@ namespace DoomBreakers
 			_velocity.x = 0f;
 			_velocity.y = 0f;
 		}
-		public void ReleaseAttackProcess(IPlayerStateMachine playerStateMachine)
+		public void ReleaseAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)
 		{
 			_velocity.x = 0f;
 			_velocity.y = 0f;
+			SetBehaviourTextureFlash(0.1f, playerSprite, Color.white);
 			_behaviourTimer.StartTimer(0.5f);
 			if (_behaviourTimer.HasTimerFinished())
 			{
@@ -242,7 +244,18 @@ namespace DoomBreakers
 
 
 		}
-
+		public bool EquipmentGainedProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)
+		{
+			_velocity.x = 0f;
+			SetBehaviourTextureFlash(0.1f, playerSprite, Color.white);
+			_behaviourTimer.StartTimer(_gainedEquipWaitTime);
+			if (_behaviourTimer.HasTimerFinished())
+			{
+				//playerStateMachine.SetPlayerState(state.IsIdle);
+				return true; //We set the Animator Controller as appropriate along with State change. 
+			}
+			return false;
+		}
 
 		void Update()
 		{

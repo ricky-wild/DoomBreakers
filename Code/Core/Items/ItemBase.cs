@@ -22,6 +22,8 @@ namespace DoomBreakers
 
         IItemBehaviour _itemBehaviour;
         IItemAnimator _itemAnimator;
+
+
         public ItemBase(){}
 		public virtual void Initialize(Animator animator, AnimatorController animController, AnimationState animationState)
 		{

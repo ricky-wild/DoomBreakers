@@ -22,7 +22,7 @@ namespace DoomBreakers
 
         private Collider2D _collider2d;
         private Collider2D[] _enemyTargetsHit;
-        private Transform _collidedTargetTransform;
+        //private Transform _collidedTargetTransform;
 
         private Transform[] _attackPoints;                            //1=quickATK, 2=powerATK, 3=upwardATK
         private float[] _attackRadius = new float[3];                //1=quickATK, 2=powerATK, 3=upwardATK
@@ -127,7 +127,8 @@ namespace DoomBreakers
         }
         private void ProcessCollisionWithPlayer(IEnemyStateMachine banditStateMachine, IBanditSprite banditSprite, Collider2D player, int playerId)
 		{
-            _collidedTargetTransform = player.transform;
+            //_collidedTargetTransform = player.transform;
+            _collisionData.PluginTargetTransform(player.transform);
             if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
                 return;
 
@@ -218,10 +219,10 @@ namespace DoomBreakers
 
             return _banditStateMachine;
         }
-        public Transform GetCollidedTargetTransform()
-		{
-            return _collidedTargetTransform;
-		}
+        //public Transform GetCollidedTargetTransform()
+		//{
+        //    return _collidedTargetTransform;
+		//}
 
         public void FlipAttackPoints(int dir)
         {

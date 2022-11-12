@@ -113,7 +113,7 @@ namespace DoomBreakers
             }
             if (IsEmptyHanded(EquipHand.Right_Hand) && !IsShield(EquipHand.Left_Hand))
             {
-                _leftHandEquip = playerEquip;
+                _rightHandEquip = playerEquip;
                 return;
             }
         }
