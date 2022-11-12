@@ -8,6 +8,8 @@ namespace DoomBreakers
 
         void Initialize(Animator animator, AnimatorController animController, AnimationState animationState);
 
+        void Destroy();
+
         //void Start() { }
 
         //void Update() { }

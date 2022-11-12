@@ -43,6 +43,20 @@ namespace DoomBreakers
             _itemAnimator.UpdateAnimator();
             _itemBehaviour.UpdateMovement();
         }
+
+   //     void OnTriggerEnter2D(Collider2D collision)
+   //     {
+   //         //ProcessCollisionFlags(collision);
+   //         if(collision.CompareTag("Player"))
+			//{
+   //             print("\nregister and calling collision here.");
+			//}
+   //     }
+
+        public void Destroy()
+		{
+            this.gameObject.SetActive(false);
+		}
     }
 }
 

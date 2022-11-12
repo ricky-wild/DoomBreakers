@@ -32,8 +32,11 @@ namespace DoomBreakers
 
         //private ITimer _cooldownTimer;
         private bool _attackCollisionEnabled;
+        private bool _itemCollisionEnabled;
 
+        //These are cached and used to communicate, register change to parent versions in Player.cs.
         private IPlayerStateMachine _playerStateMachine;
+        private IPlayerEquipment _playerEquipment;
 
         public PlayerCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints)
         {
@@ -50,6 +53,7 @@ namespace DoomBreakers
             _collisionData = new CollisionData();
             _collider2d.enabled = true;
             _attackCollisionEnabled = false;
+            _itemCollisionEnabled = false;
         }
         public void SetupLayerMasks()
 		{
@@ -92,10 +96,10 @@ namespace DoomBreakers
 
         void Update() 
         { }
-        public void UpdateCollision(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId)
+        public void UpdateCollision(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId, IPlayerEquipment playerEquipment)
 		{
             UpdateDetectEnemyTargets(playerStateMachine, playerSprite, playerId);
-
+            UpdateDetectItemTargets(playerEquipment);
         }
         public void UpdateDetectEnemyTargets(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId)
         {
@@ -252,42 +256,66 @@ namespace DoomBreakers
 
             return false;
 		}
+        public void UpdateDetectItemTargets(IPlayerEquipment playerEquipment)
+        {
+            if (!_itemCollisionEnabled)
+                return;
+
+            playerEquipment = _playerEquipment; //Any changes made apply to original parent class, Player.cs.
+
+            _itemCollisionEnabled = false;
+        }
         private void ProcessCollisionWithSword(Collider2D collision)
 		{
             if (collision.GetComponent<Sword>() == null)
                 return; //Then NOT a Sword. Get outta here!
 
+            _playerEquipment.ApplySword(collision.GetComponent<Sword>().GetSwordType(), collision.GetComponent<Sword>()._swordID);
+            collision.GetComponent<Sword>().Destroy();
 
-
+            _itemCollisionEnabled = true; //Flag so we update players equipment.
+            return;
         }
         private void ProcessCollisionWithShield(Collider2D collision)
         {
             if (collision.GetComponent<Shield>() == null)
                 return; //Then NOT a Shield. Get outta here!
+
+            _playerEquipment.ApplyShield(collision.GetComponent<Shield>().GetShieldType(), collision.GetComponent<Shield>()._shieldID);
+            collision.GetComponent<Shield>().Destroy();
+
+            _itemCollisionEnabled = true;
+            return;
         }
         private void ProcessCollisionWithArmor(Collider2D collision)
         {
             if (collision.GetComponent<Breastplate>() == null)
                 return; //Then NOT a Armor. Get outta here!
+
+            _playerEquipment.ApplyArmor(collision.GetComponent<Breastplate>().GetArmorType(), collision.GetComponent<Breastplate>()._armorID);
+            collision.GetComponent<Breastplate>().Destroy();
+
+            _itemCollisionEnabled = true;
+            return;
         }
         public void ProcessCollisionFlags(Collider2D collision)
         {
-            if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
-            {
-                ProcessCollisionWithSword(collision);
-                ProcessCollisionWithShield(collision);
-                ProcessCollisionWithArmor(collision);
-            }
-            //if (collision.CompareTag("")) { }
-            //if (collision.CompareTag("")) { }
-            //if (collision.CompareTag("")) { }
-            //if (collision.CompareTag("")) { }
-            //if (collision.CompareTag("")) { }
-            //if (collision.CompareTag("")) { }
-            //if (collision.CompareTag("")) { }
-            //if (collision.CompareTag("")) { }
-        }
-        void OnTriggerEnter2D(Collider2D collision)
+			if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
+			{
+				ProcessCollisionWithSword(collision);
+				ProcessCollisionWithShield(collision);
+				ProcessCollisionWithArmor(collision);
+			}
+			//if (collision.CompareTag("")) { }
+			//if (collision.CompareTag("")) { }
+			//if (collision.CompareTag("")) { }
+			//if (collision.CompareTag("")) { }
+			//if (collision.CompareTag("")) { }
+			//if (collision.CompareTag("")) { }
+			//if (collision.CompareTag("")) { }
+			//if (collision.CompareTag("")) { }
+		}
+        public void OnTriggerEnter2D(Collider2D collision)
         {
             ProcessCollisionFlags(collision);
         }

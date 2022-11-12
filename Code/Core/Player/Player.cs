@@ -35,7 +35,7 @@ namespace DoomBreakers
             _playerInput = new PlayerInput(_playerID);
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
             _playerCollider = new PlayerCollision(this.GetComponent<Collider2D>(), ref _attackPoints);
-            _playerEquipment = new PlayerEquipment(PlayerEquip.Empty_None, PlayerEquip.Empty_None, PlayerEquip.Empty_None);
+            _playerEquipment = new PlayerEquipment(PlayerEquipType.Empty_None, PlayerEquipType.Empty_None, PlayerEquipType.Empty_None);
             //_playerSprite = new PlayerSprite(this.GetComponent<SpriteRenderer>(), _playerID);
 
             //PlayerBehaviours.cs ALSO needs to inherit from MonoBehaviour.
@@ -212,7 +212,7 @@ namespace DoomBreakers
 
         public void UpdateCollisions()
 		{
-            _playerCollider.UpdateCollision(_playerState, _playerSprite, _playerID);
+            _playerCollider.UpdateCollision(_playerState, _playerSprite, _playerID, _playerEquipment);
 		}
         public void ReportCollisionWithEnemy(ICollisionData collisionData, int banditId)//IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
         {
@@ -225,10 +225,13 @@ namespace DoomBreakers
 
         private void UpdatePrintMsg()
 		{
-            print("\n_playerState=" + _playerState.GetPlayerState());
-            print("\n_animationState=" + _playerAnimator.GetAnimationState());
-            print("\n_playerInput.GetInputState()=" + _playerInput.GetInputState());
-            print("\n_playerCollider=");
+            //print("\n_playerState=" + _playerState.GetPlayerState());
+            //print("\n_animationState=" + _playerAnimator.GetAnimationState());
+            //print("\n_playerInput.GetInputState()=" + _playerInput.GetInputState());
+            //print("\n_playerCollider=");
+            //print("\n__playerEquipment.GetLeftHandEquip()=" + _playerEquipment.GetLeftHandEquip());
+            //print("\n__playerEquipment.GetRightHandEquip()=" + _playerEquipment.GetRightHandEquip());
+            //print("\n__playerEquipment.GetTorsoEquip()=" + _playerEquipment.GetTorsoEquip());
         }
 
         private void OnDrawGizmosSelected()

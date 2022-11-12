@@ -7,6 +7,14 @@ namespace DoomBreakers
     public enum PlayerEquip
 	{
         Empty_None = 0,
+        IsBroadsword = 1,
+        IsLongsword = 2,
+        IsShield = 3,
+        IsBreastPlate = 4
+	};
+    public enum PlayerEquipType
+	{
+        Empty_None = 0,
 
         Broadsword_Bronze = 1,
         Broadsword_Iron = 2,
@@ -34,11 +42,11 @@ namespace DoomBreakers
 	};
     public class PlayerEquipment : IPlayerEquipment//MonoBehaviour
     {
-        private PlayerEquip _torsoEquipment;
-        private PlayerEquip _leftHandEquip;
-        private PlayerEquip _rightHandEquip;
+        private PlayerEquipType _torsoEquipment;
+        private PlayerEquipType _leftHandEquip;
+        private PlayerEquipType _rightHandEquip;
 
-        public PlayerEquipment(PlayerEquip torsoEquipment, PlayerEquip leftHandEquip, PlayerEquip rightHandEquip)
+        public PlayerEquipment(PlayerEquipType torsoEquipment, PlayerEquipType leftHandEquip, PlayerEquipType rightHandEquip)
 		{
             _torsoEquipment = torsoEquipment;
             _leftHandEquip = leftHandEquip;
@@ -46,15 +54,110 @@ namespace DoomBreakers
 
         }
 
-        public PlayerEquip GetTorsoEquip()
+        public void ApplySword(PlayerEquipType playerEquip, PlayerEquip equip)
+		{
+            //Now determine where we apply this equipment.
+
+            if (!IsEquipSword(equip))
+                return;
+
+
+            if (IsBroadsword(EquipHand.Left_Hand))          //No Dual Weapons
+                return;
+            if (IsBroadsword(EquipHand.Right_Hand))         //No Dual Weapons
+                return;
+            if (IsLongsword(EquipHand.Left_Hand))           //No Dual Weapons
+                return;
+            if (IsLongsword(EquipHand.Right_Hand))          //No Dual Weapons
+                return;
+
+            if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
+            {
+                _leftHandEquip = playerEquip;
+                return;
+            }
+            if (IsShield(EquipHand.Left_Hand))
+			{
+                _rightHandEquip = playerEquip;
+                return;
+			}
+            if (IsShield(EquipHand.Right_Hand))
+            {
+                _leftHandEquip = playerEquip;
+                return;
+            }
+
+            //if (IsEquipShield(equip)) { }
+            //if (IsEquipArmor(equip)) { }
+        }
+        public void ApplyShield(PlayerEquipType playerEquip, PlayerEquip equip)
+		{
+            if (!IsEquipShield(equip))
+                return;
+
+            if (IsShield(EquipHand.Left_Hand))          //No Dual Shields
+                return;
+            if (IsShield(EquipHand.Right_Hand))         //No Dual Shields
+                return;
+
+            if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
+            {
+                _leftHandEquip = playerEquip;
+                return;
+            }
+
+            if (IsEmptyHanded(EquipHand.Left_Hand) && !IsShield(EquipHand.Right_Hand))
+            {
+                _leftHandEquip = playerEquip;
+                return;
+            }
+            if (IsEmptyHanded(EquipHand.Right_Hand) && !IsShield(EquipHand.Left_Hand))
+            {
+                _leftHandEquip = playerEquip;
+                return;
+            }
+        }
+        public void ApplyArmor(PlayerEquipType playerEquip, PlayerEquip equip)
+		{
+            if (!IsEquipArmor(equip))
+                return;
+
+            if(!IsArmor())
+			{
+                _torsoEquipment = playerEquip;
+                return;
+			}
+        }
+        private bool IsEquipSword(PlayerEquip equip)
+		{
+            if (equip == PlayerEquip.IsBroadsword)
+                return true;
+            if (equip == PlayerEquip.IsLongsword)
+                return true;
+            return false;
+        }
+        private bool IsEquipShield(PlayerEquip equip)
+        {
+            if (equip == PlayerEquip.IsShield)
+                return true;
+            return false;
+        }
+        private bool IsEquipArmor(PlayerEquip equip)
+        {
+            if (equip == PlayerEquip.IsBreastPlate)
+                return true;
+            return false;
+        }
+
+        public PlayerEquipType GetTorsoEquip()
 		{
             return _torsoEquipment;
 		}
-        public PlayerEquip GetLeftHandEquip()
+        public PlayerEquipType GetLeftHandEquip()
         {
             return _leftHandEquip;
         }
-        public PlayerEquip GetRightHandEquip()
+        public PlayerEquipType GetRightHandEquip()
         {
             return _rightHandEquip;
         }
@@ -62,24 +165,24 @@ namespace DoomBreakers
 		{
             if(equipHand == EquipHand.Left_Hand)
 			{
-                if (_leftHandEquip == PlayerEquip.Broadsword_Bronze)
+                if (_leftHandEquip == PlayerEquipType.Broadsword_Bronze)
                     return true;
-                if (_leftHandEquip == PlayerEquip.Broadsword_Iron)
+                if (_leftHandEquip == PlayerEquipType.Broadsword_Iron)
                     return true;
-                if (_leftHandEquip == PlayerEquip.Broadsword_Steel)
+                if (_leftHandEquip == PlayerEquipType.Broadsword_Steel)
                     return true;
-                if (_leftHandEquip == PlayerEquip.Broadsword_Ebony)
+                if (_leftHandEquip == PlayerEquipType.Broadsword_Ebony)
                     return true;
             }
             if (equipHand == EquipHand.Right_Hand)
             {
-                if (_rightHandEquip == PlayerEquip.Broadsword_Bronze)
+                if (_rightHandEquip == PlayerEquipType.Broadsword_Bronze)
                     return true;
-                if (_rightHandEquip == PlayerEquip.Broadsword_Iron)
+                if (_rightHandEquip == PlayerEquipType.Broadsword_Iron)
                     return true;
-                if (_rightHandEquip == PlayerEquip.Broadsword_Steel)
+                if (_rightHandEquip == PlayerEquipType.Broadsword_Steel)
                     return true;
-                if (_rightHandEquip == PlayerEquip.Broadsword_Ebony)
+                if (_rightHandEquip == PlayerEquipType.Broadsword_Ebony)
                     return true;
             }
 
@@ -89,24 +192,24 @@ namespace DoomBreakers
         {
             if (equipHand == EquipHand.Left_Hand)
             {
-                if (_leftHandEquip == PlayerEquip.Longsword_Bronze)
+                if (_leftHandEquip == PlayerEquipType.Longsword_Bronze)
                     return true;
-                if (_leftHandEquip == PlayerEquip.Longsword_Iron)
+                if (_leftHandEquip == PlayerEquipType.Longsword_Iron)
                     return true;
-                if (_leftHandEquip == PlayerEquip.Longsword_Steel)
+                if (_leftHandEquip == PlayerEquipType.Longsword_Steel)
                     return true;
-                if (_leftHandEquip == PlayerEquip.Longsword_Ebony)
+                if (_leftHandEquip == PlayerEquipType.Longsword_Ebony)
                     return true;
             }
             if (equipHand == EquipHand.Right_Hand)
             {
-                if (_rightHandEquip == PlayerEquip.Longsword_Bronze)
+                if (_rightHandEquip == PlayerEquipType.Longsword_Bronze)
                     return true;
-                if (_rightHandEquip == PlayerEquip.Longsword_Iron)
+                if (_rightHandEquip == PlayerEquipType.Longsword_Iron)
                     return true;
-                if (_rightHandEquip == PlayerEquip.Longsword_Steel)
+                if (_rightHandEquip == PlayerEquipType.Longsword_Steel)
                     return true;
-                if (_rightHandEquip == PlayerEquip.Longsword_Ebony)
+                if (_rightHandEquip == PlayerEquipType.Longsword_Ebony)
                     return true;
             }
             return false;
@@ -115,37 +218,37 @@ namespace DoomBreakers
         {
             if (equipHand == EquipHand.Left_Hand)
             {
-                if (_leftHandEquip == PlayerEquip.Shield_Bronze)
+                if (_leftHandEquip == PlayerEquipType.Shield_Bronze)
                     return true;
-                if (_leftHandEquip == PlayerEquip.Shield_Iron)
+                if (_leftHandEquip == PlayerEquipType.Shield_Iron)
                     return true;
-                if (_leftHandEquip == PlayerEquip.Shield_Steel)
+                if (_leftHandEquip == PlayerEquipType.Shield_Steel)
                     return true;
-                if (_leftHandEquip == PlayerEquip.Shield_Ebony)
+                if (_leftHandEquip == PlayerEquipType.Shield_Ebony)
                     return true;
             }
             if (equipHand == EquipHand.Right_Hand)
             {
-                if (_rightHandEquip == PlayerEquip.Shield_Bronze)
+                if (_rightHandEquip == PlayerEquipType.Shield_Bronze)
                     return true;
-                if (_rightHandEquip == PlayerEquip.Shield_Iron)
+                if (_rightHandEquip == PlayerEquipType.Shield_Iron)
                     return true;
-                if (_rightHandEquip == PlayerEquip.Shield_Steel)
+                if (_rightHandEquip == PlayerEquipType.Shield_Steel)
                     return true;
-                if (_rightHandEquip == PlayerEquip.Shield_Ebony)
+                if (_rightHandEquip == PlayerEquipType.Shield_Ebony)
                     return true;
             }
             return false;
         }
         public bool IsArmor()
         {
-            if (_torsoEquipment == PlayerEquip.BreastPlate_Bronze)
+            if (_torsoEquipment == PlayerEquipType.BreastPlate_Bronze)
                 return true;
-            if (_torsoEquipment == PlayerEquip.BreastPlate_Iron)
+            if (_torsoEquipment == PlayerEquipType.BreastPlate_Iron)
                 return true;
-            if (_torsoEquipment == PlayerEquip.BreastPlate_Steel)
+            if (_torsoEquipment == PlayerEquipType.BreastPlate_Steel)
                 return true;
-            if (_torsoEquipment == PlayerEquip.BreastPlate_Ebony)
+            if (_torsoEquipment == PlayerEquipType.BreastPlate_Ebony)
                 return true;
             return false;
         }
@@ -154,12 +257,12 @@ namespace DoomBreakers
         {
             if (equipHand == EquipHand.Left_Hand)
             {
-                if (_leftHandEquip == PlayerEquip.Empty_None)// && _rightHandEquip == PlayerEquip.Empty_None)
+                if (_leftHandEquip == PlayerEquipType.Empty_None)// && _rightHandEquip == PlayerEquipType.Empty_None)
                     return true;
             }
             if (equipHand == EquipHand.Right_Hand)
             {
-                if (_rightHandEquip == PlayerEquip.Empty_None)
+                if (_rightHandEquip == PlayerEquipType.Empty_None)
                     return true;
             }
 

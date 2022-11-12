@@ -27,7 +27,7 @@ namespace DoomBreakers
 		{
 			switch (_animationState)
 			{
-				case AnimationState.IdleSword:
+				case AnimationState.IdleBroadSword:
 					_animator.Play("Sword");//, 0, 0.0f);
 					break;
 				case AnimationState.IdleLongsword:

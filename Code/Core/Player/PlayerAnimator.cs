@@ -8,7 +8,7 @@ namespace DoomBreakers
 		IdleLongsword = -4,
 		IdleBreastplate = -3,
 		IdleShield = -2,
-		IdleSword = -1,
+		IdleBroadSword = -1,
 
 		IdleAnim = 0,
 		MoveAnim = 1,

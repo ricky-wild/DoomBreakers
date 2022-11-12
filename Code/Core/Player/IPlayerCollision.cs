@@ -9,11 +9,10 @@ namespace DoomBreakers
 		void SetupAttackRadius();
 		void SetupCompareTags();
 		string GetCompareTag(CompareTags compareTagId);
-		void UpdateCollision(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId);
+		void UpdateCollision(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId, IPlayerEquipment playerEquipment);
 		void ProcessCollisionFlags(Collider2D collision);
 		void UpdateDetectEnemyTargets(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId);
-		//IPlayerStateMachine RegisterHitByAttack(IEnemyStateMachine enemyStateMachine, IPlayerStateMachine playerStateMachine,
-		//										IPlayerSprite playerSprite, IBanditSprite banditSprite);
+		void UpdateDetectItemTargets(IPlayerEquipment playerEquipment);
 		IPlayerStateMachine RegisterHitByAttack(ICollisionData collisionData, int playerId, int banditId);
 		void EnableAttackCollisions();
 		//bool IsAttackCollisionsEnabled();
