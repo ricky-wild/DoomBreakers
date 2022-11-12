@@ -58,7 +58,7 @@ namespace DoomBreakers
 
 		void Start()
         {
-            _playerAnimator.SetAnimatorController(AnimatorController.Player_with_broadsword_with_shield_controller, false);
+            _playerAnimator.SetAnimatorController(_playerEquipment);//AnimatorController.Player_with_broadsword_with_shield_controller, false);
         }
 
         void Update()

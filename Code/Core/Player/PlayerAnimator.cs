@@ -166,21 +166,11 @@ namespace DoomBreakers
 		}
 		public void SetAnimationState(AnimationState animationState)
 		{
-			//if (_animationState == animationState)//Guard Clause
-			//	return;
-
-			//UpdateAnimator(); //.Play() once.
-
 			_animationState = animationState;
 		}
-		public void SetAnimatorController(AnimatorController animatorController, bool withArmor)
+		public void SetAnimatorController(IPlayerEquipment playerEquipment)//AnimatorController animatorController, bool withArmor)
 		{
-			_animatorController = animatorController;
-
-			if(withArmor)
-				_animControllerFilepath = "HumanAnimControllers/Armored/";
-			else
-				_animControllerFilepath = "HumanAnimControllers/Unarmored/";
+			SetupAnimControllerBasedOnEquip(playerEquipment);
 
 			switch (_animatorController)
 			{
@@ -207,6 +197,67 @@ namespace DoomBreakers
 					break;
 			}
 		}
+
+		private void SetupAnimControllerBasedOnEquip(IPlayerEquipment playerEquipment)
+		{
+			if (playerEquipment.IsArmor())
+				_animControllerFilepath = "HumanAnimControllers/Armored/";
+			else
+				_animControllerFilepath = "HumanAnimControllers/Unarmored/";
+
+			if (playerEquipment.IsEmptyHanded(EquipHand.Left_Hand) && 
+				playerEquipment.IsEmptyHanded(EquipHand.Right_Hand))								//EMPTY HANDED BOTH LEFT & RIGHT
+			{
+				_animatorController = AnimatorController.Player_with_nothing_controller;
+				return;
+			}
+			if (playerEquipment.IsBroadsword(EquipHand.Left_Hand) &&								//BROADSWORD ONLY IN LEFT OR RIGHT HAND
+				playerEquipment.IsEmptyHanded(EquipHand.Right_Hand) ||
+				playerEquipment.IsEmptyHanded(EquipHand.Left_Hand) && 
+				playerEquipment.IsBroadsword(EquipHand.Right_Hand))
+			{
+				_animatorController = AnimatorController.Player_with_broadsword_controller;
+				return;
+			}
+
+			if (playerEquipment.IsLongsword(EquipHand.Left_Hand) &&									//LONGSWORD ONLY IN LEFT OR RIGHT HAND
+				playerEquipment.IsEmptyHanded(EquipHand.Right_Hand) ||
+				playerEquipment.IsEmptyHanded(EquipHand.Left_Hand) &&
+				playerEquipment.IsLongsword(EquipHand.Right_Hand))
+			{
+				_animatorController = AnimatorController.Player_with_longsword_controller;
+				return;
+			}
+
+			if (playerEquipment.IsShield(EquipHand.Left_Hand) &&                                    //SHIELD ONLY IN LEFT OR RIGHT HAND
+				playerEquipment.IsEmptyHanded(EquipHand.Right_Hand) ||
+				playerEquipment.IsEmptyHanded(EquipHand.Left_Hand) &&
+				playerEquipment.IsShield(EquipHand.Right_Hand))
+			{
+				_animatorController = AnimatorController.Player_with_shield_controller;
+				return;
+			}
+
+			if (playerEquipment.IsShield(EquipHand.Left_Hand) &&                                    //BROADSWORD & SHIELD, LEFT OR RIGHT VICE VERSA COMBINATION
+				playerEquipment.IsBroadsword(EquipHand.Right_Hand) ||
+				playerEquipment.IsBroadsword(EquipHand.Left_Hand) &&
+				playerEquipment.IsShield(EquipHand.Right_Hand))
+			{
+				_animatorController = AnimatorController.Player_with_broadsword_with_shield_controller;
+				return;
+			}
+
+			if (playerEquipment.IsShield(EquipHand.Left_Hand) &&                                    //LONGSWORD & SHIELD, LEFT OR RIGHT VICE VERSA COMBINATION
+				playerEquipment.IsLongsword(EquipHand.Right_Hand) ||
+				playerEquipment.IsLongsword(EquipHand.Left_Hand) &&
+				playerEquipment.IsShield(EquipHand.Right_Hand))
+			{
+				_animatorController = AnimatorController.Player_with_longsword_with_shield_controller;
+				return;
+			}
+		}
+
+		
 
 	}
 }

@@ -6,7 +6,7 @@ namespace DoomBreakers
 		void UpdateAnimator(IPlayerBehaviours playerBehaviour);
 		AnimationState GetAnimationState();
 		void SetAnimationState(AnimationState animationState);
-		void SetAnimatorController(AnimatorController animatorController, bool withArmor);
+		void SetAnimatorController(IPlayerEquipment playerEquipment);//AnimatorController animatorController, bool withArmor);
 		//void SetAnimationState(string animationState);
 	}
 }
