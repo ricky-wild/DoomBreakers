@@ -7,8 +7,8 @@ namespace DoomBreakers
 	public class Shield : ItemBase
 	{
 		[Header("Shield ID")]
-		[Tooltip("Set its base type")]
-		public PlayerEquip _shieldID;
+		[Tooltip("Set its base item type to appropriate.")]
+		public PlayerItem _shieldID;
 
 		[Header("Shield Type")]
 		[Tooltip("Set Item to any kind of shield.")]
@@ -30,7 +30,7 @@ namespace DoomBreakers
 				_playerEquip != PlayerEquipType.Shield_Ebony)
 			{
 				_playerEquip = PlayerEquipType.Shield_Bronze;
-				_shieldID = PlayerEquip.IsShield;
+				_shieldID = PlayerItem.IsShield;
 				_animState = AnimationState.IdleShield;
 				return;
 			}
@@ -42,8 +42,8 @@ namespace DoomBreakers
 				_playerEquip == PlayerEquipType.Shield_Steel ||
 				_playerEquip == PlayerEquipType.Shield_Ebony)
 			{
-				if (_shieldID != PlayerEquip.IsShield)
-					_shieldID = PlayerEquip.IsShield;
+				if (_shieldID != PlayerItem.IsShield)
+					_shieldID = PlayerItem.IsShield;
 				_animState = AnimationState.IdleShield;
 				return;
 			}
@@ -51,12 +51,14 @@ namespace DoomBreakers
 		}
 		public override void Awake()
 		{
-			Initialize(this.GetComponent<Animator>(), AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleShield);
+			Initialize(this.GetComponent<SpriteRenderer>(), this.GetComponent<Animator>(), 
+				AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleShield, _shieldID, _playerEquip);
 		}
-		public override void Initialize(Animator animator, AnimatorController animController, AnimationState animationState)
+		public override void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
+									    AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType)
 		{
 			SetupShield();
-			base.Initialize(animator, animController, _animState);
+			base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);
 		}
 		public override void Start()
 		{

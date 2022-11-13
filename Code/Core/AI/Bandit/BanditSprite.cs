@@ -30,7 +30,7 @@ namespace DoomBreakers
 
             _weaponChargeTimerFlag = false;
 
-            SetupTexture2DColorSwap(0);
+            SetupTexture2DColorSwap("_SwapTexBandit",banditID);
         }
         public void Setup(SpriteRenderer spriteRenderer, int banditID)
         {
@@ -71,7 +71,7 @@ namespace DoomBreakers
         }
         public void ApplyCustomTexture2DColours()
         {
-            SetupTexture2DColorSwap(0);
+            SetupTexture2DColorSwap("_SwapTexBandit", _banditID);
 
             int temp = 2;
             //switch (MenuManager._instance.GetPlayerCustomSkinId(_playerID))
@@ -189,7 +189,7 @@ namespace DoomBreakers
             _colorSwapTexture2D.Apply();
         }
 
-        public override void  SetupTexture2DColorSwap(int texId)
+        public override void  SetupTexture2DColorSwap(string texName, int texId)
         {
             _colorSwapTexture2D = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
             _colorSwapTexture2D.filterMode = FilterMode.Point;
@@ -200,8 +200,8 @@ namespace DoomBreakers
 
             _colorSwapTexture2D.Apply();
 
-
-            _spriteRenderer.material.SetTexture("_SwapTexBandit", _colorSwapTexture2D);
+            //texName = "_SwapTexBandit";
+            _spriteRenderer.material.SetTexture(texName, _colorSwapTexture2D);
 
             _colorSwapTextureColors = new Color[texturePixelWidth];
 

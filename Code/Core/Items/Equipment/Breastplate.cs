@@ -7,8 +7,8 @@ namespace DoomBreakers
 	public class Breastplate : ItemBase
 	{
 		[Header("Armor ID")]
-		[Tooltip("Set its base type")]
-		public PlayerEquip _armorID;
+		[Tooltip("Set its base item type to appropriate.")]
+		public PlayerItem _armorID;
 
 		[Header("Armor Type")]
 		[Tooltip("Set Item to any kind of armor.")]
@@ -23,14 +23,10 @@ namespace DoomBreakers
 		private void SetupArmor()
 		{
 			//Ensure a armor type has been applied within the inspector.
-			if (_playerEquip == PlayerEquipType.Empty_None ||
-				_playerEquip != PlayerEquipType.BreastPlate_Bronze ||
-				_playerEquip != PlayerEquipType.BreastPlate_Iron ||
-				_playerEquip != PlayerEquipType.BreastPlate_Steel ||
-				_playerEquip != PlayerEquipType.BreastPlate_Ebony)
+			if (_playerEquip == PlayerEquipType.Empty_None)
 			{
 				_playerEquip = PlayerEquipType.BreastPlate_Bronze;
-				_armorID = PlayerEquip.IsBreastPlate;
+				_armorID = PlayerItem.IsBreastPlate;
 				_animState = AnimationState.IdleBreastplate;
 				return;
 			}
@@ -42,8 +38,8 @@ namespace DoomBreakers
 				_playerEquip == PlayerEquipType.BreastPlate_Steel ||
 				_playerEquip == PlayerEquipType.BreastPlate_Ebony)
 			{
-				if (_armorID != PlayerEquip.IsBreastPlate)
-					_armorID = PlayerEquip.IsBreastPlate;
+				if (_armorID != PlayerItem.IsBreastPlate)
+					_armorID = PlayerItem.IsBreastPlate;
 				_animState = AnimationState.IdleBreastplate;
 				return;
 			}
@@ -51,12 +47,14 @@ namespace DoomBreakers
 		}
 		public override void Awake()
 		{
-			Initialize(this.GetComponent<Animator>(), AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleBreastplate);
+			Initialize(this.GetComponent<SpriteRenderer>(), this.GetComponent<Animator>(), 
+				AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleBreastplate, _armorID, _playerEquip);
 		}
-		public override void Initialize(Animator animator, AnimatorController animController, AnimationState animationState)
+		public override void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
+									   AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType)
 		{
 			SetupArmor();
-			base.Initialize(animator, animController, _animState);
+			base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);
 		}
 		public override void Start()
 		{

@@ -7,11 +7,12 @@ namespace DoomBreakers
 		int GetSpriteDirection();
 		WeaponChargeHold GetWeaponTexChargeFlag();
 		void FlipSprite();
-		void SetupTexture2DColorSwap();
+		void SetupTexture2DColorSwap(string texName, int texId);
 		void ResetTexture2DColor();
 		void ApplyCustomTexture2DColours();
 		void SetTexture2DColor(Color color);
 		void SetWeaponChargeTextureFXFlag(bool b);
+		void SetNewEquipmemtTextureColorFlag(bool b, IPlayerEquipment playerEquipment);
 	}
 }
 

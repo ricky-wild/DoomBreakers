@@ -25,7 +25,7 @@ namespace DoomBreakers
 		void DodgeInitiatedProcess(IPlayerStateMachine playerStateMachine, bool dodgeLeft, IPlayerSprite playerSprite, IPlayerCollision playerCollider);
 		void DodgeReleasedProcess(IPlayerStateMachine playerStateMachine);
 		void HitByQuickAttackProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite);
-		bool EquipmentGainedProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite);
+		bool EquipmentGainedProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, IPlayerEquipment playerEquipment);
 	}
 }
 

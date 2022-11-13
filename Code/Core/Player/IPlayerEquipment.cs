@@ -4,10 +4,10 @@ namespace DoomBreakers
 {
     public interface IPlayerEquipment
 	{
-		//void ApplyEquipment(PlayerEquipType playerEquip, PlayerEquip equip);
-		void ApplySword(PlayerEquipType playerEquip, PlayerEquip equip);
-		void ApplyShield(PlayerEquipType playerEquip, PlayerEquip equip);
-		void ApplyArmor(PlayerEquipType playerEquip, PlayerEquip equip);
+		//void ApplyEquipment(PlayerEquipType playerEquip, PlayerItem equip);
+		void ApplySword(PlayerEquipType playerEquip, PlayerItem equip);
+		void ApplyShield(PlayerEquipType playerEquip, PlayerItem equip);
+		void ApplyArmor(PlayerEquipType playerEquip, PlayerItem equip);
 		PlayerEquipType GetTorsoEquip();
 		PlayerEquipType GetLeftHandEquip();
 		PlayerEquipType GetRightHandEquip();

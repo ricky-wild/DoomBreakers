@@ -244,13 +244,14 @@ namespace DoomBreakers
 
 
 		}
-		public bool EquipmentGainedProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite)
+		public bool EquipmentGainedProcess(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, IPlayerEquipment playerEquipment)
 		{
 			_velocity.x = 0f;
-			SetBehaviourTextureFlash(0.1f, playerSprite, Color.white);
+			SetBehaviourTextureFlash(0.025f, playerSprite, Color.white);
 			_behaviourTimer.StartTimer(_gainedEquipWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
 			{
+				playerSprite.SetNewEquipmemtTextureColorFlag(true, playerEquipment);
 				//playerStateMachine.SetPlayerState(state.IsIdle);
 				return true; //We set the Animator Controller as appropriate along with State change. 
 			}

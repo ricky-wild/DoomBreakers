@@ -4,14 +4,14 @@ namespace DoomBreakers
 {
     public class Sprite : MonoBehaviour, ISprite
     {
-		private SpriteRenderer _spriteRenderer;
-		private Texture2D _colorSwapTexture2D;
-		private Color[] _colorSwapTextureColors;
+		protected SpriteRenderer _spriteRenderer;
+		protected Texture2D _colorSwapTexture2D;
+		protected Color[] _colorSwapTextureColors;
 		private int _spriteFaceDirection;
 		private ITimer _colorSwappedTimer;
 		private bool _colorSwappedFlag;
 
-		public virtual void Setup(SpriteRenderer spriteRenderer)
+		public virtual void Setup(SpriteRenderer spriteRenderer, string texName, int texId)
 		{
 			_spriteRenderer = spriteRenderer;
 			_spriteFaceDirection = 1; //1 = face right, -1 = face left.
@@ -20,7 +20,7 @@ namespace DoomBreakers
 			_colorSwappedTimer.Setup("_colorSwappedTimer");
 			_colorSwappedFlag = false;
 
-			//SetupTexture2DColorSwap();
+			SetupTexture2DColorSwap(texName, texId);
 		}
 		public virtual int GetSpriteDirection()
 		{
@@ -41,7 +41,7 @@ namespace DoomBreakers
 				return;
 			}
 		}
-		public virtual void SetupTexture2DColorSwap(int texId)
+		public virtual void SetupTexture2DColorSwap(string texName, int texId)
 		{
 			_colorSwapTexture2D = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
 			_colorSwapTexture2D.filterMode = FilterMode.Point;
@@ -52,8 +52,8 @@ namespace DoomBreakers
 
 			_colorSwapTexture2D.Apply();
 
-
-			_spriteRenderer.material.SetTexture("_SwapTex" + texId, _colorSwapTexture2D);
+			//shader->ColorSwapBandit->_SwapTexBandit
+			_spriteRenderer.material.SetTexture(texName, _colorSwapTexture2D);
 
 			_colorSwapTextureColors = new Color[texturePixelWidth];
 		}

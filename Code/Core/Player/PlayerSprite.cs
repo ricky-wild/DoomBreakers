@@ -69,9 +69,9 @@ namespace DoomBreakers
     {
 		
 		private SpriteColourIndex _spriteColourIndex;
-		private SpriteRenderer _spriteRenderer;
-		private Texture2D _colorSwapTexture2D;
-		private Color[] _colorSwapTextureColors;
+		//private SpriteRenderer _spriteRenderer;
+		//private Texture2D _colorSwapTexture2D;
+		//private Color[] _colorSwapTextureColors;
 		private int _playerID, _spriteFaceDirection;
         private ITimer _colorSwappedTimer;
         private bool _colorSwappedFlag;
@@ -83,7 +83,10 @@ namespace DoomBreakers
         private const int _weaponTimerIncrementMax = 10;
         private bool _weaponChargeTimerFlag;
 
+        private bool _newEquipmentColorFlag;
+
         private WeaponChargeHold _weaponChargeHoldFlag; //Indicates how long the weapon charge went on for.
+        private IPlayerEquipment _playerEquipment;
 
 
         public void Setup(SpriteRenderer spriteRenderer, int playerID)
@@ -106,6 +109,8 @@ namespace DoomBreakers
 
             _weaponChargeHoldFlag = WeaponChargeHold.None;
 
+            _newEquipmentColorFlag = false;
+
             //SetupTexture2DColorSwap();
             ApplyCustomTexture2DColours();
         }
@@ -119,24 +124,25 @@ namespace DoomBreakers
 		}
         public override void FlipSprite()
 		{
-            if(_spriteFaceDirection == 1) //Facing Right
+			//base.FlipSprite();
+			if (_spriteFaceDirection == 1) //Facing Right
 			{
-                _spriteFaceDirection = -1; //Then set to face left.
-                _spriteRenderer.flipX = true;
-                return;
-            }
-            if (_spriteFaceDirection == -1) //Facing Left
-            {
-                _spriteFaceDirection = 1; //Then set to face right.
-                _spriteRenderer.flipX = false;
-                return;
-            }
-        }
+				_spriteFaceDirection = -1; //Then set to face left.
+				_spriteRenderer.flipX = true;
+				return;
+			}
+			if (_spriteFaceDirection == -1) //Facing Left
+			{
+				_spriteFaceDirection = 1; //Then set to face right.
+				_spriteRenderer.flipX = false;
+				return;
+			}
+		}
 		public void ApplyCustomTexture2DColours()
 		{
-            SetupTexture2DColorSwap();
+            SetupTexture2DColorSwap("_SwapTex", _playerID);
 
-            int temp = 5;
+            int temp = 4;
 
             //switch (MenuManager._instance.GetPlayerCustomSkinId(_playerID))
             switch(temp)
@@ -254,8 +260,9 @@ namespace DoomBreakers
             _colorSwapTexture2D.Apply();
         }
 
-		public void SetupTexture2DColorSwap()
-		{
+		public override void SetupTexture2DColorSwap(string texName, int texId)
+        {
+			//base.SetupTexture2DColorSwap(texName, _playerID);
 			_colorSwapTexture2D = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
 			_colorSwapTexture2D.filterMode = FilterMode.Point;
 
@@ -265,8 +272,11 @@ namespace DoomBreakers
 
 			_colorSwapTexture2D.Apply();
 
-
-			_spriteRenderer.material.SetTexture("_SwapTex" + _playerID, _colorSwapTexture2D);
+            //shader->ColorSwap->_SwapTex0
+            //shader->ColorSwap1->_SwapTex1
+            //shader->ColorSwap2->_SwapTex2
+            //shader->ColorSwap3->_SwapTex3
+            _spriteRenderer.material.SetTexture("_SwapTex" + _playerID, _colorSwapTexture2D);
 
 			_colorSwapTextureColors = new Color[texturePixelWidth];
 
@@ -274,36 +284,37 @@ namespace DoomBreakers
 
         public override void SetTexture2DColor(Color color)
         {
-            int texturePixelWidth = _colorSwapTexture2D.width;
-            for (int i = 0; i < texturePixelWidth; ++i)
-            {
-                _colorSwapTexture2D.SetPixel(i, 0, color);
-            }
-
-            if(!_colorSwappedFlag) //Ensure we reset internally upon failure to do so externally (ie a state change)
+			//base.SetTexture2DColor(color);
+			int texturePixelWidth = _colorSwapTexture2D.width;
+			for (int i = 0; i < texturePixelWidth; ++i)
 			{
-                _colorSwappedTimer.StartTimer(0.5f);
-                _colorSwappedFlag = true;
-            }
-            
-            _colorSwapTexture2D.Apply();
-        }
+				_colorSwapTexture2D.SetPixel(i, 0, color);
+			}
+
+			if (!_colorSwappedFlag) //Ensure we reset internally upon failure to do so externally (ie a state change)
+			{
+				_colorSwappedTimer.StartTimer(0.5f);
+				_colorSwappedFlag = true;
+			}
+
+			_colorSwapTexture2D.Apply();
+		}
 
         public override void ResetTexture2DColor()
         {
-            int texturePixelWidth = _colorSwapTexture2D.width;
+			int texturePixelWidth = _colorSwapTexture2D.width;
 
-            for (int i = 0; i < texturePixelWidth; ++i)
-            {
-                _colorSwapTexture2D.SetPixel(i, 0, _colorSwapTextureColors[i]);
-            }
+			for (int i = 0; i < texturePixelWidth; ++i)
+			{
+				_colorSwapTexture2D.SetPixel(i, 0, _colorSwapTextureColors[i]);
+			}
 
-            if (_colorSwappedFlag)
-                _colorSwappedFlag = false;
-            
-            _colorSwapTexture2D.Apply();
+			if (_colorSwappedFlag)
+				_colorSwappedFlag = false;
 
-        }
+			_colorSwapTexture2D.Apply();
+			//base.ResetTexture2DColor();
+		}
 
         private void UpdateColorTextureResetInternally()
 		{
@@ -321,6 +332,7 @@ namespace DoomBreakers
 
         void Update()
 		{
+            UpdateNewEquipmentTextureColor();
             UpdateColorTextureResetInternally();
 
             if (!_weaponChargeTimerFlag) //Guard Clause.
@@ -330,6 +342,209 @@ namespace DoomBreakers
 
         }
 
+        private void UpdateNewEquipmentTextureColor()
+		{
+            if (!_newEquipmentColorFlag)
+                return;
+
+            if (_playerEquipment == null)
+                return;
+
+            ApplyCustomTexture2DColours();
+            ApplyArmorColours();
+            ApplyShieldColours();
+            ApplySwordColours();
+
+            //_colorSwapTexture2D.Apply();
+            _newEquipmentColorFlag = false;
+
+        }
+        private void ApplyArmorColours()
+		{
+            if (_playerEquipment.IsArmor())
+            {
+                switch (_playerEquipment.GetTorsoEquip())
+                {
+                    case PlayerEquipType.BreastPlate_Bronze:
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_a, ColorFromInt(0xced37b));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_b, ColorFromInt(0xc4c973));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0xbabf6e));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_d, ColorFromInt(0xafb370));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_e, ColorFromInt(0xa0a557));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_f, ColorFromInt(0x9ca060));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x61512f));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_h, ColorFromInt(0x44371c));
+                        break;
+                    case PlayerEquipType.BreastPlate_Iron:
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_a, ColorFromInt(0x9d9d9d));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_b, ColorFromInt(0x8b8b8b));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0x858585));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_d, ColorFromInt(0x808080));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_e, ColorFromInt(0x7e7a7a));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_f, ColorFromInt(0x747474));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x535353));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_h, ColorFromInt(0x1e1e1e));
+                        break;
+                    case PlayerEquipType.BreastPlate_Steel:
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_a, ColorFromInt(0xdedede));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_b, ColorFromInt(0xc6c6c6));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0xbebebe));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_d, ColorFromInt(0xb8b8b8));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_e, ColorFromInt(0xb5b0b0));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_f, ColorFromInt(0xa8a8a8));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x7b7b7b));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_h, ColorFromInt(0x343434));
+                        break;
+                    case PlayerEquipType.BreastPlate_Ebony:
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_a, ColorFromInt(0x565656));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_b, ColorFromInt(0x4e4c4c));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0x494e64));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_d, ColorFromInt(0x4c4f5a));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_e, ColorFromInt(0x424141));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_f, ColorFromInt(0x383636));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x302d2d));
+                        SwapTexture2DColor(SpriteColourIndex.Armor_Standard_h, ColorFromInt(0x201d1d));
+                        break;
+                }
+                _colorSwapTexture2D.Apply();
+            }
+        }
+        private void ApplyShieldColours()
+		{
+            if (!SafeToApplyShieldColor())
+                return;
+
+            PlayerEquipType shieldType = PlayerEquipType.Empty_None;
+            if (_playerEquipment.IsShield(EquipHand.Left_Hand))
+                shieldType = _playerEquipment.GetLeftHandEquip();
+            if (_playerEquipment.IsShield(EquipHand.Right_Hand))
+                shieldType = _playerEquipment.GetRightHandEquip();
+
+            
+
+            switch(shieldType)
+			{
+                case PlayerEquipType.Shield_Bronze:
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0xcbd092));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0x9ca060));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x61512f));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_d, ColorFromInt(0x074f21));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_e, ColorFromInt(0x0e622c));
+                    break;
+                case PlayerEquipType.Shield_Iron:
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0xa8a8a8));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0x7b7b7b));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x343434));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_d, ColorFromInt(0x4f1507));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_e, ColorFromInt(0x823c3d));
+                    break;
+                case PlayerEquipType.Shield_Steel:
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0xcfc8c8));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0xb1a7a7));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x918686));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_d, ColorFromInt(0x212454));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_e, ColorFromInt(0x3c407e));
+                    break;
+                case PlayerEquipType.Shield_Ebony:
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0x2f3146));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0x272834));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x1e1717));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_d, ColorFromInt(0x121d28));
+                    SwapTexture2DColor(SpriteColourIndex.Shield_Standard_e, ColorFromInt(0x3f464e));
+                    break;
+            }
+
+            _colorSwapTexture2D.Apply();
+        }
+        private bool SafeToApplyShieldColor()
+		{
+            if (_playerEquipment == null)
+                return false;
+            if (_playerEquipment.IsShield(EquipHand.Left_Hand))
+                return true;
+            if (_playerEquipment.IsShield(EquipHand.Right_Hand))
+                return true;
+
+            return false;
+		}
+        private void ApplySwordColours()
+        {
+            if (!SafeToApplySwordColor())
+                return;
+
+            PlayerEquipType swordType = PlayerEquipType.Empty_None;
+            if (_playerEquipment.IsBroadsword(EquipHand.Left_Hand))
+                swordType = _playerEquipment.GetLeftHandEquip();
+            if (_playerEquipment.IsBroadsword(EquipHand.Right_Hand))
+                swordType = _playerEquipment.GetRightHandEquip();
+            if (_playerEquipment.IsLongsword(EquipHand.Left_Hand))
+                swordType = _playerEquipment.GetLeftHandEquip();
+            if (_playerEquipment.IsLongsword(EquipHand.Right_Hand))
+                swordType = _playerEquipment.GetRightHandEquip();
+
+
+
+            switch (swordType)
+            {
+                case PlayerEquipType.Broadsword_Bronze:
+                case PlayerEquipType.Longsword_Bronze:
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_a, ColorFromInt(0xe4e6c9));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_b, ColorFromInt(0xd3d6ab));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_c, ColorFromInt(0xcbd092));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_d, ColorFromInt(0xb5b977));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_e, ColorFromInt(0x9ca060));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_a, ColorFromInt(0x61512f));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_b, ColorFromInt(0x6c5a34));
+                    break;
+                case PlayerEquipType.Broadsword_Iron:
+                case PlayerEquipType.Longsword_Iron:
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_a, ColorFromInt(0xafafaf));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_b, ColorFromInt(0xa3a2a2));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_c, ColorFromInt(0x939191));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_d, ColorFromInt(0x8b8b8b));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_e, ColorFromInt(0x7c7979));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_a, ColorFromInt(0x144c18));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_b, ColorFromInt(0x1a5a1f));
+                    break;
+                case PlayerEquipType.Broadsword_Steel:
+                case PlayerEquipType.Longsword_Steel:
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_a, ColorFromInt(0xd5d5d5));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_b, ColorFromInt(0xcbc5c5));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_c, ColorFromInt(0xb9b9b9));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_d, ColorFromInt(0xb3afaf));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_e, ColorFromInt(0x9f9a9a));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_a, ColorFromInt(0x0f1c4e));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_b, ColorFromInt(0x182964));
+                    break;
+                case PlayerEquipType.Broadsword_Ebony:
+                case PlayerEquipType.Longsword_Ebony:
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_a, ColorFromInt(0x565965));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_b, ColorFromInt(0x424141));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_c, ColorFromInt(0x383636));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_d, ColorFromInt(0x302d2d));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_e, ColorFromInt(0x201d1d));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_a, ColorFromInt(0x4c1212));
+                    SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_b, ColorFromInt(0x601c1c));
+                    break;
+            }
+
+            _colorSwapTexture2D.Apply();
+        }
+        private bool SafeToApplySwordColor()
+        {
+            if (_playerEquipment == null)
+                return false;
+            if (_playerEquipment.IsBroadsword(EquipHand.Left_Hand))
+                return true;
+            if (_playerEquipment.IsBroadsword(EquipHand.Right_Hand))
+                return true;
+            if (_playerEquipment.IsLongsword(EquipHand.Left_Hand))
+                return true;
+            if (_playerEquipment.IsLongsword(EquipHand.Right_Hand))
+                return true;
+
+            return false;
+        }
         private void UpdateWeaponChargeTextureFX()
 		{
 			if (_weaponChargeTimer.HasTimerFinished())
@@ -446,29 +661,36 @@ namespace DoomBreakers
             SwapTexture2DColor(SpriteColourIndex.ChargeFX, ColorFromInt(0xe5f7ba));
             _colorSwapTexture2D.Apply();
         }
-
+        public void SetNewEquipmemtTextureColorFlag(bool b, IPlayerEquipment playerEquipment)
+		{
+            _newEquipmentColorFlag = b;
+            _playerEquipment = playerEquipment;
+		}
 
         public override void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor)
 		{
-			_colorSwapTextureColors[(int)indexOfColourToSwap] = replacementColor;
-			_colorSwapTexture2D.SetPixel((int)indexOfColourToSwap, 0, replacementColor);
-		}
+            //_colorSwapTextureColors[(int)indexOfColourToSwap] = replacementColor;
+            //_colorSwapTexture2D.SetPixel((int)indexOfColourToSwap, 0, replacementColor);
+            base.SwapTexture2DColor(indexOfColourToSwap, replacementColor);
+        }
 
         public override Color ColorFromInt(int c, float alpha = 1.0f)
         {
-            int r = (c >> 16) & 0x000000FF;
-            int g = (c >> 8) & 0x000000FF;
-            int b = c & 0x000000FF;
+            //int r = (c >> 16) & 0x000000FF;
+            //int g = (c >> 8) & 0x000000FF;
+            //int b = c & 0x000000FF;
 
-            Color ret = ColorFromIntRGB(r, g, b);
-            ret.a = alpha;
+            //Color ret = ColorFromIntRGB(r, g, b);
+            //ret.a = alpha;
 
-            return ret;
+            //return ret;
+            return base.ColorFromInt(c, alpha);
         }
 
         public override Color ColorFromIntRGB(int r, int g, int b)
         {
-            return new Color((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, 1.0f);
+            //return new Color((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, 1.0f);
+            return base.ColorFromIntRGB(r, g, b);
         }
 
     }

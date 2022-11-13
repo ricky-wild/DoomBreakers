@@ -211,7 +211,7 @@ namespace DoomBreakers
                     break;
                 case state.IsGainedEquipment:
                     _playerAnimator.SetAnimationState(AnimationState.EquipmentGained);
-                    if(!_playerBehaviours.EquipmentGainedProcess(_playerState, _playerSprite))
+                    if(!_playerBehaviours.EquipmentGainedProcess(_playerState, _playerSprite, _playerEquipment))
                     { }
                     else
 					{

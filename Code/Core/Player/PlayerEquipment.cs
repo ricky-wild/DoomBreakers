@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
-    public enum PlayerEquip
+    public enum PlayerItem
 	{
         Empty_None = 0,
         IsBroadsword = 1,
@@ -54,7 +54,7 @@ namespace DoomBreakers
 
         }
 
-        public void ApplySword(PlayerEquipType playerEquip, PlayerEquip equip)
+        public void ApplySword(PlayerEquipType playerEquip, PlayerItem equip)
 		{
             //Now determine where we apply this equipment.
 
@@ -90,7 +90,7 @@ namespace DoomBreakers
             //if (IsEquipShield(equip)) { }
             //if (IsEquipArmor(equip)) { }
         }
-        public void ApplyShield(PlayerEquipType playerEquip, PlayerEquip equip)
+        public void ApplyShield(PlayerEquipType playerEquip, PlayerItem equip)
 		{
             if (!IsEquipShield(equip))
                 return;
@@ -117,7 +117,7 @@ namespace DoomBreakers
                 return;
             }
         }
-        public void ApplyArmor(PlayerEquipType playerEquip, PlayerEquip equip)
+        public void ApplyArmor(PlayerEquipType playerEquip, PlayerItem equip)
 		{
             if (!IsEquipArmor(equip))
                 return;
@@ -128,23 +128,23 @@ namespace DoomBreakers
                 return;
 			}
         }
-        private bool IsEquipSword(PlayerEquip equip)
+        private bool IsEquipSword(PlayerItem equip)
 		{
-            if (equip == PlayerEquip.IsBroadsword)
+            if (equip == PlayerItem.IsBroadsword)
                 return true;
-            if (equip == PlayerEquip.IsLongsword)
-                return true;
-            return false;
-        }
-        private bool IsEquipShield(PlayerEquip equip)
-        {
-            if (equip == PlayerEquip.IsShield)
+            if (equip == PlayerItem.IsLongsword)
                 return true;
             return false;
         }
-        private bool IsEquipArmor(PlayerEquip equip)
+        private bool IsEquipShield(PlayerItem equip)
         {
-            if (equip == PlayerEquip.IsBreastPlate)
+            if (equip == PlayerItem.IsShield)
+                return true;
+            return false;
+        }
+        private bool IsEquipArmor(PlayerItem equip)
+        {
+            if (equip == PlayerItem.IsBreastPlate)
                 return true;
             return false;
         }

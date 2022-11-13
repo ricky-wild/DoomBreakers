@@ -6,7 +6,8 @@ namespace DoomBreakers
     public interface IItem //: MonoBehaviour
     {
 
-        void Initialize(Animator animator, AnimatorController animController, AnimationState animationState);
+        void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
+                        AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType);
 
         void Destroy();
 

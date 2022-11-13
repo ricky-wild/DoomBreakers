@@ -7,8 +7,8 @@ namespace DoomBreakers
     public class Sword : ItemBase
     {
 		[Header("Sword ID")]
-		[Tooltip("Set its base type")]
-		public PlayerEquip _swordID;
+		[Tooltip("Set its base item type to appropriate.")]
+		public PlayerItem _swordID;
 
 		[Header("Sword Type")]
 		[Tooltip("Set Item to any kind of sword.")]
@@ -20,22 +20,13 @@ namespace DoomBreakers
 		{
 			return _playerEquip;
 		}
-
 		private void SetupSword()
 		{
 			//Ensure a sword type has been applied within the inspector.
-			if (_playerEquip == PlayerEquipType.Empty_None ||
-				_playerEquip != PlayerEquipType.Broadsword_Bronze ||
-				_playerEquip != PlayerEquipType.Broadsword_Iron ||
-				_playerEquip != PlayerEquipType.Broadsword_Steel ||
-				_playerEquip != PlayerEquipType.Broadsword_Ebony ||
-				_playerEquip != PlayerEquipType.Longsword_Bronze ||
-				_playerEquip != PlayerEquipType.Longsword_Iron ||
-				_playerEquip != PlayerEquipType.Longsword_Steel ||
-				_playerEquip != PlayerEquipType.Longsword_Ebony)
+			if (_playerEquip == PlayerEquipType.Empty_None)
 			{
 				_playerEquip = PlayerEquipType.Broadsword_Bronze;
-				_swordID = PlayerEquip.IsBroadsword;
+				_swordID = PlayerItem.IsBroadsword;
 			    _animState = AnimationState.IdleBroadSword;
 				return;
 			}
@@ -47,8 +38,8 @@ namespace DoomBreakers
 				_playerEquip == PlayerEquipType.Broadsword_Steel ||
 				_playerEquip == PlayerEquipType.Broadsword_Ebony)
 			{
-				if (_swordID != PlayerEquip.IsBroadsword)
-					_swordID = PlayerEquip.IsBroadsword;
+				if (_swordID != PlayerItem.IsBroadsword)
+					_swordID = PlayerItem.IsBroadsword;
 				_animState = AnimationState.IdleBroadSword;
 				return;
 			}
@@ -57,8 +48,8 @@ namespace DoomBreakers
 				_playerEquip == PlayerEquipType.Longsword_Steel ||
 				_playerEquip == PlayerEquipType.Longsword_Ebony)
 			{
-				if(_swordID != PlayerEquip.IsLongsword)
-					_swordID = PlayerEquip.IsLongsword;
+				if(_swordID != PlayerItem.IsLongsword)
+					_swordID = PlayerItem.IsLongsword;
 				_animState = AnimationState.IdleLongsword;
 				return;
 			}
@@ -66,12 +57,14 @@ namespace DoomBreakers
 
 		public override void Awake()
 		{		
-			Initialize(this.GetComponent<Animator>(), AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleBroadSword);
+			Initialize(this.GetComponent<SpriteRenderer>(), this.GetComponent<Animator>(), 
+				AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleBroadSword, _swordID, _playerEquip);
 		}
-		public override void Initialize(Animator animator, AnimatorController animController, AnimationState animationState)
+		public override void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
+									   AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType)
 		{
 			SetupSword();
-			base.Initialize(animator, animController, _animState);//animationState);
+			base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);//animationState);
 		}
 		public override void Start()
 		{

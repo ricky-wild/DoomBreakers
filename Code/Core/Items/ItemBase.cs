@@ -22,16 +22,20 @@ namespace DoomBreakers
 
         IItemBehaviour _itemBehaviour;
         IItemAnimator _itemAnimator;
-
+        IItemSprite _itemSprite;
 
         public ItemBase(){}
-		public virtual void Initialize(Animator animator, AnimatorController animController, AnimationState animationState)
+		public virtual void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
+                                       AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType)
 		{
 			//_itemBehaviour = new ItemBehaviour();
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
 			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>());
             _itemAnimator = new ItemAnimator(animator, animController, animationState);
-		}
+            _itemSprite = this.gameObject.AddComponent<ItemSprite>();
+            _itemSprite.Setup(ref spriteRenderer, _itemID, itemType, playerEquipType);
+            //_itemSprite.Setup(this.GetComponent<SpriteRenderer>(), _itemID, itemType, playerEquipType);
+        }
         public virtual void Awake()
 		{
 			//Initialize();
