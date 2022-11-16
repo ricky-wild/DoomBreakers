@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
-	public class PlayerInput : IPlayerInput//: MonoBehaviour
+	public class PlayerInput : MyPlayerStateMachine// ,IPlayerInput//: MonoBehaviour
 	{
 
 		public enum inputState
@@ -27,19 +27,14 @@ namespace DoomBreakers
 		private inputState _inputState;
 		private Rewired.Player _rewirdInputPlayer;
 		private Vector2 _inputVector2;
-		//private ITimer _spamPreventTimer;
-		//private Dictionary<inputState, bool> _inputStates = new Dictionary<inputState, bool>();
+		//private MyPlayerStateMachine _playerStateMachine;
 
 
-		public PlayerInput(int playerID)
+		public PlayerInput(int playerID, Transform t, Controller2D controller2D)//, MyPlayerStateMachine playerStateMachine)
 		{
 			_rewirdInputPlayer = ReInput.players.GetPlayer(playerID);
 			_inputVector2 = new Vector2();
-			//_spamPreventTimer = new Timer();
-
-			//Initialize input states
-			//_inputStates.Add(inputState.Empty, false);
-			//_inputStates.Add(inputState.Jump, true);
+			//_playerStateMachine = playerStateMachine;
 		}
 		public bool SafeToReset()
 		{
@@ -54,10 +49,6 @@ namespace DoomBreakers
 				return;
 
 			_inputState = inputState.Empty;
-			//foreach (var key in _inputStates.Keys.ToList())
-			//{
-			//	_inputStates[key] = false;
-			//}
 		}
 		public void UpdateInput()
 		{
@@ -67,14 +58,15 @@ namespace DoomBreakers
 
 
 			_inputVector2.x = _rewirdInputPlayer.GetAxis("MoveHorizontal");
-			//_inputVector2.x = _rewirdInputPlayer.GetAxis(0);
-			//if (_inputVector2.x < 0.1f)
-			//	_inputVector2.x = _rewirdInputPlayer.GetAxis(1);
-
 			_inputVector2.y = _rewirdInputPlayer.GetAxis("MoveVertical");
 
-			if (_rewirdInputPlayer.GetButtonDown("Jump"))
-				_inputState = inputState.Jump; //_inputStates[inputState.Jump] = true;
+			//if (_inputVector2.x > 0f || _inputVector2.x < 0f)
+			//	SetState(new PlayerMove(this));
+			//else
+			//	SetState(new PlayerIdle(this));//SetState(new PlayerIdle(this));
+
+			//if (_rewirdInputPlayer.GetButtonDown("Jump"))
+			//	SetState(new PlayerJump(this));//_playerStateMachine.SetState(new PlayerJump(_playerStateMachine));//_inputState = inputState.Jump; //_inputStates[inputState.Jump] = true;
 			if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.01f))
 			{
 				if(_inputVector2.y > 0.44f)
@@ -114,17 +106,7 @@ namespace DoomBreakers
 			return _inputVector2;
 		}
 
-		//public Dictionary<inputState, bool> GetInputStates()
-		//{
-		//	return _inputStates;
-		//}
 
-		//public bool IsJumpPressed()
-		//{
-		//	if (_inputState == inputState.Jump)
-		//		return true;
-		//	return false;
-		//}
 	}
 }
 

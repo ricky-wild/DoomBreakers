@@ -17,31 +17,10 @@ namespace DoomBreakers
         public override void SetupTexture2DColorSwap(string texName, int texId)
         {
             base.SetupTexture2DColorSwap(texName,texId);
-            //_colorSwapTexture2D = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
-            //_colorSwapTexture2D.filterMode = FilterMode.Point;
-
-            //int texturePixelWidth = _colorSwapTexture2D.width;
-            //for (int i = 0; i < texturePixelWidth; ++i)
-            //    _colorSwapTexture2D.SetPixel(i, 0, new Color(0.0f, 0.0f, 0.0f, 0.0f));
-
-            //_colorSwapTexture2D.Apply();
-
-
-            //_spriteRenderer.material.SetTexture("_SwapTexBandit", _colorSwapTexture2D);
-
-            //_colorSwapTextureColors = new Color[texturePixelWidth];
         }
         public override void ResetTexture2DColor()
 		{
             base.ResetTexture2DColor();
-            //int texturePixelWidth = _colorSwapTexture2D.width;
-
-            //for (int i = 0; i < texturePixelWidth; ++i)
-            //{
-            //    _colorSwapTexture2D.SetPixel(i, 0, _colorSwapTextureColors[i]);
-            //}
-
-            //_colorSwapTexture2D.Apply();
         }
         public void ApplyCustomTexture2DColours(PlayerItem itemType, PlayerEquipType playerEquipType)//IItem item)
 		{

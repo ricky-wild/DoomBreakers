@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
-	//PlayerBehaviours.cs obj also requires Controller2D.cs & RaycastController.cs & BoxCollder2D
-	//[RequireComponent(typeof(Controller2D))]
-	public class PlayerBehaviours : MonoBehaviour, IPlayerBehaviours
+
+	public class PlayerBehaviours : MyPlayerStateMachine, IPlayerBehaviours
 	{
 		private Controller2D _controller2D; 
 		private Vector3 _velocity;
@@ -69,7 +68,7 @@ namespace DoomBreakers
 		}
 		public void IdleProcess(IPlayerStateMachine playerStateMachine)
 		{
-
+			//_state.IsIdle();
 			_velocity.x = 0f;
 			//_velocity.y = 0f;
 			//print("\n_velocity.y=" + Mathf.Abs(_velocity.y));

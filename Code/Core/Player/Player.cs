@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Rewired;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace DoomBreakers
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Controller2D))]
-    public class Player : MonoBehaviour, IPlayer
+    public class Player : MyPlayerStateMachine, IPlayer
     {
         [Header("Player ID")]
         [Tooltip("ID ranges from 0 to 3")]  //Max 4 players.
@@ -21,8 +22,14 @@ namespace DoomBreakers
         [Tooltip("Vectors that represent point of attack radius")]
         public Transform[] _attackPoints; //1=quickATK, 2=powerATK, 3=upwardATK
 
+        private Rewired.Player _rewirdInputPlayer;
+        private Vector2 _inputVector2;
+        private Transform _playerTransform;
+        private Controller2D _controller2D;
+        private Animator _animator;
+
         private IPlayerStateMachine _playerState;
-        private IPlayerInput _playerInput;
+        private PlayerInput _playerInput;
         private IPlayerBehaviours _playerBehaviours;
         private IPlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
@@ -32,16 +39,21 @@ namespace DoomBreakers
         private void InitializePlayer()
 		{
             _playerState = new PlayerStateMachine(state.IsIdle);
-            _playerInput = new PlayerInput(_playerID);
+            _playerInput = new PlayerInput(_playerID, this.transform, this.GetComponent<Controller2D>());//, _playerStateMachine);
+
+
+            _playerTransform = this.transform;
+            _controller2D = this.GetComponent<Controller2D>();
+            _rewirdInputPlayer = ReInput.players.GetPlayer(_playerID);
+            _inputVector2 = new Vector2();
+            _animator = this.GetComponent<Animator>();
+
+
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
             _playerEquipment = new PlayerEquipment(PlayerEquipType.Empty_None, PlayerEquipType.Empty_None, PlayerEquipType.Empty_None);
-            //_playerSprite = new PlayerSprite(this.GetComponent<SpriteRenderer>(), _playerID);
 
-            //PlayerBehaviours.cs ALSO needs to inherit from MonoBehaviour.
-            //Creating a new Obj() constructor is not allowed under this case.
-            //In Unity anything using MonoBehaviour must be attached to an gameobject,
-            //or the script will just exist somewhere & won't work.
-            //_playerBehaviours = new PlayerBehaviours(this.transform, this.GetComponent<Controller2D>());
+
+
             _playerBehaviours = this.gameObject.AddComponent<PlayerBehaviours>();
             _playerBehaviours.Setup(this.transform, this.GetComponent<Controller2D>());
             _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
@@ -62,15 +74,70 @@ namespace DoomBreakers
 
         void Update()
         {
-            UpdateInput();
-            UpdateStateBehaviours();
-            UpdateCollisions();
-            UpdateAnimator();
-            //UpdatePrintMsg();
+            //UpdateInput();
+
+            
+
+            _inputVector2.x = _rewirdInputPlayer.GetAxis("MoveHorizontal");
+            _inputVector2.y = _rewirdInputPlayer.GetAxis("MoveVertical");
+
+            if (_inputVector2.x > 0f || _inputVector2.x < 0f)
+                SetState(new PlayerMove(this));
+            if (Mathf.Abs(_inputVector2.x) == 0f)//else
+                SetState(new PlayerIdle(this));
+            if (_rewirdInputPlayer.GetButtonDown("Jump"))
+                SetState(new PlayerJump(this));
+
+            _state.IsIdle(ref _animator);
+            _state.IsMoving(ref _animator,ref _inputVector2);
+            _state.IsJumping(ref _animator,ref _controller2D);
+            _state.IsFalling(ref _animator,ref _controller2D);
+            _state.UpdateBehaviour(ref _controller2D);
+
+            //UpdateStateBehaviours();
+            //UpdateCollisions();
+            //UpdateAnimator();
         }
+
 
         public void UpdateInput()
 		{
+            if (_rewirdInputPlayer == null)
+                return;
+
+
+
+            _inputVector2.x = _rewirdInputPlayer.GetAxis("MoveHorizontal");
+            _inputVector2.y = _rewirdInputPlayer.GetAxis("MoveVertical");
+
+            //if (_inputVector2.x > 0f || _inputVector2.x < 0f)
+            //    SetState(new PlayerMove(this));
+            //else
+            //    SetState(new PlayerIdle(this));
+
+            //if (_rewirdInputPlayer.GetButtonDown("Jump"))
+            //    SetState(new PlayerJump(this));
+
+            //if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.01f))
+            //{
+            //    if (_inputVector2.y > 0.44f) { }; //_inputState = inputState.UpwardAttack;
+            //    else { }; //_inputState = inputState.Attack;
+            //}
+            //if (_rewirdInputPlayer.GetButtonDown("Defend")) { };
+            //if (_rewirdInputPlayer.GetButtonUp("Defend")) { };
+            //if (_rewirdInputPlayer.GetButtonTimedPressDown("Attack", 0.25f)) { };
+            //if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.25f)) { };
+            //if (_rewirdInputPlayer.GetButtonTimedPressUp("KnockBack", 0.01f)) { };
+            //if (_rewirdInputPlayer.GetButtonDown("DodgeL")) { };
+            //if (_rewirdInputPlayer.GetButtonDown("DodgeR")) { };
+            //if (_rewirdInputPlayer.GetButtonDown("Sprint")) { };
+            //if (_rewirdInputPlayer.GetButtonUp("Sprint")) { };
+            //if (_rewirdInputPlayer.GetAnyButtonUp())
+            //	_inputVector2.x = 0.0f;
+
+
+
+
             _playerInput.ResetInput();
             _playerInput.UpdateInput();
             switch(_playerInput.GetInputState())
@@ -240,17 +307,6 @@ namespace DoomBreakers
             collisionData.PluginPlayerState(_playerState, _playerID);
             collisionData.PluginPlayerSprite(_playerSprite, _playerID);
             _playerState = _playerCollider.RegisterHitByAttack(collisionData, _playerID, banditId);
-        }
-
-        private void UpdatePrintMsg()
-		{
-            //print("\n_playerState=" + _playerState.GetPlayerState());
-            //print("\n_animationState=" + _playerAnimator.GetAnimationState());
-            //print("\n_playerInput.GetInputState()=" + _playerInput.GetInputState());
-            //print("\n_playerCollider=");
-            //print("\n__playerEquipment.GetLeftHandEquip()=" + _playerEquipment.GetLeftHandEquip());
-            //print("\n__playerEquipment.GetRightHandEquip()=" + _playerEquipment.GetRightHandEquip());
-            //print("\n__playerEquipment.GetTorsoEquip()=" + _playerEquipment.GetTorsoEquip());
         }
 
         private void OnDrawGizmosSelected()

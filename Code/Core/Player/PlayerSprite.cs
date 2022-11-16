@@ -142,7 +142,7 @@ namespace DoomBreakers
 		{
             SetupTexture2DColorSwap("_SwapTex", _playerID);
 
-            int temp = 4;
+            int temp = 3;
 
             //switch (MenuManager._instance.GetPlayerCustomSkinId(_playerID))
             switch(temp)
