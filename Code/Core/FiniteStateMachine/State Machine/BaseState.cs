@@ -27,15 +27,15 @@ namespace DoomBreakers
 		protected float _quickAtkWaitTime, _gainedEquipWaitTime;
 		//protected ITimer _behaviourTimer, _dodgedTimer, _spriteColourSwapTimer;
 
-		public BaseState()
+		public BaseState(Vector3 velocity)
 		{
 
-			_velocity = new Vector3();
+			_velocity = velocity;//new Vector3();
 			_moveSpeed = 3.75f;//3.5f;
 			_sprintSpeed = 1.0f;
 			_targetVelocityX = 1.0f;
-			_maxJumpVelocity = 50.0f;//14.0f;//13.25f;
-			_gravity = wildlogicgames.DoomBreakers.GetGravity()*2;
+			_maxJumpVelocity = 64.0f;//14.0f;//13.25f;
+			_gravity = wildlogicgames.DoomBreakers.GetGravity();// *2;
 			_quickAttackIncrement = 0;
 			_dodgedLeftFlag = false;
 			_quickAtkWaitTime = 0.133f;
@@ -45,22 +45,25 @@ namespace DoomBreakers
 
 		}
 
-		public virtual void UpdateBehaviour(ref Controller2D controller2D)
+		public virtual void UpdateBehaviour(ref Controller2D controller2D, ref Animator animator)
 		{
-			UpdateGravity(controller2D);
-			UpdateTransform(controller2D);
+			UpdateGravity(ref controller2D, ref animator);
+			UpdateTransform(ref controller2D);		
 		}
 
-		private void UpdateTransform(Controller2D controller2D)
+		private void UpdateTransform(ref Controller2D controller2D)
 		{
 			//if(_controller2D == null) return;
 			controller2D.Move(_velocity * Time.deltaTime, _velocity);
 		}
-		private void UpdateGravity(Controller2D controller2D)
+		private void UpdateGravity(ref Controller2D controller2D, ref Animator animator)
 		{
 			//if (_controller2D == null) return;
 			if (!controller2D.collisions.below)
+			{
+				//animator.Play("Fall");
 				_velocity.y += _gravity * Time.deltaTime;
+			}
 
 			if (controller2D.collisions.below)
 				_velocity.y = 0f;

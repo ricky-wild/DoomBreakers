@@ -82,17 +82,17 @@ namespace DoomBreakers
             _inputVector2.y = _rewirdInputPlayer.GetAxis("MoveVertical");
 
             if (_inputVector2.x > 0f || _inputVector2.x < 0f)
-                SetState(new PlayerMove(this));
+                SetState(new PlayerMove(this, _inputVector2));
             if (Mathf.Abs(_inputVector2.x) == 0f)//else
-                SetState(new PlayerIdle(this));
+                SetState(new PlayerIdle(this, _inputVector2));
             if (_rewirdInputPlayer.GetButtonDown("Jump"))
-                SetState(new PlayerJump(this));
+                SetState(new PlayerJump(this, _inputVector2));
 
             _state.IsIdle(ref _animator);
             _state.IsMoving(ref _animator,ref _inputVector2);
             _state.IsJumping(ref _animator,ref _controller2D);
             _state.IsFalling(ref _animator,ref _controller2D);
-            _state.UpdateBehaviour(ref _controller2D);
+            _state.UpdateBehaviour(ref _controller2D, ref _animator);
 
             //UpdateStateBehaviours();
             //UpdateCollisions();
