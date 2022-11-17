@@ -70,6 +70,7 @@ namespace DoomBreakers
 		void Start()
         {
             _playerAnimator.SetAnimatorController(_playerEquipment);//AnimatorController.Player_with_broadsword_with_shield_controller, false);
+            SetState(new PlayerIdle(this, _inputVector2));
         }
 
         void Update()
@@ -82,11 +83,20 @@ namespace DoomBreakers
             _inputVector2.y = _rewirdInputPlayer.GetAxis("MoveVertical");
 
             if (_inputVector2.x > 0f || _inputVector2.x < 0f)
-                SetState(new PlayerMove(this, _inputVector2));
-            if (Mathf.Abs(_inputVector2.x) == 0f)//else
-                SetState(new PlayerIdle(this, _inputVector2));
+            {
+                if (_state.GetType() != typeof(PlayerMove))
+                    SetState(new PlayerMove(this, _inputVector2));
+            }
+            if (Mathf.Abs(_inputVector2.x) == 0f && Mathf.Abs(_inputVector2.y) == 0f)//else
+			{
+                if (SafeToSetIdle())
+                    SetState(new PlayerIdle(this, _inputVector2));
+            }
             if (_rewirdInputPlayer.GetButtonDown("Jump"))
-                SetState(new PlayerJump(this, _inputVector2));
+            {
+                if (_state.GetType() != typeof(PlayerJump))
+                    SetState(new PlayerJump(this, _inputVector2));
+            }
 
             _state.IsIdle(ref _animator);
             _state.IsMoving(ref _animator,ref _inputVector2);
@@ -99,6 +109,14 @@ namespace DoomBreakers
             //UpdateAnimator();
         }
 
+        private bool SafeToSetIdle() //Look into handling more than one state at a time.
+		{
+            //We don't want to set to idle each frame if already Idle AND is Jumping AND is Falling.
+            if (_state.GetType() != typeof(PlayerIdle) && _state.GetType() != typeof(PlayerFall) && _state.GetType() != typeof(PlayerJump))
+                return true;
+
+            return false;
+		}
 
         public void UpdateInput()
 		{

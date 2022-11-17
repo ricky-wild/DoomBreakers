@@ -7,7 +7,7 @@ using UnityEngine;
 namespace DoomBreakers
 {
 
-	public class BaseState //: MonoBehaviour
+	public class BaseState : MonoBehaviour
 	{
 		//<summary>
 		//All these variables are required for the various Player Behaviours. 
@@ -16,16 +16,14 @@ namespace DoomBreakers
 		//</summary>
 
 		protected StateMachine _stateMachine;
-		//protected Animator _animator;
-		//protected Controller2D _controller2D;
 		protected Vector3 _velocity;
-		//protected Transform _transform;
-		protected float _targetVelocityX, _maxJumpVelocity, _moveSpeed, _sprintSpeed, _gravity;
+		protected const float _maxJumpVelocity = 12.0f;
+		protected float _targetVelocityX, _moveSpeed, _sprintSpeed, _jumpSpeed, _gravity;
 		protected int _quickAttackIncrement; //4+ variations of this animation.
 		protected bool _dodgedLeftFlag;//, _jumpedFlag;
 
 		protected float _quickAtkWaitTime, _gainedEquipWaitTime;
-		//protected ITimer _behaviourTimer, _dodgedTimer, _spriteColourSwapTimer;
+		protected ITimer _behaviourTimer;// _dodgedTimer, _spriteColourSwapTimer;
 
 		public BaseState(Vector3 velocity)
 		{
@@ -34,7 +32,7 @@ namespace DoomBreakers
 			_moveSpeed = 3.75f;//3.5f;
 			_sprintSpeed = 1.0f;
 			_targetVelocityX = 1.0f;
-			_maxJumpVelocity = 64.0f;//14.0f;//13.25f;
+			_jumpSpeed = 4.0f;//14.0f;//13.25f;
 			_gravity = wildlogicgames.DoomBreakers.GetGravity();// *2;
 			_quickAttackIncrement = 0;
 			_dodgedLeftFlag = false;
