@@ -6,12 +6,20 @@ namespace DoomBreakers
 	public class MyPlayerStateMachine : StateMachine
 	{
 		protected bool _inputDodgedLeft;
+        protected int _quickAttackIncrement;
 
-        public bool SafeToSetIdle() //Look into handling more than one state at a time.
+        public bool SafeToSetIdle() //Still require these checks to have player behave as desired.
         {
-            //We don't want to set to idle each frame if already Idle AND is Jumping AND is Falling.
-            if (_state.GetType() != typeof(PlayerIdle) && _state.GetType() != typeof(PlayerFall) && _state.GetType() != typeof(PlayerJump)
-                && _state.GetType() != typeof(PlayerDodge) && _state.GetType() != typeof(PlayerQuickAttack))
+            //We don't want to set to idle each frame if already Idle AND is Jumping AND is Falling ect.
+            if (_state.GetType() != typeof(PlayerIdle) && 
+                _state.GetType() != typeof(PlayerFall) && 
+                _state.GetType() != typeof(PlayerJump) && 
+                _state.GetType() != typeof(PlayerDodge) && 
+                _state.GetType() != typeof(PlayerQuickAttack) &&
+                _state.GetType() != typeof(PlayerUpwardAttack) &&
+                _state.GetType() != typeof(PlayerHoldAttack) &&
+                _state.GetType() != typeof(PlayerReleaseAttack) &&
+                _state.GetType() != typeof(PlayerDefend))
                 return true;
 
             return false;
@@ -19,8 +27,15 @@ namespace DoomBreakers
 
         public bool SafeToSetMove()
         {
-            if (_state.GetType() != typeof(PlayerMove) && _state.GetType() != typeof(PlayerFall) && _state.GetType() != typeof(PlayerJump)
-                && _state.GetType() != typeof(PlayerDodge) && _state.GetType() != typeof(PlayerQuickAttack))
+            if (_state.GetType() != typeof(PlayerMove) && 
+                _state.GetType() != typeof(PlayerFall) && 
+                _state.GetType() != typeof(PlayerJump) && 
+                _state.GetType() != typeof(PlayerDodge) && 
+                _state.GetType() != typeof(PlayerQuickAttack) &&
+                _state.GetType() != typeof(PlayerUpwardAttack) &&
+                _state.GetType() != typeof(PlayerHoldAttack) &&
+                _state.GetType() != typeof(PlayerReleaseAttack) &&
+                _state.GetType() != typeof(PlayerDefend)) 
                 return true;
             return false;
         }
@@ -28,6 +43,17 @@ namespace DoomBreakers
         public bool SafeToSetJump()
         {
             if (_state.GetType() != typeof(PlayerJump))
+                return true;
+
+            return false;
+
+        }
+
+        public bool SafeToSetHoldAttack()
+        {
+            if (_state.GetType() != typeof(PlayerJump) &&
+                _state.GetType() != typeof(PlayerReleaseAttack) &&
+                _state.GetType() != typeof(PlayerFall))
                 return true;
 
             return false;

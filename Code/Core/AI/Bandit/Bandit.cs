@@ -1,6 +1,4 @@
-﻿//using System;
-//using System.Collections;
-//using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 namespace DoomBreakers
@@ -27,7 +25,7 @@ namespace DoomBreakers
         private IBanditSprite _banditSprite;
         private IBanditCollision _banditCollider;
 
-
+        private Action _actionListener;
 
         private void InitializeBandit()
         {
@@ -40,16 +38,17 @@ namespace DoomBreakers
             _banditSprite = this.gameObject.AddComponent<BanditSprite>();
             _banditSprite.Setup(this.GetComponent<SpriteRenderer>(), _banditID);
 
+            _actionListener = new Action(AttackedByPlayer);//AttackedByPlayer()
 
-            
         }
         private void OnEnable()
-        {           
-            //_banditCollider.SetOnEnabled();//EventManager.StartListening("BanditHitByPlayer", _eventListener);
+        {
+            //Player.cs->PlayerCollision.cs->enemy.GetComponent<Bandit>()->BattleColliderManager.TriggerEvent("ReportCollisionWithBandit"); 
+            BattleColliderManager.Subscribe("ReportCollisionWithBandit", _actionListener);
         }
         private void OnDisable()
         {
-            //_banditCollider.SetOnDisabled();//EventManager.StopListening("BanditHitByPlayer", _eventListener);
+            BattleColliderManager.Unsubscribe("ReportCollisionWithBandit", _actionListener);
         }
         private void Awake()
         {
@@ -61,7 +60,7 @@ namespace DoomBreakers
         }
         void Update() 
         {
-            UpdateStateBehaviours();
+            //UpdateStateBehaviours();
             UpdateCollisions();
             UpdateAnimator(); 
             //UpdatePrintMsg();
@@ -142,11 +141,10 @@ namespace DoomBreakers
 		{
             _banditCollider.UpdateCollision(_banditState, _banditSprite);
         }
-        public void ReportCollisionWithPlayer(ICollisionData collisionData, int playerId)//IPlayerStateMachine playerStateMachine)
+
+        private void AttackedByPlayer()
 		{
-            collisionData.PluginEnemyState(_banditState, _banditID);
-            collisionData.PluginBanditSprite(_banditSprite, _banditID);
-            _banditState = _banditCollider.RegisterHitByAttack(collisionData, playerId);//playerStateMachine);
+            print("\nBandit.cs= AttackedByPlayer() called!");
 		}
 
         private void UpdatePrintMsg()

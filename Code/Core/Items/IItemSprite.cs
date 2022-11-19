@@ -7,6 +7,6 @@ namespace DoomBreakers
 		void SetupTexture2DColorSwap(string texName, int texId);
 		void ResetTexture2DColor();
 		void ApplyCustomTexture2DColours(PlayerItem itemType, PlayerEquipType playerEquipType);// IItem item);
-		void SetTexture2DColor(Color color);
+		void SetTexture2DColor(float time, Color color);
 	}
 }

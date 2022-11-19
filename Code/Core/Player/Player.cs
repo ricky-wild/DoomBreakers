@@ -1,7 +1,5 @@
 ﻿using Rewired;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using UnityEngine;
 
 namespace DoomBreakers
@@ -24,42 +22,33 @@ namespace DoomBreakers
 
         private Rewired.Player _rewirdInputPlayer;
         private Vector2 _inputVector2;
-        private Transform _playerTransform;
         private Controller2D _controller2D;
         private Animator _animator;
+        private MyPlayerStateMachine _playerStateMachine;
 
-        private IPlayerStateMachine _playerState;
-        private PlayerInput _playerInput;
-        private IPlayerBehaviours _playerBehaviours;
         private IPlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
         private IPlayerCollision _playerCollider;
         private IPlayerEquipment _playerEquipment;
 
+        private Action _actionListener;
+
         private void InitializePlayer()
 		{
-            _playerState = new PlayerStateMachine(state.IsIdle);
-            _playerInput = new PlayerInput(_playerID, this.transform, this.GetComponent<Controller2D>());//, _playerStateMachine);
-
-
-            _playerTransform = this.transform;
             _controller2D = this.GetComponent<Controller2D>();
             _rewirdInputPlayer = ReInput.players.GetPlayer(_playerID);
             _inputVector2 = new Vector2();
             _animator = this.GetComponent<Animator>();
-
+            _playerStateMachine = this;
 
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
             _playerEquipment = new PlayerEquipment(PlayerEquipType.Empty_None, PlayerEquipType.Empty_None, PlayerEquipType.Empty_None);
-
-
-
-            _playerBehaviours = this.gameObject.AddComponent<PlayerBehaviours>();
-            _playerBehaviours.Setup(this.transform, this.GetComponent<Controller2D>());
             _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
             _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
             _playerCollider = this.gameObject.AddComponent<PlayerCollision>(); //Required for OnTriggerEnter2D()
             _playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints);
+
+            _actionListener = new Action(AttackedByBandit);//AttackedByBandit()
         }
 
 		private void Awake()
@@ -69,15 +58,26 @@ namespace DoomBreakers
 
 		void Start()
         {
+            _playerEquipment.ApplySword(PlayerEquipType.Broadsword_Steel, PlayerItem.IsBroadsword);
             _playerAnimator.SetAnimatorController(_playerEquipment);//AnimatorController.Player_with_broadsword_with_shield_controller, false);
+
             SetState(new PlayerIdle(this, _inputVector2));
+        }
+        private void OnEnable()
+        {
+            ////Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
+            BattleColliderManager.Subscribe("ReportCollisionWithPlayer", _actionListener);
+        }
+        private void OnDisable()
+        {
+            BattleColliderManager.Unsubscribe("ReportCollisionWithPlayer", _actionListener);
         }
 
         void Update()
         {
             UpdateInput();
             UpdateStateBehaviours();
-            //UpdateCollisions();
+            UpdateCollisions();
             //UpdateAnimator();
         }
 
@@ -119,11 +119,35 @@ namespace DoomBreakers
             if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.01f))
             {
                 if (_inputVector2.y > 0.44f)
-                    return;// _inputState = inputState.UpwardAttack;
+                    SetState(new PlayerUpwardAttack(this, _inputVector2));
                 else
-                    SetState(new PlayerQuickAttack(this, _inputVector2));
+                {
+                    if (_state.GetType() != typeof(PlayerHoldAttack))
+                    {
+                        SetState(new PlayerQuickAttack(this, _inputVector2));//, _quickAttackIncrement));
+                        _playerCollider.EnableAttackCollisions();
+                    }
+                }
             }
-
+            if (_rewirdInputPlayer.GetButtonDown("Defend"))
+			{
+                SetState(new PlayerDefend(this, _inputVector2));
+			}
+            if (_rewirdInputPlayer.GetButtonUp("Defend"))
+			{
+                if (_state.GetType() == typeof(PlayerDefend))
+                    SetState(new PlayerIdle(this, _inputVector2));
+			}
+            if (_rewirdInputPlayer.GetButtonTimedPressDown("Attack", 0.25f))
+			{
+                if(SafeToSetHoldAttack())
+                    SetState(new PlayerHoldAttack(this, _inputVector2));
+            }
+            if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.25f))
+			{
+                if (_state.GetType() == typeof(PlayerHoldAttack))
+                    SetState(new PlayerReleaseAttack(this, _inputVector2));
+            }
         }
 
         public void UpdateStateBehaviours()
@@ -134,26 +158,66 @@ namespace DoomBreakers
             _state.IsFalling(ref _animator, ref _controller2D, ref _inputVector2);
             _state.IsDodging(ref _animator, ref _controller2D, ref _inputVector2, _inputDodgedLeft, ref _playerSprite, ref _playerCollider);
             _state.IsDodged(ref _animator, ref _controller2D, ref _inputVector2);
-            _state.IsQuickAttack(ref _animator, ref _playerSprite, ref _inputVector2);
+            _state.IsQuickAttack(ref _animator, ref _playerSprite, ref _inputVector2, ref _quickAttackIncrement);
+            _state.IsUpwardAttack(ref _animator, ref _playerSprite, ref _inputVector2);
+            _state.IsHoldAttack(ref _animator, ref _playerSprite, ref _inputVector2);
+            _state.IsReleaseAttack(ref _animator, ref _playerSprite, ref _inputVector2);
+            _state.IsDefending(ref _animator, ref _inputVector2);
+            _state.IsHitBySmallAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.UpdateBehaviour(ref _controller2D, ref _animator);
         }
 
         public void UpdateAnimator()
 		{
-            _playerAnimator.UpdateAnimator(_playerBehaviours);
+            //_playerAnimator.UpdateAnimator(_playerBehaviours);
         }
 
         public void UpdateCollisions()
 		{
-            _playerCollider.UpdateCollision(_playerState, _playerSprite, _playerID, _playerEquipment);
+            _playerCollider.UpdateCollision(ref _state, _playerID, _playerEquipment);
 		}
-        public void ReportCollisionWithEnemy(ICollisionData collisionData, int banditId)//IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
+
+        private void AttackedByBandit()
+		{
+            print("\nPlayer.cs= AttackedByBandit() called!");
+        }
+        private bool IsDefendingCorrectDirection(IBanditSprite banditSprite)
         {
-            //_playerState = _playerCollider.RegisterHitByAttack(enemyStateMachine, _playerState, _playerSprite, banditSprite);
-            collisionData.PluginPlayer(this, _playerID);
-            collisionData.PluginPlayerState(_playerState, _playerID);
-            collisionData.PluginPlayerSprite(_playerSprite, _playerID);
-            _playerState = _playerCollider.RegisterHitByAttack(collisionData, _playerID, banditId);
+            //Detrmine which way the player is facing whilst defending & the enemy bandit is attacking.
+            //Why? Player doesn't successfully defend against enemy attack defending the wrong face direction.
+
+            int playerFaceDir = _playerSprite.GetSpriteDirection();
+            int enemyFaceDir = banditSprite.GetSpriteDirection();
+
+            //Enemy would only ever be attacking if directly in front of player.
+            //So if player face direction is 1 (right) then enemy would have to be -1 (left) 
+            //case sceneria true for successful defence.
+            if (playerFaceDir == 1 && enemyFaceDir == -1 ||
+                playerFaceDir == -1 && enemyFaceDir == 1)
+                return true;
+
+            return false;
+        }
+        private bool IsDefendingSelf()
+        {
+            if (_state.GetType() == typeof(PlayerDefend))
+                return true;
+            //if (playerStateMachine.IsQuickHitWhenDefending())
+            //    return true;
+            //if (playerStateMachine.IsPowerHitWhenDefending())
+            //    return true;
+
+            return false;
+        }
+        private bool IsIgnoreDamage()
+        {
+            if (_state.GetType() == typeof(PlayerDodge))
+                return true;
+            if (_state.GetType() == typeof(PlayerDodged))
+                return true;
+
+
+            return false;
         }
 
         private void OnDrawGizmosSelected()

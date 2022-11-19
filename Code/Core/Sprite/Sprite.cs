@@ -71,7 +71,7 @@ namespace DoomBreakers
 
 			_colorSwapTexture2D.Apply();
 		}
-		public virtual void SetTexture2DColor(Color color)
+		public virtual void SetTexture2DColor(float time, Color color)
 		{
 			int texturePixelWidth = _colorSwapTexture2D.width;
 			for (int i = 0; i < texturePixelWidth; ++i)
@@ -81,7 +81,7 @@ namespace DoomBreakers
 
 			if (!_colorSwappedFlag) //Ensure we reset internally upon failure to do so externally (ie a state change)
 			{
-				_colorSwappedTimer.StartTimer(0.5f);
+				_colorSwappedTimer.StartTimer(time);
 				_colorSwappedFlag = true;
 			}
 

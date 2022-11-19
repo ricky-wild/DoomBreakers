@@ -13,6 +13,11 @@ namespace DoomBreakers
             //_state.IsIdle();
 		}
 
+        public BaseState GetState()//Evil yet here we are.
+		{
+            return _state;
+		}
+
 
     }
 }

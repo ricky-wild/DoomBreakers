@@ -73,7 +73,12 @@ namespace DoomBreakers
 		public virtual void IsDodging(ref Animator animator, ref Controller2D controller2D, ref Vector2 input, 
 										bool dodgeLeft, ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider) { }
 		public virtual void IsDodged(ref Animator animator, ref Controller2D controller2D, ref Vector2 input) { }
-		public virtual void IsQuickAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
+		public virtual void IsQuickAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input, ref int quickAttackIncrement) { }
+		public virtual void IsUpwardAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
+		public virtual void IsHoldAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
+		public virtual void IsReleaseAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
+		public virtual void IsDefending(ref Animator animator, ref Vector2 input) { }
+		public virtual void IsHitBySmallAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
 	}
 }
 

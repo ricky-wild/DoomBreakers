@@ -6,6 +6,6 @@ namespace DoomBreakers
 {
 	interface IPlayerQuickAttack
 	{
-		void IsQuickAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input);
+		void IsQuickAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input, ref int quickAttackIncrement);
 	}
 }

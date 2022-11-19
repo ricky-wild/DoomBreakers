@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace DoomBreakers
 {
@@ -15,7 +16,7 @@ namespace DoomBreakers
 
     public class PlayerCollision : MonoBehaviour, IPlayerCollision
     {
-        private ICollisionData _collisionData;
+
         private CompareTags _compareTags;
 
         private Collider2D _collider2d;
@@ -35,8 +36,7 @@ namespace DoomBreakers
         private bool _attackCollisionEnabled;
         private bool _itemCollisionEnabled;
 
-        //These are cached and used to communicate, register change to parent versions in Player.cs.
-        private IPlayerStateMachine _playerStateMachine;
+
         private IPlayerEquipment _playerEquipment;
 
         //public PlayerCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints) { }
@@ -49,13 +49,10 @@ namespace DoomBreakers
             SetupAttackRadius();
             SetupCompareTags();
 
-            //_cooldownTimer = this.gameObject.AddComponent<Timer>();
-            //_cooldownTimer.Setup();
-
-            _collisionData = new CollisionData();
             _collider2d.enabled = true;
             _attackCollisionEnabled = false;
             _itemCollisionEnabled = false;
+
         }
         public void SetupLayerMasks()
 		{
@@ -98,12 +95,12 @@ namespace DoomBreakers
 
         void Update() 
         { }
-        public void UpdateCollision(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId, IPlayerEquipment playerEquipment)
+        public void UpdateCollision(ref BaseState playerState, int playerId, IPlayerEquipment playerEquipment)
 		{
-            UpdateDetectEnemyTargets(playerStateMachine, playerSprite, playerId);
-            UpdateDetectItemTargets(playerEquipment, playerStateMachine);
+            UpdateDetectEnemyTargets(ref playerState, playerId);
+            UpdateDetectItemTargets(playerEquipment, ref playerState);
         }
-        public void UpdateDetectEnemyTargets(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, int playerId)
+        public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId)
         {
             if (!_attackCollisionEnabled)
                 return;
@@ -111,154 +108,52 @@ namespace DoomBreakers
             for (int i = 0; i < _enemyLayerMasks.Length; i++)
 			{
                 
-                //if (playerStateMachine.GetPlayerState() == state.IsQuickAttack)
-                //    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_enemyLayerMaskStr));
-                //if (playerStateMachine.GetPlayerState() == state.IsAttackRelease)
-                //    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], LayerMask.GetMask(_enemyLayerMaskStr));//_enemyLayerMasks[i]);
-                //if (playerStateMachine.GetPlayerState() == state.IsUpwardAttack)
-                //    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], _enemyLayerMasks[i]);
-
-                DetermineCollisionPurpose(playerStateMachine, i);
+                DetermineCollisionPurpose(ref playerState, i);
 
                 if (_enemyTargetsHit == null)
                     break;
 
                 foreach (Collider2D enemy in _enemyTargetsHit)
 				{
-                    if (enemy.CompareTag(GetCompareTag(CompareTags.Player)))
-					{
-					}
+                    if (enemy.CompareTag(GetCompareTag(CompareTags.Player))) { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2))) { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player3))) { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player4))) { }
 
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Enemy))) 
                     {
-                        ProcessCollisionWithBandit(playerStateMachine, playerSprite, enemy, playerId);//, 0);
-                        //EventManager.TriggerEvent("BanditHitByPlayer");
-                        //_attackCollisionEnabled = false;
-                        //return;
-                        //if (enemy.GetComponent<Bandit>() != null) //Guard clause.
-                        //{
-                        //    _collisionData.PluginPlayerState(playerStateMachine);
-                        //    enemy.GetComponent<Bandit>().ReportCollisionWithPlayer(_collisionData);
-                        //Think of GetComponent as a check for interface implementation.
-                        //Unity is a component based architecture / OOP hybrid and using GetComponent is unavoidable.
-                        //}
+                        if (enemy.GetComponent<Bandit>() == null) //Guard clause.
+                            return;
+
+                        BattleColliderManager.TriggerEvent("ReportCollisionWithBandit");
                     }
                 }
 
             }
             _attackCollisionEnabled = false;
         }
-        private void ProcessCollisionWithBandit(IPlayerStateMachine playerStateMachine, IPlayerSprite playerSprite, Collider2D enemy, int playerId)//, int enemyId)
-        {
-            if (enemy.GetComponent<Bandit>() == null) //Guard clause.
-                return;
 
-            _collisionData.PluginPlayerState(playerStateMachine, playerId);
-            _collisionData.PluginPlayerSprite(playerSprite, playerId);
-            enemy.GetComponent<Bandit>().ReportCollisionWithPlayer(_collisionData, playerId);//RegisterHitByAttack();
-
-        }
-        private void DetermineCollisionPurpose(IPlayerStateMachine playerStateMachine, int i)
+        private void DetermineCollisionPurpose(ref BaseState playerState, int i)
         {
-            if(playerStateMachine.IsQuickAttack())
+            if(playerState.GetType() == typeof(PlayerQuickAttack))
 			{
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_enemyLayerMaskStr));
                 return;
 			}
-            if(playerStateMachine.IsPowerAttackRelease())
+            if(playerState.GetType() == typeof(PlayerReleaseAttack))
 			{
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], LayerMask.GetMask(_enemyLayerMaskStr));
                 return;
             }
-            if(playerStateMachine.IsUpwardAttack())
+            if(playerState.GetType() == typeof(PlayerUpwardAttack))
 			{
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], LayerMask.GetMask(_enemyLayerMaskStr));//_enemyLayerMasks[i]);
                 return;
             }
         }
-        public IPlayerStateMachine RegisterHitByAttack(ICollisionData collisionData, int playerId, int banditId)
-        {
-            if(IsIgnoreDamage(collisionData.GetCachedPlayerState(playerId)))
-                return collisionData.GetCachedPlayerState(playerId);
-
-            if (IsDefendingSelf(collisionData.GetCachedPlayerState(playerId)))
-			{
-                if (collisionData.GetCachedEnemyState(banditId).IsQuickAttack())
-				{
-
-                    if (IsDefendingCorrectDirection(collisionData.GetCachedPlayerSprite(playerId), collisionData.GetCachedBanditSprite(banditId)))
-                        collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsQuickHitWhileDefending);
-                    else
-                        collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsHitByQuickAttack); //GREAT SUCCESS!
-
-                }
-                if (collisionData.GetCachedEnemyState(banditId).IsPowerAttackRelease())
-                {
-                    if (IsDefendingCorrectDirection(collisionData.GetCachedPlayerSprite(playerId), collisionData.GetCachedBanditSprite(banditId)))
-                        collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsHitWhileDefending);
-                    else
-                        collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsHitByReleaseAttack);
-                }
-            }
-            if (!IsDefendingSelf(collisionData.GetCachedPlayerState(playerId)))
-			{
-
-                if (collisionData.GetCachedEnemyState(banditId).IsQuickAttack())
-                    collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsHitByQuickAttack);
-                if (collisionData.GetCachedEnemyState(banditId).IsPowerAttackRelease())
-                    collisionData.GetCachedPlayerState(playerId).SetPlayerState(state.IsHitByReleaseAttack);
-            }
 
 
-
-            _playerStateMachine = collisionData.GetCachedPlayerState(playerId);
-            return collisionData.GetCachedPlayerState(playerId);
-        }
-        private bool IsDefendingCorrectDirection(IPlayerSprite playerSprite, IBanditSprite banditSprite)
-		{
-            //Detrmine which way the player is facing whilst defending & the enemy bandit is attacking.
-            //Why? Player doesn't successfully defend against enemy attack defending the wrong face direction.
-
-            int playerFaceDir = playerSprite.GetSpriteDirection();
-            int enemyFaceDir = banditSprite.GetSpriteDirection();
-
-            //Enemy would only ever be attacking if directly in front of player.
-            //So if player face direction is 1 (right) then enemy would have to be -1 (left) 
-            //case sceneria true for successful defence.
-            if (playerFaceDir == 1 && enemyFaceDir == -1 ||
-                playerFaceDir == -1 && enemyFaceDir == 1)
-                return true;
-
-            return false;
-		}
-        private bool IsDefendingSelf(IPlayerStateMachine playerStateMachine)
-		{
-            if (playerStateMachine.IsDefendingPrepare())
-                return true;
-            if (playerStateMachine.IsDefendingMoving())
-                return true;
-            if (playerStateMachine.IsQuickHitWhenDefending())
-                return true;
-            if (playerStateMachine.IsPowerHitWhenDefending())
-                return true;
-
-            return false;
-		}
-        private bool IsIgnoreDamage(IPlayerStateMachine playerStateMachine)
-		{
-            if (playerStateMachine.IsDodgeLeftPrepare())
-                return true;
-            if (playerStateMachine.IsDodgeRightPrepare())
-                return true;
-            if (playerStateMachine.IsDodgeRelease())
-                return true;
-
-            return false;
-		}
-        public void UpdateDetectItemTargets(IPlayerEquipment playerEquipment, IPlayerStateMachine playerStateMachine)
+        public void UpdateDetectItemTargets(IPlayerEquipment playerEquipment, ref BaseState playerState)
         {
             if (_playerEquipment == null)
                 _playerEquipment = playerEquipment; //For ProcessCollisionFlags() Item use.
@@ -266,8 +161,8 @@ namespace DoomBreakers
             if (!_itemCollisionEnabled)
                 return;
 
-            playerEquipment = _playerEquipment; //Any changes made apply to original parent class, Player.cs.
-            playerStateMachine.SetPlayerState(state.IsGainedEquipment);
+            //playerEquipment = _playerEquipment; //Any changes made apply to original parent class, Player.cs.
+            //playerStateMachine.SetPlayerState(state.IsGainedEquipment);
 
             _itemCollisionEnabled = false;
         }
@@ -314,13 +209,7 @@ namespace DoomBreakers
 				ProcessCollisionWithArmor(collision);
 			}
 			//if (collision.CompareTag("")) { }
-			//if (collision.CompareTag("")) { }
-			//if (collision.CompareTag("")) { }
-			//if (collision.CompareTag("")) { }
-			//if (collision.CompareTag("")) { }
-			//if (collision.CompareTag("")) { }
-			//if (collision.CompareTag("")) { }
-			//if (collision.CompareTag("")) { }
+
 		}
         public void OnTriggerEnter2D(Collider2D collision)
         {

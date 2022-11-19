@@ -48,7 +48,7 @@ namespace DoomBreakers
 			}
 
 
-			playerSprite.SetBehaviourTextureFlash(0.05f, Color.white);
+			playerSprite.SetBehaviourTextureFlash(0.5f, Color.white);
 
 			if (_behaviourTimer.HasTimerFinished())
 				_stateMachine.SetState(new PlayerDodged(_stateMachine, _velocity, _dodgedLeftFlag));

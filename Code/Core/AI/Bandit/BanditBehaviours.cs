@@ -169,9 +169,10 @@ namespace DoomBreakers
 		}
 		public void PersueTarget(IEnemyStateMachine enemyStateMachine, ICollisionData collisionData, IBanditSprite banditSprite)
 		{
-			if (!SafeToPersueTarget(enemyStateMachine, collisionData.GetCachedTargetTransform(), 
-				collisionData.GetCachedPlayerState(collisionData.GetLastCollidedPlayerID())))//Guard Clause
-				return;
+			
+			//if (!SafeToPersueTarget(enemyStateMachine, collisionData.GetCachedTargetTransform(), 
+			//	collisionData.GetCachedPlayerState(collisionData.GetLastCollidedPlayerID())))//Guard Clause
+			//	return;
 
 			int trackingDir = 0; //Face direction either -1 left, or 1 right.
 
@@ -396,7 +397,7 @@ namespace DoomBreakers
 		{
 			_spriteColourSwapTimer.StartTimer(time);//flash sprite colour timer.
 			if (_spriteColourSwapTimer.HasTimerFinished())
-				banditSprite.SetTexture2DColor(colour);
+				banditSprite.SetTexture2DColor(time, colour);
 		}
 
 		public bool SafeToPersueTarget(IEnemyStateMachine enemyStateMachine, Transform targetTransform, IPlayerStateMachine playerStateMachine)

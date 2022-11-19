@@ -18,9 +18,9 @@ namespace DoomBreakers
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed));
 
 			if (_dodgedLeftFlag)
-				_velocity.x -= 44.0f;
+				_velocity.x -= 66.0f;
 			if (!_dodgedLeftFlag)
-				_velocity.x += 44.0f;
+				_velocity.x += 66.0f;
 
 			_stateMachine.SetState(new PlayerIdle(_stateMachine, _velocity));
 			//base.UpdateBehaviour();

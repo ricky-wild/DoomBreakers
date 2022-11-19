@@ -284,7 +284,7 @@ namespace DoomBreakers
 			_colorSwapTextureColors = new Color[texturePixelWidth];
 
 		}
-        public override void SetTexture2DColor(Color color)
+        public override void SetTexture2DColor(float time, Color color)
         {
 			//base.SetTexture2DColor(color);
 			int texturePixelWidth = _colorSwapTexture2D.width;
@@ -295,7 +295,7 @@ namespace DoomBreakers
 
 			if (!_colorSwappedFlag) //Ensure we reset internally upon failure to do so externally (ie a state change)
 			{
-				_colorSwappedTimer.StartTimer(0.5f);
+				_colorSwappedTimer.StartTimer(time);
 				_colorSwappedFlag = true;
 			}
 
@@ -320,7 +320,7 @@ namespace DoomBreakers
         {
             _behaviourTimer.StartTimer(time);//flash sprite colour timer.
             if (_behaviourTimer.HasTimerFinished())
-                SetTexture2DColor(colour);
+                SetTexture2DColor(time, colour);
         }
 
         void Update()

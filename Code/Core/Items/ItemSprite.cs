@@ -155,9 +155,9 @@ namespace DoomBreakers
             }
             _colorSwapTexture2D.Apply();
         }
-        public override void SetTexture2DColor(Color color)
+        public override void SetTexture2DColor(float time, Color color)
 		{
-            base.SetTexture2DColor(color);
+            base.SetTexture2DColor(time, color);
         }
 
         public override void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor)

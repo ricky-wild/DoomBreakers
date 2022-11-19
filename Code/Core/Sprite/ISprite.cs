@@ -8,7 +8,7 @@ namespace DoomBreakers
 		void FlipSprite();
 		void SetupTexture2DColorSwap(string texName,int texId);
 		void ResetTexture2DColor();
-		void SetTexture2DColor(Color color);
+		void SetTexture2DColor(float time, Color color);
 
 		void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor);
 		//static Color ColorFromInt(int c, float alpha = 1.0f);
