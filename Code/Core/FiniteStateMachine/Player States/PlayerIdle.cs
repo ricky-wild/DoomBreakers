@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
-	public class PlayerIdle : BaseState
+	public class PlayerIdle : BaseState, IPlayerIdle
 	{
 
 		public PlayerIdle(StateMachine s, Vector3 v) : base(velocity: v)//=> _stateMachine = s; 

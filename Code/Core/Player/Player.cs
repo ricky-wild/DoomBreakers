@@ -75,238 +75,67 @@ namespace DoomBreakers
 
         void Update()
         {
-            //UpdateInput();
-
-            
-
-            _inputVector2.x = _rewirdInputPlayer.GetAxis("MoveHorizontal");
-            _inputVector2.y = _rewirdInputPlayer.GetAxis("MoveVertical");
-
-            if (_inputVector2.x > 0f || _inputVector2.x < 0f)
-            {
-                if (_state.GetType() != typeof(PlayerMove))
-                    SetState(new PlayerMove(this, _inputVector2));
-            }
-            if (Mathf.Abs(_inputVector2.x) == 0f && Mathf.Abs(_inputVector2.y) == 0f)//else
-			{
-                if (SafeToSetIdle())
-                    SetState(new PlayerIdle(this, _inputVector2));
-            }
-            if (_rewirdInputPlayer.GetButtonDown("Jump"))
-            {
-                if (_state.GetType() != typeof(PlayerJump))
-                    SetState(new PlayerJump(this, _inputVector2));
-            }
-
-            _state.IsIdle(ref _animator);
-            _state.IsMoving(ref _animator,ref _inputVector2);
-            _state.IsJumping(ref _animator,ref _controller2D);
-            _state.IsFalling(ref _animator,ref _controller2D);
-            _state.UpdateBehaviour(ref _controller2D, ref _animator);
-
-            //UpdateStateBehaviours();
+            UpdateInput();
+            UpdateStateBehaviours();
             //UpdateCollisions();
             //UpdateAnimator();
         }
 
-        private bool SafeToSetIdle() //Look into handling more than one state at a time.
-		{
-            //We don't want to set to idle each frame if already Idle AND is Jumping AND is Falling.
-            if (_state.GetType() != typeof(PlayerIdle) && _state.GetType() != typeof(PlayerFall) && _state.GetType() != typeof(PlayerJump))
-                return true;
 
-            return false;
-		}
 
         public void UpdateInput()
 		{
             if (_rewirdInputPlayer == null)
                 return;
 
-
-
             _inputVector2.x = _rewirdInputPlayer.GetAxis("MoveHorizontal");
             _inputVector2.y = _rewirdInputPlayer.GetAxis("MoveVertical");
 
-            //if (_inputVector2.x > 0f || _inputVector2.x < 0f)
-            //    SetState(new PlayerMove(this));
-            //else
-            //    SetState(new PlayerIdle(this));
-
-            //if (_rewirdInputPlayer.GetButtonDown("Jump"))
-            //    SetState(new PlayerJump(this));
-
-            //if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.01f))
-            //{
-            //    if (_inputVector2.y > 0.44f) { }; //_inputState = inputState.UpwardAttack;
-            //    else { }; //_inputState = inputState.Attack;
-            //}
-            //if (_rewirdInputPlayer.GetButtonDown("Defend")) { };
-            //if (_rewirdInputPlayer.GetButtonUp("Defend")) { };
-            //if (_rewirdInputPlayer.GetButtonTimedPressDown("Attack", 0.25f)) { };
-            //if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.25f)) { };
-            //if (_rewirdInputPlayer.GetButtonTimedPressUp("KnockBack", 0.01f)) { };
-            //if (_rewirdInputPlayer.GetButtonDown("DodgeL")) { };
-            //if (_rewirdInputPlayer.GetButtonDown("DodgeR")) { };
-            //if (_rewirdInputPlayer.GetButtonDown("Sprint")) { };
-            //if (_rewirdInputPlayer.GetButtonUp("Sprint")) { };
-            //if (_rewirdInputPlayer.GetAnyButtonUp())
-            //	_inputVector2.x = 0.0f;
-
-
-
-
-            _playerInput.ResetInput();
-            _playerInput.UpdateInput();
-            switch(_playerInput.GetInputState())
-			{
-                case PlayerInput.inputState.Empty:
-                    //_playerState.SetPlayerState(state.IsIdle); //Cannot do this without interfering with other anims.
-                    break;
-                case PlayerInput.inputState.Jump:
-                    //if(_playerState.GetPlayerState() != state.IsJumping || _playerState.GetPlayerState() != state.IsFalling)
-                    _playerState.SetPlayerState(state.IsJumping);
-                    break;
-                case PlayerInput.inputState.Attack:
-                    _playerState.SetPlayerState(state.IsQuickAttack);
-                    break;
-                case PlayerInput.inputState.UpwardAttack:
-                    _playerState.SetPlayerState(state.IsUpwardAttack);
-                    break;
-                case PlayerInput.inputState.HoldAttack:
-                    if (_playerState.IsJumping() || _playerState.IsFalling())
-                        return;
-                    _playerState.SetPlayerState(state.IsAttackPrepare);
-                    break;
-                case PlayerInput.inputState.ReleaseAttack:
-                    if (_playerState.IsJumping() || _playerState.IsFalling())
-                        return;
-                    _playerState.SetPlayerState(state.IsAttackRelease);
-                    break;
-                case PlayerInput.inputState.KnockBackAttack:
-                    _playerState.SetPlayerState(state.IsKnockBackAttack);
-                    break;
-                case PlayerInput.inputState.Defend:
-                    if(_playerInput.GetInputVector2().x != 0.0f)
-                        _playerState.SetPlayerState(state.IsDefenceMoving);
-                    else
-                        _playerState.SetPlayerState(state.IsDefencePrepare);
-                    break;
-                case PlayerInput.inputState.DefenceReleased:
-                    _playerState.SetPlayerState(state.IsDefenceRelease);
-                    break;
-                case PlayerInput.inputState.DodgeL:
-                    if(_playerState.GetPlayerState() != state.IsDodgeRelease)
-                        _playerState.SetPlayerState(state.IsDodgeLPrepare);
-                    break;
-                case PlayerInput.inputState.DodgeR:
-                    if (_playerState.GetPlayerState() != state.IsDodgeRelease)
-                        _playerState.SetPlayerState(state.IsDodgeRPrepare);
-                    break;
-                case PlayerInput.inputState.Sprint:
-                    if (_playerInput.GetInputVector2().x == 0.0f)// || _playerState.IsGainedEquipment())
-                        return;
-                    if(_playerState.IsGainedEquipment())
-                        return;
-                    if (_playerState.IsJumping() || _playerState.IsFalling())
-                        return;
-                    _playerState.SetPlayerState(state.IsSprinting);
-                    break;
+            if (_inputVector2.x > 0f || _inputVector2.x < 0f)
+            {
+                if (SafeToSetMove())
+                    SetState(new PlayerMove(this, _inputVector2));
             }
-            
-		}
+            if (Mathf.Abs(_inputVector2.x) == 0f && Mathf.Abs(_inputVector2.y) == 0f)//else
+            {
+                if (SafeToSetIdle())
+                    SetState(new PlayerIdle(this, _inputVector2));
+            }
+            if (_rewirdInputPlayer.GetButtonDown("Jump"))
+            {
+                if (SafeToSetJump())
+                    SetState(new PlayerJump(this, _inputVector2));
+            }
+            if (_rewirdInputPlayer.GetButtonDown("DodgeL"))
+            {
+                _inputDodgedLeft = true;
+                SetState(new PlayerDodge(this, _inputVector2));
+            }
+            if (_rewirdInputPlayer.GetButtonDown("DodgeR"))
+            {
+                _inputDodgedLeft = false;
+                SetState(new PlayerDodge(this, _inputVector2));
+            }
+            if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.01f))
+            {
+                if (_inputVector2.y > 0.44f)
+                    return;// _inputState = inputState.UpwardAttack;
+                else
+                    SetState(new PlayerQuickAttack(this, _inputVector2));
+            }
+
+        }
 
         public void UpdateStateBehaviours()
 		{
-            
-            switch (_playerState.GetPlayerState())
-			{
-                case state.IsIdle:
-                case state.IsDefenceRelease:
-                    _playerAnimator.SetAnimationState(AnimationState.IdleAnim);
-                    _playerBehaviours.IdleProcess(_playerState);
-                    break;
-                case state.IsMoving:
-                    _playerAnimator.SetAnimationState(AnimationState.MoveAnim);
-                    break;
-                case state.IsSprinting:
-                    _playerAnimator.SetAnimationState(AnimationState.SprintAnim);
-                    break;
-                case state.IsJumping:                  
-                    if(_playerBehaviours.JumpProcess(_playerState))
-                        _playerAnimator.SetAnimationState(AnimationState.JumpAnim);
-                    break;
-                case state.IsFalling:
-                    _playerAnimator.SetAnimationState(AnimationState.FallenAnim);
-                    _playerBehaviours.FallProcess(_playerState);
-                    break;
-                case state.IsQuickAttack:
-                    _playerAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
-                    _playerBehaviours.QuickAttackProcess(_playerState, _playerSprite);//, _playerCollider);
-                    _playerCollider.EnableAttackCollisions();
-                    break;
-                case state.IsUpwardAttack:
-                    _playerAnimator.SetAnimationState(AnimationState.UpwardAtkAnim);
-                    _playerBehaviours.UpwardAttackProcess(_playerState, _playerSprite);
-                    _playerCollider.EnableAttackCollisions();
-                    break;
-                case state.IsAttackPrepare:
-                    _playerAnimator.SetAnimationState(AnimationState.HoldAtkAnim);
-                    _playerBehaviours.HoldAttackProcess(_playerState);
-                    _playerSprite.SetWeaponChargeTextureFXFlag(true);
-                    break;
-                case state.IsAttackRelease:
-                    _playerAnimator.SetAnimationState(AnimationState.ReleaseAtkAnim);
-                    _playerBehaviours.ReleaseAttackProcess(_playerState, _playerSprite);
-                    _playerCollider.EnableAttackCollisions();
-                    _playerSprite.SetWeaponChargeTextureFXFlag(false);
-                    break;
-                case state.IsKnockBackAttack:
-                    _playerAnimator.SetAnimationState(AnimationState.KnockBackAtkAnim);
-                    _playerBehaviours.KnockbackAttackProcess(_playerState);
-                    _playerCollider.EnableAttackCollisions();
-                    break;
-                case state.IsDefencePrepare:
-                    _playerAnimator.SetAnimationState(AnimationState.DefendAnim);
-                    _playerBehaviours.IdleDefenceProcess(_playerState);
-                    break;
-                case state.IsDefenceMoving:
-                    _playerAnimator.SetAnimationState(AnimationState.DefendMoveAnim);
-                    _playerBehaviours.IdleDefenceProcess(_playerState);
-                    break;
-                case state.IsQuickHitWhileDefending:
-                case state.IsHitWhileDefending:
-                    _playerAnimator.SetAnimationState(AnimationState.DefendHitAnim);
-                    _playerBehaviours.IdleDefenceProcess(_playerState);
-                    break;
-                case state.IsDodgeLPrepare:
-                    _playerAnimator.SetAnimationState(AnimationState.DodgeAnim);
-                    _playerBehaviours.DodgeInitiatedProcess(_playerState, true, _playerSprite, _playerCollider);
-                    break;
-                case state.IsDodgeRPrepare:
-                    _playerAnimator.SetAnimationState(AnimationState.DodgeAnim);
-                    _playerBehaviours.DodgeInitiatedProcess(_playerState, false, _playerSprite, _playerCollider);
-                    break;
-                case state.IsDodgeRelease:
-                    _playerBehaviours.DodgeReleasedProcess(_playerState);
-                    break;
-                case state.IsHitByQuickAttack:
-                    _playerAnimator.SetAnimationState(AnimationState.SmallHitAnim);
-                    _playerBehaviours.HitByQuickAttackProcess(_playerState, _playerSprite);
-                    break;
-                case state.IsGainedEquipment:
-                    _playerAnimator.SetAnimationState(AnimationState.EquipmentGained);
-                    if(!_playerBehaviours.EquipmentGainedProcess(_playerState, _playerSprite, _playerEquipment))
-                    { }
-                    else
-					{
-                        //Finished. Update the animators controller as appropriate and change state.
-                        _playerAnimator.SetAnimatorController(_playerEquipment);
-                        _playerState.SetPlayerState(state.IsIdle);
-					}
-                    break;
-            }
-            _playerBehaviours.UpdateMovement(_playerInput.GetInputVector2(), _playerState, _playerSprite, _playerCollider);//UpdateMovement();
+            _state.IsIdle(ref _animator);
+            _state.IsMoving(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
+            _state.IsJumping(ref _animator, ref _controller2D, ref _inputVector2);
+            _state.IsFalling(ref _animator, ref _controller2D, ref _inputVector2);
+            _state.IsDodging(ref _animator, ref _controller2D, ref _inputVector2, _inputDodgedLeft, ref _playerSprite, ref _playerCollider);
+            _state.IsDodged(ref _animator, ref _controller2D, ref _inputVector2);
+            _state.IsQuickAttack(ref _animator, ref _playerSprite, ref _inputVector2);
+            _state.UpdateBehaviour(ref _controller2D, ref _animator);
         }
 
         public void UpdateAnimator()

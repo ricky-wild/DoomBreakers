@@ -87,7 +87,10 @@ namespace DoomBreakers
 
 			_colorSwapTexture2D.Apply();
 		}
-		
+		public virtual void SetBehaviourTextureFlash(float time, Color colour)
+		{
+
+		}
 		public virtual void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor)
 		{
 			_colorSwapTextureColors[(int)indexOfColourToSwap] = replacementColor;

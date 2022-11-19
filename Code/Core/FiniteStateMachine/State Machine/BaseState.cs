@@ -29,11 +29,11 @@ namespace DoomBreakers
 		{
 
 			_velocity = velocity;//new Vector3();
-			_moveSpeed = 3.75f;//3.5f;
+			_moveSpeed = 4.0f;//3.75f;//3.5f;
 			_sprintSpeed = 1.0f;
 			_targetVelocityX = 1.0f;
-			_jumpSpeed = 4.0f;//14.0f;//13.25f;
-			_gravity = wildlogicgames.DoomBreakers.GetGravity();// *2;
+			_jumpSpeed = 4.6f;// 4.0f;
+			_gravity = wildlogicgames.DoomBreakers.GetGravity();
 			_quickAttackIncrement = 0;
 			_dodgedLeftFlag = false;
 			_quickAtkWaitTime = 0.133f;
@@ -67,9 +67,13 @@ namespace DoomBreakers
 				_velocity.y = 0f;
 		}
 		public virtual void IsIdle(ref Animator animator) { }
-		public virtual void IsMoving(ref Animator animator, ref Vector2 input) { }
-		public virtual void IsJumping(ref Animator animator, ref Controller2D controller2D) { }
-		public virtual void IsFalling(ref Animator animator, ref Controller2D controller2D) { }
+		public virtual void IsMoving(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider) { }
+		public virtual void IsJumping(ref Animator animator, ref Controller2D controller2D, ref Vector2 input) { }
+		public virtual void IsFalling(ref Animator animator, ref Controller2D controller2D, ref Vector2 input) { }
+		public virtual void IsDodging(ref Animator animator, ref Controller2D controller2D, ref Vector2 input, 
+										bool dodgeLeft, ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider) { }
+		public virtual void IsDodged(ref Animator animator, ref Controller2D controller2D, ref Vector2 input) { }
+		public virtual void IsQuickAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
 	}
 }
 

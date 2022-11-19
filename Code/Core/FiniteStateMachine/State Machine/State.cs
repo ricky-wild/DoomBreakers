@@ -36,6 +36,7 @@ namespace DoomBreakers
 		public abstract void IsMoving();
 		public abstract void IsJumping();
 		public abstract void IsFalling();
+		public abstract void IsDodging();
 	}
 }
 
