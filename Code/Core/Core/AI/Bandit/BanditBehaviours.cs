@@ -167,7 +167,7 @@ namespace DoomBreakers
 				enemyStateMachine.SetEnemyState(state.IsIdle);
 			}
 		}
-		public void PersueTarget(IEnemyStateMachine enemyStateMachine, ICollisionData collisionData, IBanditSprite banditSprite)
+		public void PersueTarget(IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
 			
 			//if (!SafeToPersueTarget(enemyStateMachine, collisionData.GetCachedTargetTransform(), 
@@ -240,7 +240,7 @@ namespace DoomBreakers
 				enemyStateMachine.SetEnemyState(state.IsIdle);
 			}
 		}
-		public void HitByPowerAttackProcess(ICollisionData collisionData, int banditId)//IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
+		public void HitByPowerAttackProcess(int banditId)//IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
 			if (collisionData.SomeDataIsNull())// == null)
 				return;

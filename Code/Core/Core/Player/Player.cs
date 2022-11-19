@@ -24,7 +24,6 @@ namespace DoomBreakers
         private Vector2 _inputVector2;
         private Controller2D _controller2D;
         private Animator _animator;
-        private MyPlayerStateMachine _playerStateMachine;
 
         private IPlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
@@ -39,7 +38,6 @@ namespace DoomBreakers
             _rewirdInputPlayer = ReInput.players.GetPlayer(_playerID);
             _inputVector2 = new Vector2();
             _animator = this.GetComponent<Animator>();
-            _playerStateMachine = this;
 
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
             _playerEquipment = new PlayerEquipment(PlayerEquipType.Empty_None, PlayerEquipType.Empty_None, PlayerEquipType.Empty_None);
@@ -125,9 +123,14 @@ namespace DoomBreakers
                     if (_state.GetType() != typeof(PlayerHoldAttack))
                     {
                         SetState(new PlayerQuickAttack(this, _inputVector2));//, _quickAttackIncrement));
-                        _playerCollider.EnableAttackCollisions();
                     }
                 }
+                _playerCollider.EnableAttackCollisions();
+            }
+            if (_rewirdInputPlayer.GetButtonTimedPressUp("KnockBack", 0.01f))
+			{
+                SetState(new PlayerKnockAttack(this, _inputVector2));
+                _playerCollider.EnableAttackCollisions();
             }
             if (_rewirdInputPlayer.GetButtonDown("Defend"))
 			{
@@ -146,7 +149,10 @@ namespace DoomBreakers
             if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.25f))
 			{
                 if (_state.GetType() == typeof(PlayerHoldAttack))
+                {
                     SetState(new PlayerReleaseAttack(this, _inputVector2));
+                    _playerCollider.EnableAttackCollisions();
+                }
             }
         }
 
@@ -160,6 +166,7 @@ namespace DoomBreakers
             _state.IsDodged(ref _animator, ref _controller2D, ref _inputVector2);
             _state.IsQuickAttack(ref _animator, ref _playerSprite, ref _inputVector2, ref _quickAttackIncrement);
             _state.IsUpwardAttack(ref _animator, ref _playerSprite, ref _inputVector2);
+            _state.IsKnockAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsHoldAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsReleaseAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsDefending(ref _animator, ref _inputVector2);
