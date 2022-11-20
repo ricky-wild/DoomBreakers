@@ -12,47 +12,38 @@ namespace DoomBreakers
 
 		[Header("Armor Type")]
 		[Tooltip("Set Item to any kind of armor.")]
-		public PlayerEquipType _playerEquip;
+		public EquipmentArmorType _armorType;
+
+		[Header("Material Type")]
+		[Tooltip("Set Item to any type of material.")]
+		public EquipmentMaterialType _materialType;
 
 		private AnimationState _animState; //Apply as appropriate based on _playerEquip.
 		private IEquipmentSprite _breastplateSprite;
 
-		public PlayerEquipType GetArmorType()
+		public EquipmentArmorType GetArmorType()
 		{
-			return _playerEquip;
+			return _armorType;
 		}
 		private void SetupArmor()
 		{
 			//Ensure a armor type has been applied within the inspector.
-			if (_playerEquip == PlayerEquipType.Empty_None)
-			{
-				_playerEquip = PlayerEquipType.BreastPlate_Bronze;
+			if (_armorType != EquipmentArmorType.Breastplate)
+				_armorType = EquipmentArmorType.Breastplate;
+
+			if (_armorID != PlayerItem.IsBreastPlate)
 				_armorID = PlayerItem.IsBreastPlate;
-				_animState = AnimationState.IdleBreastplate;
-				return;
-			}
-
-
-			//Set the appropriate animation for the armor.
-			if (_playerEquip == PlayerEquipType.BreastPlate_Bronze ||
-				_playerEquip == PlayerEquipType.BreastPlate_Iron ||
-				_playerEquip == PlayerEquipType.BreastPlate_Steel ||
-				_playerEquip == PlayerEquipType.BreastPlate_Ebony)
-			{
-				if (_armorID != PlayerItem.IsBreastPlate)
-					_armorID = PlayerItem.IsBreastPlate;
-				_animState = AnimationState.IdleBreastplate;
-				return;
-			}
+			
+			_animState = AnimationState.IdleBreastplate;
 
 		}
 		public override void Awake()
 		{
 			Initialize(this.GetComponent<SpriteRenderer>(), this.GetComponent<Animator>(), 
-				AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleBreastplate, _armorID, _playerEquip);
+				AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleBreastplate, _armorID, _materialType);
 		}
 		public override void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
-									   AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType)
+									   AnimationState animationState, PlayerItem itemType, EquipmentMaterialType equipMaterialType)
 		{
 			SetupArmor();
 			//base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);
@@ -61,7 +52,7 @@ namespace DoomBreakers
 			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>());
 			_itemAnimator = new ItemAnimator(animator, animController, animationState);
 			_breastplateSprite = this.gameObject.AddComponent<BreastplateSprite>();
-			_breastplateSprite.Setup(ref spriteRenderer, _itemID, itemType, playerEquipType);
+			_breastplateSprite.Setup(ref spriteRenderer, _itemID, itemType, equipMaterialType);
 		}
 		public override void Start()
 		{

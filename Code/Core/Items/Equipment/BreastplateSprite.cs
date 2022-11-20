@@ -7,12 +7,12 @@ namespace DoomBreakers
     {
         private int _itemId;
         //private Texture2D _colorSwapTexture2D;
-        public void Setup(ref SpriteRenderer spriteRenderer, int itemID, PlayerItem itemType, PlayerEquipType playerEquipType)
+        public void Setup(ref SpriteRenderer spriteRenderer, int itemID, PlayerItem itemType, EquipmentMaterialType equipMaterialType)
         {
             _spriteRenderer = spriteRenderer;
             //base.Setup(spriteRenderer, "_SwapTexBandit", _itemId);
             _itemId = itemID;
-            ApplyCustomTexture2DColours(itemType, playerEquipType);
+            ApplyCustomTexture2DColours(itemType, equipMaterialType);
         }
         public override void SetupTexture2DColorSwap(string texName, int texId)
         {
@@ -22,40 +22,40 @@ namespace DoomBreakers
         {
             base.ResetTexture2DColor();
         }
-        public void ApplyCustomTexture2DColours(PlayerItem itemType, PlayerEquipType playerEquipType)//IItem item)
+        public void ApplyCustomTexture2DColours(PlayerItem itemType, EquipmentMaterialType equipMaterialType)//IItem item)
         {
             SetupTexture2DColorSwap("_SwapTexBandit", _itemId);
 
             if (itemType != PlayerItem.IsBreastPlate)
                 return;
 
-            ApplyArmorColours(playerEquipType);
+            ApplyArmorColours(equipMaterialType);
 
             //_colorSwapTexture2D.Apply();
         }
-        private void ApplyArmorColours(PlayerEquipType playerEquipType)
+        private void ApplyArmorColours(EquipmentMaterialType equipMaterialType)
         {
-            switch (playerEquipType)
+            switch (equipMaterialType)
             {
-                case PlayerEquipType.BreastPlate_Bronze:
+                case EquipmentMaterialType.Bronze:
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0xbabf6e));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_f, ColorFromInt(0x9ca060));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x61512f));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_h, ColorFromInt(0x44371c));
                     break;
-                case PlayerEquipType.BreastPlate_Iron:
+                case EquipmentMaterialType.Iron:
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0x858585));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_f, ColorFromInt(0x747474));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x535353));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_h, ColorFromInt(0x1e1e1e));
                     break;
-                case PlayerEquipType.BreastPlate_Steel:
+                case EquipmentMaterialType.Steel:
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0xbebebe));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_f, ColorFromInt(0xa8a8a8));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x7b7b7b));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_h, ColorFromInt(0x343434));
                     break;
-                case PlayerEquipType.BreastPlate_Ebony:
+                case EquipmentMaterialType.Ebony:
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0x494e64));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_f, ColorFromInt(0x383636));
                     SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x302d2d));

@@ -12,29 +12,7 @@ namespace DoomBreakers
         IsShield = 3,
         IsBreastPlate = 4
 	};
-    public enum PlayerEquipType
-	{
-        Empty_None = 0,
 
-        Broadsword_Bronze = 1,
-        Broadsword_Iron = 2,
-        Broadsword_Steel = 3,
-        Broadsword_Ebony = 4,
-        Longsword_Bronze = 5,
-        Longsword_Iron = 6,
-        Longsword_Steel = 7,
-        Longsword_Ebony = 8,
-
-        Shield_Bronze = 9,
-        Shield_Iron = 10,
-        Shield_Steel = 11,
-        Shield_Ebony = 12,
-
-        BreastPlate_Bronze = 13,
-        BreastPlate_Iron = 14,
-        BreastPlate_Steel = 15,
-        BreastPlate_Ebony = 16
-    };
     public enum EquipHand
 	{
         Left_Hand = 1,
@@ -42,11 +20,11 @@ namespace DoomBreakers
 	};
     public class PlayerEquipment : IPlayerEquipment//MonoBehaviour
     {
-        private PlayerEquipType _torsoEquipment;
-        private PlayerEquipType _leftHandEquip;
-        private PlayerEquipType _rightHandEquip;
+        private ItemBase _torsoEquipment;
+        private ItemBase _leftHandEquip;
+        private ItemBase _rightHandEquip;
 
-        public PlayerEquipment(PlayerEquipType torsoEquipment, PlayerEquipType leftHandEquip, PlayerEquipType rightHandEquip)
+        public PlayerEquipment(ItemBase torsoEquipment, ItemBase leftHandEquip, ItemBase rightHandEquip)
 		{
             _torsoEquipment = torsoEquipment;
             _leftHandEquip = leftHandEquip;
@@ -54,11 +32,11 @@ namespace DoomBreakers
 
         }
 
-        public void ApplySword(PlayerEquipType playerEquip, PlayerItem equip)
+        public void ApplySword(ItemBase playerEquip)
 		{
             //Now determine where we apply this equipment.
 
-            if (!IsEquipSword(equip))
+            if (!IsEquipSword(playerEquip))
                 return;
 
 
@@ -90,9 +68,9 @@ namespace DoomBreakers
             //if (IsEquipShield(equip)) { }
             //if (IsEquipArmor(equip)) { }
         }
-        public void ApplyShield(PlayerEquipType playerEquip, PlayerItem equip)
+        public void ApplyShield(ItemBase playerEquip)
 		{
-            if (!IsEquipShield(equip))
+            if (!IsEquipShield(playerEquip))
                 return;
 
             if (IsShield(EquipHand.Left_Hand))          //No Dual Shields
@@ -117,9 +95,9 @@ namespace DoomBreakers
                 return;
             }
         }
-        public void ApplyArmor(PlayerEquipType playerEquip, PlayerItem equip)
+        public void ApplyArmor(ItemBase playerEquip)
 		{
-            if (!IsEquipArmor(equip))
+            if (!IsEquipArmor(playerEquip))
                 return;
 
             if(!IsArmor())
@@ -128,36 +106,35 @@ namespace DoomBreakers
                 return;
 			}
         }
-        private bool IsEquipSword(PlayerItem equip)
+        private bool IsEquipSword(ItemBase equip)
 		{
-            if (equip == PlayerItem.IsBroadsword)
+            if (equip.GetType() == typeof(Sword))
                 return true;
-            if (equip == PlayerItem.IsLongsword)
+
+            return false;
+        }
+        private bool IsEquipShield(ItemBase equip)
+        {
+            if (equip.GetType() == typeof(Shield))
                 return true;
             return false;
         }
-        private bool IsEquipShield(PlayerItem equip)
+        private bool IsEquipArmor(ItemBase equip)
         {
-            if (equip == PlayerItem.IsShield)
-                return true;
-            return false;
-        }
-        private bool IsEquipArmor(PlayerItem equip)
-        {
-            if (equip == PlayerItem.IsBreastPlate)
+            if (equip.GetType() == typeof(Breastplate))
                 return true;
             return false;
         }
 
-        public PlayerEquipType GetTorsoEquip()
+        public ItemBase GetTorsoEquip()
 		{
             return _torsoEquipment;
 		}
-        public PlayerEquipType GetLeftHandEquip()
+        public ItemBase GetLeftHandEquip()
         {
             return _leftHandEquip;
         }
-        public PlayerEquipType GetRightHandEquip()
+        public ItemBase GetRightHandEquip()
         {
             return _rightHandEquip;
         }

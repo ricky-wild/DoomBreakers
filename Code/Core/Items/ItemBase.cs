@@ -9,6 +9,29 @@ namespace DoomBreakers
     //have all the same behaviours, bar, animations and what they represent. 
     //This will also be used for Health items that are also picked up. Such as Apples, Chicken & Fish.
     //</summary>
+
+    public enum EquipmentMaterialType
+    {
+        None = -1,
+        Bronze = 0,
+        Iron = 1,
+        Steel = 2,
+        Ebony = 3
+    };
+    public enum EquipmentWeaponType
+	{
+        None = -1,
+        Broadsword = 0,
+        Longsword = 1
+	};
+    public enum EquipmentArmorType
+	{
+        None = -1,
+        Breastplate = 0,
+        Shield = 1
+	}
+
+
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(Collider2D))]
@@ -26,7 +49,7 @@ namespace DoomBreakers
 
         public ItemBase(){}
 		public virtual void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
-                                       AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType)
+                                       AnimationState animationState, PlayerItem itemType, EquipmentMaterialType equipMaterialType)
 		{
 
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();

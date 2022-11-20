@@ -7,12 +7,12 @@ namespace DoomBreakers
     {
         private int _itemId;
         //private Texture2D _colorSwapTexture2D;
-        public void Setup(ref SpriteRenderer spriteRenderer, int itemID, PlayerItem itemType, PlayerEquipType playerEquipType)
+        public void Setup(ref SpriteRenderer spriteRenderer, int itemID, PlayerItem itemType, EquipmentMaterialType equipMaterialType)
         {
             _spriteRenderer = spriteRenderer;
             //base.Setup(spriteRenderer, "_SwapTexBandit", _itemId);
             _itemId = itemID;
-            ApplyCustomTexture2DColours(itemType, playerEquipType);
+            ApplyCustomTexture2DColours(itemType, equipMaterialType);
         }
         public override void SetupTexture2DColorSwap(string texName, int texId)
         {
@@ -22,43 +22,43 @@ namespace DoomBreakers
         {
             base.ResetTexture2DColor();
         }
-        public void ApplyCustomTexture2DColours(PlayerItem itemType, PlayerEquipType playerEquipType)//IItem item)
+        public void ApplyCustomTexture2DColours(PlayerItem itemType, EquipmentMaterialType equipMaterialType)//IItem item)
         {
             SetupTexture2DColorSwap("_SwapTexBandit", _itemId);
 
             if (itemType != PlayerItem.IsShield)
                 return;
 
-            ApplyShieldColours(playerEquipType);
+            ApplyShieldColours(equipMaterialType);
 
             //_colorSwapTexture2D.Apply();
         } 
-        private void ApplyShieldColours(PlayerEquipType playerEquipType)
+        private void ApplyShieldColours(EquipmentMaterialType equipMaterialType)
         {
-            switch (playerEquipType)
+            switch (equipMaterialType)
             {
-                case PlayerEquipType.Shield_Bronze:
+                case EquipmentMaterialType.Bronze:
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0xcbd092));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0x9ca060));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x61512f));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_d, ColorFromInt(0x074f21));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_e, ColorFromInt(0x0e622c));
                     break;
-                case PlayerEquipType.Shield_Iron:
+                case EquipmentMaterialType.Iron:
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0xa8a8a8));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0x7b7b7b));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x343434));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_d, ColorFromInt(0x4f1507));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_e, ColorFromInt(0x823c3d));
                     break;
-                case PlayerEquipType.Shield_Steel:
+                case EquipmentMaterialType.Steel:
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0xcfc8c8));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0xb1a7a7));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x918686));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_d, ColorFromInt(0x212454));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_e, ColorFromInt(0x3c407e));
                     break;
-                case PlayerEquipType.Shield_Ebony:
+                case EquipmentMaterialType.Ebony:
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0x2f3146));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0x272834));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x1e1717));

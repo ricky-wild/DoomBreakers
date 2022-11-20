@@ -12,51 +12,38 @@ namespace DoomBreakers
 
 		[Header("Shield Type")]
 		[Tooltip("Set Item to any kind of shield.")]
-		public PlayerEquipType _playerEquip;
+		public EquipmentArmorType _shieldType;
+
+		[Header("Material Type")]
+		[Tooltip("Set Item to any type of material.")]
+		public EquipmentMaterialType _materialType;
 
 		private AnimationState _animState; //Apply as appropriate based on _playerEquip.
 		private IEquipmentSprite _shieldSprite;
 
-		public PlayerEquipType GetShieldType()
+		public EquipmentMaterialType GetShieldType()
 		{
-			return _playerEquip;
+			return _materialType;
 		}
 		private void SetupShield()
 		{
 			//Ensure a shield type has been applied within the inspector.
-			if (_playerEquip == PlayerEquipType.Empty_None ||
-				_playerEquip != PlayerEquipType.Shield_Bronze ||
-				_playerEquip != PlayerEquipType.Shield_Iron ||
-				_playerEquip != PlayerEquipType.Shield_Steel ||
-				_playerEquip != PlayerEquipType.Shield_Ebony)
-			{
-				_playerEquip = PlayerEquipType.Shield_Bronze;
+			if (_shieldType != EquipmentArmorType.Shield)
+				_shieldType = EquipmentArmorType.Shield;
+
+			if (_shieldID != PlayerItem.IsShield)
 				_shieldID = PlayerItem.IsShield;
-				_animState = AnimationState.IdleShield;
-				return;
-			}
 
-
-			//Set the appropriate animation for the shield.
-			if (_playerEquip == PlayerEquipType.Shield_Bronze ||
-				_playerEquip == PlayerEquipType.Shield_Iron ||
-				_playerEquip == PlayerEquipType.Shield_Steel ||
-				_playerEquip == PlayerEquipType.Shield_Ebony)
-			{
-				if (_shieldID != PlayerItem.IsShield)
-					_shieldID = PlayerItem.IsShield;
-				_animState = AnimationState.IdleShield;
-				return;
-			}
+			_animState = AnimationState.IdleShield;
 
 		}
 		public override void Awake()
 		{
 			Initialize(this.GetComponent<SpriteRenderer>(), this.GetComponent<Animator>(), 
-				AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleShield, _shieldID, _playerEquip);
+				AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleShield, _shieldID, _materialType);
 		}
 		public override void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
-									    AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType)
+									    AnimationState animationState, PlayerItem itemType, EquipmentMaterialType equipMaterialType)
 		{
 			SetupShield();
 			//base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);
@@ -65,7 +52,7 @@ namespace DoomBreakers
 			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>());
 			_itemAnimator = new ItemAnimator(animator, animController, animationState);
 			_shieldSprite = this.gameObject.AddComponent<ShieldSprite>();
-			_shieldSprite.Setup(ref spriteRenderer, _itemID, itemType, playerEquipType);
+			_shieldSprite.Setup(ref spriteRenderer, _itemID, itemType, equipMaterialType);
 		}
 		public override void Start()
 		{
