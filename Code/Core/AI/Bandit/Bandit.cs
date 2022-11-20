@@ -72,65 +72,65 @@ namespace DoomBreakers
 		}
         public void UpdateStateBehaviours()
 		{
-            switch (_banditState.GetEnemyState())
-            {
-                case state.IsIdle:
-                case state.IsDefenceRelease:
-                    _banditAnimator.SetAnimationState(AnimationState.IdleAnim);
-                    _banditBehaviours.IdleProcess(_banditState, _banditCollider);
-                    break;
-                case state.IsWaiting:
-                    _banditAnimator.SetAnimationState(AnimationState.IdleAnim);
-                    _banditBehaviours.WaitingProcess(_banditState);
-                    break;
-                case state.IsMoving:
-                    _banditAnimator.SetAnimationState(AnimationState.MoveAnim);
-                    _banditBehaviours.PersueTarget(_banditState, _banditCollider.GetRecentCollision(), _banditSprite);
-                    break;
-                case state.IsJumping:
-                    //if (_banditBehaviours.JumpProcess(_banditState))
-                    //    _banditAnimator.SetAnimationState(AnimationState.JumpAnim);
-                    break;
-                case state.IsFalling:
-                    _banditAnimator.SetAnimationState(AnimationState.FallenAnim);
-                    _banditBehaviours.FallProcess(_banditState, _banditSprite, _banditID);
-                    break;
-                case state.IsQuickAttack:
-                    _banditAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
-                    _banditBehaviours.QuickAttackProcess(_banditState, _banditSprite);
-                    _banditCollider.EnableTargetCollisionDetection();
-                    break;
-                case state.IsAttackPrepare:
-                    _banditAnimator.SetAnimationState(AnimationState.HoldAtkAnim);
-                    //_banditBehaviours.HoldAttackProcess(_banditState);
-                    //_banditSprite.SetWeaponChargeTextureFXFlag(true);
-                    break;
-                case state.IsAttackRelease:
-                    _banditAnimator.SetAnimationState(AnimationState.ReleaseAtkAnim);
-                    //_banditBehaviours.ReleaseAttackProcess(_banditState);
-                    //_banditCollider.EnableAttackCollisions();
-                    //_banditSprite.SetWeaponChargeTextureFXFlag(false);
-                    break;
-                case state.IsDefencePrepare:
-                    //_banditAnimator.SetAnimationState(AnimationState.DefendAnim);
-                    //_banditBehaviours.IdleDefenceProcess(_banditState);
-                    break;
-                case state.IsDefenceMoving:
-                    _banditAnimator.SetAnimationState(AnimationState.DefendMoveAnim);
-                    //_banditBehaviours.IdleDefenceProcess(_banditState);
-                    break;
-                case state.IsHitByQuickAttack:
-                    _banditAnimator.SetAnimationState(AnimationState.SmallHitAnim);
-                    _banditBehaviours.HitByQuickAttackProcess(_banditState, _banditSprite);
-                    break;
-                case state.IsHitByReleaseAttack:
-                    _banditAnimator.SetAnimationState(AnimationState.PowerHitAnim);
-                    _banditBehaviours.HitByPowerAttackProcess(_banditCollider.GetRecentCollision(), _banditID);
-                    //_banditBehaviours.HitByPowerAttackProcess(_banditState, _banditSprite);
-                    break;
+            //switch (_banditState.GetEnemyState())
+            //{
+            //    case state.IsIdle:
+            //    case state.IsDefenceRelease:
+            //        _banditAnimator.SetAnimationState(AnimationState.IdleAnim);
+            //        _banditBehaviours.IdleProcess(_banditState, _banditCollider);
+            //        break;
+            //    case state.IsWaiting:
+            //        _banditAnimator.SetAnimationState(AnimationState.IdleAnim);
+            //        _banditBehaviours.WaitingProcess(_banditState);
+            //        break;
+            //    case state.IsMoving:
+            //        _banditAnimator.SetAnimationState(AnimationState.MoveAnim);
+            //        _banditBehaviours.PersueTarget(_banditState, _banditCollider.GetRecentCollision(), _banditSprite);
+            //        break;
+            //    case state.IsJumping:
+            //        //if (_banditBehaviours.JumpProcess(_banditState))
+            //        //    _banditAnimator.SetAnimationState(AnimationState.JumpAnim);
+            //        break;
+            //    case state.IsFalling:
+            //        _banditAnimator.SetAnimationState(AnimationState.FallenAnim);
+            //        _banditBehaviours.FallProcess(_banditState, _banditSprite, _banditID);
+            //        break;
+            //    case state.IsQuickAttack:
+            //        _banditAnimator.SetAnimationState(AnimationState.QuickAtkAnim);
+            //        _banditBehaviours.QuickAttackProcess(_banditState, _banditSprite);
+            //        _banditCollider.EnableTargetCollisionDetection();
+            //        break;
+            //    case state.IsAttackPrepare:
+            //        _banditAnimator.SetAnimationState(AnimationState.HoldAtkAnim);
+            //        //_banditBehaviours.HoldAttackProcess(_banditState);
+            //        //_banditSprite.SetWeaponChargeTextureFXFlag(true);
+            //        break;
+            //    case state.IsAttackRelease:
+            //        _banditAnimator.SetAnimationState(AnimationState.ReleaseAtkAnim);
+            //        //_banditBehaviours.ReleaseAttackProcess(_banditState);
+            //        //_banditCollider.EnableAttackCollisions();
+            //        //_banditSprite.SetWeaponChargeTextureFXFlag(false);
+            //        break;
+            //    case state.IsDefencePrepare:
+            //        //_banditAnimator.SetAnimationState(AnimationState.DefendAnim);
+            //        //_banditBehaviours.IdleDefenceProcess(_banditState);
+            //        break;
+            //    case state.IsDefenceMoving:
+            //        _banditAnimator.SetAnimationState(AnimationState.DefendMoveAnim);
+            //        //_banditBehaviours.IdleDefenceProcess(_banditState);
+            //        break;
+            //    case state.IsHitByQuickAttack:
+            //        _banditAnimator.SetAnimationState(AnimationState.SmallHitAnim);
+            //        _banditBehaviours.HitByQuickAttackProcess(_banditState, _banditSprite);
+            //        break;
+            //    case state.IsHitByReleaseAttack:
+            //        _banditAnimator.SetAnimationState(AnimationState.PowerHitAnim);
+            //        _banditBehaviours.HitByPowerAttackProcess(_banditCollider.GetRecentCollision(), _banditID);
+            //        //_banditBehaviours.HitByPowerAttackProcess(_banditState, _banditSprite);
+            //        break;
 
-            }
-            _banditBehaviours.UpdateMovement(_banditState, _banditSprite, _banditCollider);//UpdateMovement();
+            //}
+            //_banditBehaviours.UpdateMovement(_banditState, _banditSprite, _banditCollider);//UpdateMovement();
             //UpdateMovement();
         }
         public void UpdateAnimator()

@@ -353,9 +353,9 @@ namespace DoomBreakers
 		{
             if (_playerEquipment.IsArmor())
             {
-                switch (_playerEquipment.GetTorsoEquip())
+                switch (_playerEquipment.GetArmorMaterialType())
                 {
-                    case PlayerEquipType.BreastPlate_Bronze:
+                    case EquipmentMaterialType.Bronze:
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_a, ColorFromInt(0xced37b));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_b, ColorFromInt(0xc4c973));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0xbabf6e));
@@ -365,7 +365,7 @@ namespace DoomBreakers
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x61512f));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_h, ColorFromInt(0x44371c));
                         break;
-                    case PlayerEquipType.BreastPlate_Iron:
+                    case EquipmentMaterialType.Iron:
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_a, ColorFromInt(0x9d9d9d));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_b, ColorFromInt(0x8b8b8b));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0x858585));
@@ -375,7 +375,7 @@ namespace DoomBreakers
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x535353));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_h, ColorFromInt(0x1e1e1e));
                         break;
-                    case PlayerEquipType.BreastPlate_Steel:
+                    case EquipmentMaterialType.Steel:
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_a, ColorFromInt(0xdedede));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_b, ColorFromInt(0xc6c6c6));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0xbebebe));
@@ -385,7 +385,7 @@ namespace DoomBreakers
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_g, ColorFromInt(0x7b7b7b));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_h, ColorFromInt(0x343434));
                         break;
-                    case PlayerEquipType.BreastPlate_Ebony:
+                    case EquipmentMaterialType.Ebony:
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_a, ColorFromInt(0x565656));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_b, ColorFromInt(0x4e4c4c));
                         SwapTexture2DColor(SpriteColourIndex.Armor_Standard_c, ColorFromInt(0x494e64));
@@ -402,40 +402,32 @@ namespace DoomBreakers
         private void ApplyShieldColours()
 		{
             if (!SafeToApplyShieldColor())
-                return;
+                return;           
 
-            PlayerEquipType shieldType = PlayerEquipType.Empty_None;
-            if (_playerEquipment.IsShield(EquipHand.Left_Hand))
-                shieldType = _playerEquipment.GetLeftHandEquip();
-            if (_playerEquipment.IsShield(EquipHand.Right_Hand))
-                shieldType = _playerEquipment.GetRightHandEquip();
-
-            
-
-            switch(shieldType)
+            switch(_playerEquipment.GetShieldMaterialType())
 			{
-                case PlayerEquipType.Shield_Bronze:
+                case EquipmentMaterialType.Bronze:
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0xcbd092));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0x9ca060));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x61512f));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_d, ColorFromInt(0x074f21));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_e, ColorFromInt(0x0e622c));
                     break;
-                case PlayerEquipType.Shield_Iron:
+                case EquipmentMaterialType.Iron:
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0xa8a8a8));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0x7b7b7b));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x343434));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_d, ColorFromInt(0x4f1507));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_e, ColorFromInt(0x823c3d));
                     break;
-                case PlayerEquipType.Shield_Steel:
+                case EquipmentMaterialType.Steel:
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0xcfc8c8));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0xb1a7a7));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x918686));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_d, ColorFromInt(0x212454));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_e, ColorFromInt(0x3c407e));
                     break;
-                case PlayerEquipType.Shield_Ebony:
+                case EquipmentMaterialType.Ebony:
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_a, ColorFromInt(0x2f3146));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_b, ColorFromInt(0x272834));
                     SwapTexture2DColor(SpriteColourIndex.Shield_Standard_c, ColorFromInt(0x1e1717));
@@ -462,22 +454,10 @@ namespace DoomBreakers
             if (!SafeToApplySwordColor())
                 return;
 
-            PlayerEquipType swordType = PlayerEquipType.Empty_None;
-            if (_playerEquipment.IsBroadsword(EquipHand.Left_Hand))
-                swordType = _playerEquipment.GetLeftHandEquip();
-            if (_playerEquipment.IsBroadsword(EquipHand.Right_Hand))
-                swordType = _playerEquipment.GetRightHandEquip();
-            if (_playerEquipment.IsLongsword(EquipHand.Left_Hand))
-                swordType = _playerEquipment.GetLeftHandEquip();
-            if (_playerEquipment.IsLongsword(EquipHand.Right_Hand))
-                swordType = _playerEquipment.GetRightHandEquip();
 
-
-
-            switch (swordType)
+            switch (_playerEquipment.GetSwordMaterialType())
             {
-                case PlayerEquipType.Broadsword_Bronze:
-                case PlayerEquipType.Longsword_Bronze:
+                case EquipmentMaterialType.Bronze:
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_a, ColorFromInt(0xe4e6c9));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_b, ColorFromInt(0xd3d6ab));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_c, ColorFromInt(0xcbd092));
@@ -486,8 +466,7 @@ namespace DoomBreakers
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_a, ColorFromInt(0x61512f));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_b, ColorFromInt(0x6c5a34));
                     break;
-                case PlayerEquipType.Broadsword_Iron:
-                case PlayerEquipType.Longsword_Iron:
+                case EquipmentMaterialType.Iron:
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_a, ColorFromInt(0xafafaf));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_b, ColorFromInt(0xa3a2a2));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_c, ColorFromInt(0x939191));
@@ -496,8 +475,7 @@ namespace DoomBreakers
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_a, ColorFromInt(0x144c18));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_b, ColorFromInt(0x1a5a1f));
                     break;
-                case PlayerEquipType.Broadsword_Steel:
-                case PlayerEquipType.Longsword_Steel:
+                case EquipmentMaterialType.Steel:
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_a, ColorFromInt(0xd5d5d5));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_b, ColorFromInt(0xcbc5c5));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_c, ColorFromInt(0xb9b9b9));
@@ -506,8 +484,7 @@ namespace DoomBreakers
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_a, ColorFromInt(0x0f1c4e));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_handle_b, ColorFromInt(0x182964));
                     break;
-                case PlayerEquipType.Broadsword_Ebony:
-                case PlayerEquipType.Longsword_Ebony:
+                case EquipmentMaterialType.Ebony:
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_a, ColorFromInt(0x565965));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_b, ColorFromInt(0x424141));
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_c, ColorFromInt(0x383636));

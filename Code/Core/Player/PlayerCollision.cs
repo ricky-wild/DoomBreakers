@@ -95,12 +95,12 @@ namespace DoomBreakers
 
         void Update() 
         { }
-        public void UpdateCollision(ref BaseState playerState, int playerId, IPlayerEquipment playerEquipment)
+        public void UpdateCollision(ref MyPlayerStateMachine playerStateMachine, ref Vector3 velocity, int playerId, IPlayerEquipment playerEquipment)
 		{
-            UpdateDetectEnemyTargets(ref playerState, playerId);
-            UpdateDetectItemTargets(playerEquipment, ref playerState);
+            UpdateDetectEnemyTargets(ref playerStateMachine, ref velocity, playerId);
+            UpdateDetectItemTargets(playerEquipment, ref playerStateMachine, ref velocity);
         }
-        public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId)
+        public void UpdateDetectEnemyTargets(ref MyPlayerStateMachine playerStateMachine, ref Vector3 velocity, int playerId)
         {
             if (!_attackCollisionEnabled)
                 return;
@@ -108,7 +108,7 @@ namespace DoomBreakers
             for (int i = 0; i < _enemyLayerMasks.Length; i++)
 			{
                 
-                DetermineCollisionPurpose(ref playerState, i);
+                DetermineCollisionPurpose(ref playerStateMachine, i);
 
                 if (_enemyTargetsHit == null)
                     break;
@@ -133,9 +133,10 @@ namespace DoomBreakers
             _attackCollisionEnabled = false;
         }
 
-        private void DetermineCollisionPurpose(ref BaseState playerState, int i)
+        private void DetermineCollisionPurpose(ref MyPlayerStateMachine playerStateMachine, int i)
         {
-            if(playerState.GetType() == typeof(PlayerQuickAttack))
+            BaseState playerState = playerStateMachine.GetState();
+            if (playerState.GetType() == typeof(PlayerQuickAttack))
 			{
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_enemyLayerMaskStr));
                 return;
@@ -153,7 +154,7 @@ namespace DoomBreakers
         }
 
 
-        public void UpdateDetectItemTargets(IPlayerEquipment playerEquipment, ref BaseState playerState)
+        public void UpdateDetectItemTargets(IPlayerEquipment playerEquipment, ref MyPlayerStateMachine playerStateMachine, ref Vector3 velocity)
         {
             if (_playerEquipment == null)
                 _playerEquipment = playerEquipment; //For ProcessCollisionFlags() Item use.
@@ -161,7 +162,9 @@ namespace DoomBreakers
             if (!_itemCollisionEnabled)
                 return;
 
-            //playerEquipment = _playerEquipment; //Any changes made apply to original parent class, Player.cs.
+            playerEquipment = _playerEquipment; //Any changes made apply to original parent class, Player.cs.
+            //playerState = new PlayerGainedEquipment()
+            playerStateMachine.SetState(new PlayerGainedEquipment(playerStateMachine, velocity));
             //playerStateMachine.SetPlayerState(state.IsGainedEquipment);
 
             _itemCollisionEnabled = false;
@@ -172,7 +175,7 @@ namespace DoomBreakers
                 return; //Then NOT a Sword. Get outta here!
 
             //_playerEquipment = collision.GetComponent<PlayerEquipment>();
-            _playerEquipment.ApplySword(collision.GetComponent<Sword>().GetSwordType(), collision.GetComponent<Sword>()._swordID);
+            _playerEquipment.ApplySword(collision.GetComponent<Sword>());
             collision.GetComponent<Sword>().Destroy();
 
             _itemCollisionEnabled = true; //Flag so we update players equipment.
@@ -183,7 +186,7 @@ namespace DoomBreakers
             if (collision.GetComponent<Shield>() == null)
                 return; //Then NOT a Shield. Get outta here!
 
-            _playerEquipment.ApplyShield(collision.GetComponent<Shield>().GetShieldType(), collision.GetComponent<Shield>()._shieldID);
+            _playerEquipment.ApplyShield(collision.GetComponent<Shield>());
             collision.GetComponent<Shield>().Destroy();
 
             _itemCollisionEnabled = true;
@@ -194,7 +197,7 @@ namespace DoomBreakers
             if (collision.GetComponent<Breastplate>() == null)
                 return; //Then NOT a Armor. Get outta here!
 
-            _playerEquipment.ApplyArmor(collision.GetComponent<Breastplate>().GetArmorType(), collision.GetComponent<Breastplate>()._armorID);
+            _playerEquipment.ApplyArmor(collision.GetComponent<Breastplate>());
             collision.GetComponent<Breastplate>().Destroy();
 
             _itemCollisionEnabled = true;

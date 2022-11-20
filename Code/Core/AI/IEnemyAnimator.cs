@@ -3,7 +3,7 @@ namespace DoomBreakers
 {
 	interface IEnemyAnimator //: MonoBehaviour
 	{
-		void UpdateAnimator(IPlayerBehaviours playerBehaviour);
+		void UpdateAnimator();
 		AnimationState GetAnimationState();
 		void SetAnimationState(AnimationState animationState);
 		void SetAnimatorController(BanditAnimatorController animatorController);

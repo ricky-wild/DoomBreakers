@@ -26,8 +26,8 @@ namespace DoomBreakers
         {
             SetupTexture2DColorSwap("_SwapTexBandit", _itemId);
 
-            if (itemType != PlayerItem.IsBroadsword || itemType != PlayerItem.IsLongsword)
-                return;
+            //if (itemType != PlayerItem.IsBroadsword || itemType != PlayerItem.IsLongsword)
+            //    return;
 
             ApplySwordColours(equipMaterialType);
 

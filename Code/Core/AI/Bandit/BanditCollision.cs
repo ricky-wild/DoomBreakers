@@ -16,7 +16,6 @@ namespace DoomBreakers
             toAttack = 2
 		};
         private CollisionTargetPurpose _collisionTargetPurpose; //Flag for player collision purpose. UpdateDetectEnemyTargets()
-        private ICollisionData _collisionData;
 
         private CompareTags _compareTags;
 
@@ -52,7 +51,6 @@ namespace DoomBreakers
             _collider2d.enabled = true;
             _detectTargetCollisionEnabled = false;
             _collisionTargetPurpose = CollisionTargetPurpose.noPurpose;
-            _collisionData = new CollisionData();
             //_eventListener = new Action(TestMethod);
         }
         //public void TestMethod(){print("TestMethod() activated via event handler!");}
@@ -127,25 +125,21 @@ namespace DoomBreakers
         }
         private void ProcessCollisionWithPlayer(IEnemyStateMachine banditStateMachine, IBanditSprite banditSprite, Collider2D player, int playerId)
 		{
-            //_collidedTargetTransform = player.transform;
-            _collisionData.PluginTargetTransform(player.transform);
+
             if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
                 return;
 
-            //if (player.GetComponent<Player>() == null) //Guard clause.
-            //    return;
 
-            if (_collisionData.GetCachedPlayer(playerId) == null)
-            {
-                if (player.GetComponent<Player>() == null) //Guard clause.
-                    return;
-                _collisionData.PluginPlayer(player.GetComponent<Player>(), playerId); //Only 1 call ever made with GetComponent<Player>() thanks to cache.
-            }
+            //if (_collisionData.GetCachedPlayer(playerId) == null)
+            //{
+            //    if (player.GetComponent<Player>() == null) //Guard clause.
+            //        return;
+            //    _collisionData.PluginPlayer(player.GetComponent<Player>(), playerId); //Only 1 call ever made with GetComponent<Player>() thanks to cache.
+            //}
 
-            _collisionData.PluginEnemyState(banditStateMachine, _banditID);
-            _collisionData.PluginBanditSprite(banditSprite, _banditID);
-            //_collisionData.GetCachedPlayer(playerId).ReportCollisionWithEnemy(_collisionData, _banditID);
-            //player.GetComponent<Player>().ReportCollisionWithEnemy(_collisionData);//RegisterHitByAttack();
+            //_collisionData.PluginEnemyState(banditStateMachine, _banditID);
+            //_collisionData.PluginBanditSprite(banditSprite, _banditID);
+
 
         }
         private void DetermineCollisionPurpose(IEnemyStateMachine banditStateMachine, int i)
@@ -206,23 +200,7 @@ namespace DoomBreakers
         {
             _detectTargetCollisionEnabled = true;
         }
-        public IEnemyStateMachine RegisterBanditHitByPlayer(ICollisionData collisionData, int playerId)//IPlayerStateMachine playerStateMachine)
-        {
-            //if (collisionData.GetCachedPlayerState(playerId).IsQuickAttack())
-            //    _banditStateMachine.SetEnemyState(state.IsHitByQuickAttack); 
-            //if (collisionData.GetCachedPlayerState(playerId).IsPowerAttackRelease())
-            //    _banditStateMachine.SetEnemyState(state.IsHitByReleaseAttack);
-            //if (playerStateMachine.GetPlayerState() == state.IsUpwardAttack)
-            //    _banditStateMachine.SetEnemyState(state.IsHitByQuickAttack);
 
-            _collisionData = collisionData; //public ICollisionData GetRecentCollision() NO! DON'T.
-
-            return _banditStateMachine;
-        }
-        //public Transform GetCollidedTargetTransform()
-		//{
-        //    return _collidedTargetTransform;
-		//}
 
         public void FlipAttackPoints(int dir)
         {
@@ -253,10 +231,7 @@ namespace DoomBreakers
                 return;
             }
         }
-        public ICollisionData GetRecentCollision()
-		{
-            return _collisionData; //_banditBehaviours.HitByPowerAttackProcess(_banditCollider.GetRecentCollision()); //Collision data required for behaviour.
-        }
+
     }
 
 }

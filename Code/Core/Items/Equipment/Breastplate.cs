@@ -25,6 +25,11 @@ namespace DoomBreakers
 		{
 			return _armorType;
 		}
+		public EquipmentMaterialType GetMaterialType() //=> return _materialType;
+		{
+			return _materialType;
+		}
+
 		private void SetupArmor()
 		{
 			//Ensure a armor type has been applied within the inspector.
@@ -53,6 +58,11 @@ namespace DoomBreakers
 			_itemAnimator = new ItemAnimator(animator, animController, animationState);
 			_breastplateSprite = this.gameObject.AddComponent<BreastplateSprite>();
 			_breastplateSprite.Setup(ref spriteRenderer, _itemID, itemType, equipMaterialType);
+		}
+		public Breastplate(EquipmentArmorType armorType, EquipmentMaterialType materialType) //Constructor for equipment setup within code, not scene.
+		{
+			_armorType = armorType;
+			_materialType = materialType;
 		}
 		public override void Start()
 		{

@@ -6,7 +6,7 @@ namespace DoomBreakers
 {
 
 
-    public class Sword : ItemBase
+    public class Sword : ItemBase, ISword
     {
 		[Header("Sword ID")]
 		[Tooltip("Set its base item type to appropriate.")]
@@ -26,6 +26,10 @@ namespace DoomBreakers
 		public EquipmentWeaponType GetSwordType()
 		{
 			return _weaponType;
+		}
+		public EquipmentMaterialType GetMaterialType() //=> return _materialType;
+		{
+			return _materialType;
 		}
 		private void SetupSword()
 		{
@@ -65,6 +69,11 @@ namespace DoomBreakers
 			_itemAnimator = new ItemAnimator(animator, animController, animationState);
 			_swordSprite = this.gameObject.AddComponent<SwordSprite>();
 			_swordSprite.Setup(ref spriteRenderer, _itemID, itemType, _materialType);
+		}
+		public Sword(EquipmentWeaponType weaponType, EquipmentMaterialType materialType) //Constructor for equipment setup within code, not scene.
+		{
+			_weaponType = weaponType;
+			_materialType = materialType;
 		}
 		public override void Start()
 		{

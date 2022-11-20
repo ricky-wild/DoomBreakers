@@ -25,10 +25,11 @@ namespace DoomBreakers
         private Controller2D _controller2D;
         private Animator _animator;
 
-        private IPlayerAnimator _playerAnimator;
-        private IPlayerSprite _playerSprite;
+        private MyPlayerStateMachine _playerStateMachine;
         private IPlayerCollision _playerCollider;
         private IPlayerEquipment _playerEquipment;
+        private IPlayerAnimator _playerAnimator;
+        private IPlayerSprite _playerSprite;
 
         private Action _actionListener;
 
@@ -39,12 +40,14 @@ namespace DoomBreakers
             _inputVector2 = new Vector2();
             _animator = this.GetComponent<Animator>();
 
-            _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
-            _playerEquipment = new PlayerEquipment(PlayerEquipType.Empty_None, PlayerEquipType.Empty_None, PlayerEquipType.Empty_None);
-            _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
-            _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
             _playerCollider = this.gameObject.AddComponent<PlayerCollision>(); //Required for OnTriggerEnter2D()
             _playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints);
+            ItemBase emptyItem = new ItemBase();
+            _playerEquipment = new PlayerEquipment(emptyItem, emptyItem, emptyItem);
+            _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
+            _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
+            _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
+
 
             _actionListener = new Action(AttackedByBandit);//AttackedByBandit()
         }
@@ -56,9 +59,10 @@ namespace DoomBreakers
 
 		void Start()
         {
-            _playerEquipment.ApplySword(PlayerEquipType.Broadsword_Steel, PlayerItem.IsBroadsword);
+            //_playerEquipment.ApplySword(PlayerEquipType.Broadsword_Steel, PlayerItem.IsBroadsword);
             _playerAnimator.SetAnimatorController(_playerEquipment);//AnimatorController.Player_with_broadsword_with_shield_controller, false);
 
+            _playerStateMachine = this;
             SetState(new PlayerIdle(this, _inputVector2));
         }
         private void OnEnable()
@@ -110,12 +114,14 @@ namespace DoomBreakers
             if (_rewirdInputPlayer.GetButtonDown("DodgeL"))
             {
                 _inputDodgedLeft = true;
-                SetState(new PlayerDodge(this, _inputVector2));
+                if (_state.GetType() != typeof(PlayerDodge))
+                    SetState(new PlayerDodge(this, _inputVector2));
             }
             if (_rewirdInputPlayer.GetButtonDown("DodgeR"))
             {
                 _inputDodgedLeft = false;
-                SetState(new PlayerDodge(this, _inputVector2));
+                if (_state.GetType() != typeof(PlayerDodge))
+                    SetState(new PlayerDodge(this, _inputVector2));
             }
             if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.01f))
             {
@@ -180,7 +186,7 @@ namespace DoomBreakers
 
         public void UpdateCollisions()
 		{
-            _playerCollider.UpdateCollision(ref _state, _playerID, _playerEquipment);
+            _playerCollider.UpdateCollision(ref _playerStateMachine, ref _velocity, _playerID, _playerEquipment);
 		}
 
         private void AttackedByBandit()

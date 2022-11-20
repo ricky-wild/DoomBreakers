@@ -12,6 +12,10 @@ namespace DoomBreakers
 		ItemBase GetLeftHandEquip();
 		ItemBase GetRightHandEquip();
 
+		EquipmentMaterialType GetArmorMaterialType();
+		EquipmentMaterialType GetSwordMaterialType();
+		EquipmentMaterialType GetShieldMaterialType();
+
 		bool IsBroadsword(EquipHand equipHand);//bool isLeftHand);
 		bool IsLongsword(EquipHand equipHand);//bool isLeftHand);
 		bool IsShield(EquipHand equipHand);//bool isLeftHand);

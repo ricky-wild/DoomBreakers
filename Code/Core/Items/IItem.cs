@@ -7,7 +7,7 @@ namespace DoomBreakers
     {
 
         void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
-                        AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType);
+                                       AnimationState animationState, PlayerItem itemType, EquipmentMaterialType equipMaterialType);
 
         void Destroy();
 

@@ -26,6 +26,7 @@ namespace DoomBreakers
 
         public PlayerEquipment(ItemBase torsoEquipment, ItemBase leftHandEquip, ItemBase rightHandEquip)
 		{
+
             _torsoEquipment = torsoEquipment;
             _leftHandEquip = leftHandEquip;
             _rightHandEquip = rightHandEquip;
@@ -138,29 +139,65 @@ namespace DoomBreakers
         {
             return _rightHandEquip;
         }
+        
+        public EquipmentMaterialType GetArmorMaterialType()
+		{
+            if (_torsoEquipment.GetType() == typeof(Breastplate))
+            {
+                Breastplate armor = (Breastplate)_torsoEquipment;
+                return armor.GetMaterialType();
+            }
+            return EquipmentMaterialType.None;
+        }
+        public EquipmentMaterialType GetShieldMaterialType()
+        {
+            if (_leftHandEquip.GetType() == typeof(Shield))
+            {
+                Shield shield = (Shield)_leftHandEquip;
+                return shield.GetMaterialType();
+            }
+            if (_rightHandEquip.GetType() == typeof(Shield))
+            {
+                Shield shield = (Shield)_rightHandEquip;
+                return shield.GetMaterialType();
+            }
+            return EquipmentMaterialType.None;
+        }
+        public EquipmentMaterialType GetSwordMaterialType()
+        {
+            if (_leftHandEquip.GetType() == typeof(Sword))
+            {
+                Sword sword = (Sword)_leftHandEquip;
+                return sword.GetMaterialType();
+            }
+            if (_rightHandEquip.GetType() == typeof(Sword))
+            {
+                Sword sword = (Sword)_rightHandEquip;
+                return sword.GetMaterialType();
+            }
+            return EquipmentMaterialType.None;
+        }
+
         public bool IsBroadsword(EquipHand equipHand)
 		{
             if(equipHand == EquipHand.Left_Hand)
 			{
-                if (_leftHandEquip == PlayerEquipType.Broadsword_Bronze)
-                    return true;
-                if (_leftHandEquip == PlayerEquipType.Broadsword_Iron)
-                    return true;
-                if (_leftHandEquip == PlayerEquipType.Broadsword_Steel)
-                    return true;
-                if (_leftHandEquip == PlayerEquipType.Broadsword_Ebony)
-                    return true;
+                if (_leftHandEquip.GetType() == typeof(Sword))
+				{
+                    ISword sword = (Sword)_leftHandEquip;
+                    if(sword.GetSwordType() == EquipmentWeaponType.Broadsword)
+                        return true;
+                }
+
             }
             if (equipHand == EquipHand.Right_Hand)
             {
-                if (_rightHandEquip == PlayerEquipType.Broadsword_Bronze)
-                    return true;
-                if (_rightHandEquip == PlayerEquipType.Broadsword_Iron)
-                    return true;
-                if (_rightHandEquip == PlayerEquipType.Broadsword_Steel)
-                    return true;
-                if (_rightHandEquip == PlayerEquipType.Broadsword_Ebony)
-                    return true;
+                if (_rightHandEquip.GetType() == typeof(Sword))
+                {
+                    ISword sword = (Sword)_rightHandEquip;
+                    if (sword.GetSwordType() == EquipmentWeaponType.Broadsword)
+                        return true;
+                }
             }
 
             return false;
@@ -169,25 +206,21 @@ namespace DoomBreakers
         {
             if (equipHand == EquipHand.Left_Hand)
             {
-                if (_leftHandEquip == PlayerEquipType.Longsword_Bronze)
-                    return true;
-                if (_leftHandEquip == PlayerEquipType.Longsword_Iron)
-                    return true;
-                if (_leftHandEquip == PlayerEquipType.Longsword_Steel)
-                    return true;
-                if (_leftHandEquip == PlayerEquipType.Longsword_Ebony)
-                    return true;
+                if (_leftHandEquip.GetType() == typeof(Sword))
+                {
+                    ISword sword = (Sword)_leftHandEquip;
+                    if (sword.GetSwordType() == EquipmentWeaponType.Longsword)
+                        return true;
+                }
             }
             if (equipHand == EquipHand.Right_Hand)
             {
-                if (_rightHandEquip == PlayerEquipType.Longsword_Bronze)
-                    return true;
-                if (_rightHandEquip == PlayerEquipType.Longsword_Iron)
-                    return true;
-                if (_rightHandEquip == PlayerEquipType.Longsword_Steel)
-                    return true;
-                if (_rightHandEquip == PlayerEquipType.Longsword_Ebony)
-                    return true;
+                if (_rightHandEquip.GetType() == typeof(Sword))
+                {
+                    ISword sword = (Sword)_rightHandEquip;
+                    if (sword.GetSwordType() == EquipmentWeaponType.Longsword)
+                        return true;
+                }
             }
             return false;
         }
@@ -195,38 +228,33 @@ namespace DoomBreakers
         {
             if (equipHand == EquipHand.Left_Hand)
             {
-                if (_leftHandEquip == PlayerEquipType.Shield_Bronze)
-                    return true;
-                if (_leftHandEquip == PlayerEquipType.Shield_Iron)
-                    return true;
-                if (_leftHandEquip == PlayerEquipType.Shield_Steel)
-                    return true;
-                if (_leftHandEquip == PlayerEquipType.Shield_Ebony)
-                    return true;
+                if (_leftHandEquip.GetType() == typeof(Shield))
+                {
+                    Shield shield = (Shield)_leftHandEquip;
+                    if (shield.GetShieldType() == EquipmentArmorType.Shield)
+                        return true;
+                }
             }
             if (equipHand == EquipHand.Right_Hand)
             {
-                if (_rightHandEquip == PlayerEquipType.Shield_Bronze)
-                    return true;
-                if (_rightHandEquip == PlayerEquipType.Shield_Iron)
-                    return true;
-                if (_rightHandEquip == PlayerEquipType.Shield_Steel)
-                    return true;
-                if (_rightHandEquip == PlayerEquipType.Shield_Ebony)
-                    return true;
+                if (_rightHandEquip.GetType() == typeof(Shield))
+                {
+                    Shield shield = (Shield)_rightHandEquip;
+                    if (shield.GetShieldType() == EquipmentArmorType.Shield)
+                        return true;
+                }
             }
             return false;
         }
         public bool IsArmor()
         {
-            if (_torsoEquipment == PlayerEquipType.BreastPlate_Bronze)
-                return true;
-            if (_torsoEquipment == PlayerEquipType.BreastPlate_Iron)
-                return true;
-            if (_torsoEquipment == PlayerEquipType.BreastPlate_Steel)
-                return true;
-            if (_torsoEquipment == PlayerEquipType.BreastPlate_Ebony)
-                return true;
+            if (_torsoEquipment.GetType() == typeof(Breastplate))
+			{
+                Breastplate armor = (Breastplate)_torsoEquipment;
+                if (armor.GetArmorType() == EquipmentArmorType.Breastplate)
+                    return true;
+			}
+
             return false;
         }
         public bool IsEmptyHanded(EquipHand equipHand)//bool isLeftHand)
@@ -234,12 +262,12 @@ namespace DoomBreakers
         {
             if (equipHand == EquipHand.Left_Hand)
             {
-                if (_leftHandEquip == PlayerEquipType.Empty_None)// && _rightHandEquip == PlayerEquipType.Empty_None)
+                if (_leftHandEquip.GetType() == typeof(ItemBase))
                     return true;
             }
             if (equipHand == EquipHand.Right_Hand)
             {
-                if (_rightHandEquip == PlayerEquipType.Empty_None)
+                if (_rightHandEquip.GetType() == typeof(ItemBase))
                     return true;
             }
 

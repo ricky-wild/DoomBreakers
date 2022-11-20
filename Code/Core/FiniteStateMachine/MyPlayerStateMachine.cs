@@ -7,6 +7,7 @@ namespace DoomBreakers
 	{
 		protected bool _inputDodgedLeft;
         protected int _quickAttackIncrement;
+        protected Vector3 _velocity;
 
         public bool SafeToSetIdle() //Still require these checks to have player behave as desired.
         {
