@@ -15,6 +15,7 @@ namespace DoomBreakers
 		public PlayerEquipType _playerEquip;
 
 		private AnimationState _animState; //Apply as appropriate based on _playerEquip.
+		private IEquipmentSprite _swordSprite;
 
 		public PlayerEquipType GetSwordType()
 		{
@@ -64,7 +65,13 @@ namespace DoomBreakers
 									   AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType)
 		{
 			SetupSword();
-			base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);//animationState);
+			//base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);
+
+			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
+			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>());
+			_itemAnimator = new ItemAnimator(animator, animController, animationState);
+			_swordSprite = this.gameObject.AddComponent<SwordSprite>();
+			_swordSprite.Setup(ref spriteRenderer, _itemID, itemType, playerEquipType);
 		}
 		public override void Start()
 		{

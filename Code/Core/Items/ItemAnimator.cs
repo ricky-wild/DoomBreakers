@@ -4,6 +4,14 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
+
+	public enum AnimationState
+	{
+		IdleBroadSword = 0,
+		IdleLongsword = 1,
+		IdleShield = 2,
+		IdleBreastplate = 3
+	}
     public class ItemAnimator : IItemAnimator
     {
 		private Animator _animator;

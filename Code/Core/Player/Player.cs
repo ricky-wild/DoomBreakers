@@ -76,7 +76,6 @@ namespace DoomBreakers
             UpdateInput();
             UpdateStateBehaviours();
             UpdateCollisions();
-            //UpdateAnimator();
         }
 
 
@@ -99,6 +98,10 @@ namespace DoomBreakers
                 if (SafeToSetIdle())
                     SetState(new PlayerIdle(this, _inputVector2));
             }
+            if (_rewirdInputPlayer.GetButtonDown("Sprint"))
+               return;
+            if (_rewirdInputPlayer.GetButtonUp("Sprint"))
+                return;
             if (_rewirdInputPlayer.GetButtonDown("Jump"))
             {
                 if (SafeToSetJump())
@@ -159,6 +162,7 @@ namespace DoomBreakers
         public void UpdateStateBehaviours()
 		{
             _state.IsIdle(ref _animator);
+            _state.IsGainedEquipment(ref _animator, ref _playerSprite);
             _state.IsMoving(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
             _state.IsJumping(ref _animator, ref _controller2D, ref _inputVector2);
             _state.IsFalling(ref _animator, ref _controller2D, ref _inputVector2);
@@ -172,11 +176,6 @@ namespace DoomBreakers
             _state.IsDefending(ref _animator, ref _inputVector2);
             _state.IsHitBySmallAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.UpdateBehaviour(ref _controller2D, ref _animator);
-        }
-
-        public void UpdateAnimator()
-		{
-            //_playerAnimator.UpdateAnimator(_playerBehaviours);
         }
 
         public void UpdateCollisions()

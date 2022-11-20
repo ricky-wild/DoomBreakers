@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 namespace DoomBreakers
 {
-	public interface IItemSprite
+	public interface IEquipmentSprite
 	{
 		void Setup(ref SpriteRenderer spriteRenderer, int itemID, PlayerItem itemType, PlayerEquipType playerEquipType);//, PlayerEquipType playerEquipType);
 		void SetupTexture2DColorSwap(string texName, int texId);

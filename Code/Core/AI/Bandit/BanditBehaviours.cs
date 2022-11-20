@@ -19,8 +19,6 @@ namespace DoomBreakers
 		private int _attackCooldownLimit;
 		private float _textureFlashTime, _cooldownWaitTime, _idleWaitTime, _quickAtkWaitTime;
 
-		private ICollisionData _collidedData;
-
         private ITimer _behaviourTimer, _cooldownTimer, _spriteColourSwapTimer;
 
 
@@ -137,29 +135,25 @@ namespace DoomBreakers
 			if (_behaviourTimer.HasTimerFinished()) //So we only activate once.
 				SetBehaviourTextureFlash(_textureFlashTime, banditSprite, Color.white);
 
-			if(_collidedData != null)//if(_targetVelocityX == (_maxPowerStruckVelocityX * 1.2f))//float multiplier = 1.2f; from -> HitByPowerAttackProcess()
-			{
-				//Then we know the FallProcess() has begun after being power attack hit from player.
-				//We want to slow down the x velocity upon peak height. (as enemy is struck into air)
+			//Then we know the FallProcess() has begun after being power attack hit from player.
+			//We want to slow down the x velocity upon peak height. (as enemy is struck into air)
 
-				int banditFaceDir = _collidedData.GetCachedBanditSprite(banditId).GetSpriteDirection();
-				int playerFaceDir = _collidedData.GetCachedPlayerSprite(0).GetSpriteDirection();
+			int banditFaceDir = 0;// _collidedData.GetCachedBanditSprite(banditId).GetSpriteDirection();
+			int playerFaceDir = 0;// _collidedData.GetCachedPlayerSprite(0).GetSpriteDirection();
 
-				float subtraction = _targetVelocityX / 2;
+			float subtraction = _targetVelocityX / 2;
 
-				if (banditFaceDir == 1 && playerFaceDir == -1) //Enemy facing right & player facing left, knock enemy to the left.
-					_velocity.x -= subtraction;
-				if (banditFaceDir == -1 && playerFaceDir == 1) //Enemy facing left & player facing right, knock enemy to the right.
-					_velocity.x += subtraction;
-				if (banditFaceDir == 1 && playerFaceDir == 1) //Enemy facing right & player facing right behind enemy, knock enemy to the right.
-					_velocity.x += subtraction;
-				if (banditFaceDir == -1 && playerFaceDir == -1) //Enemy facing left & player facing left behind enemy, knock enemy to the left.
-					_velocity.x -= subtraction;
-			}
+			if (banditFaceDir == 1 && playerFaceDir == -1) //Enemy facing right & player facing left, knock enemy to the left.
+				_velocity.x -= subtraction;
+			if (banditFaceDir == -1 && playerFaceDir == 1) //Enemy facing left & player facing right, knock enemy to the right.
+				_velocity.x += subtraction;
+			if (banditFaceDir == 1 && playerFaceDir == 1) //Enemy facing right & player facing right behind enemy, knock enemy to the right.
+				_velocity.x += subtraction;
+			if (banditFaceDir == -1 && playerFaceDir == -1) //Enemy facing left & player facing left behind enemy, knock enemy to the left.
+				_velocity.x -= subtraction;
 
 			if (_controller2D.collisions.below) //Means we're finished jumping/falling.
 			{
-				_collidedData = null;
 				_targetVelocityX = 0f;
 				_targetVelocityY = 0f;
 				_velocity.x = 0f;
@@ -176,29 +170,29 @@ namespace DoomBreakers
 
 			int trackingDir = 0; //Face direction either -1 left, or 1 right.
 
-			if (collisionData.GetCachedTargetTransform().position.x > _transform.position.x)
-				trackingDir = 1;
-			if (collisionData.GetCachedTargetTransform().position.x < _transform.position.x)
-				trackingDir = -1;
+			//if (collisionData.GetCachedTargetTransform().position.x > _transform.position.x)
+			//	trackingDir = 1;
+			//if (collisionData.GetCachedTargetTransform().position.x < _transform.position.x)
+			//	trackingDir = -1;
 
-			//if (banditSprite.GetSpriteDirection() == -1)
-			if(trackingDir == -1)
-			{
-				if (_transform.position.x > collisionData.GetCachedTargetTransform().position.x + 1.0f)
-					_targetVelocityX = -(0.5f * (_moveSpeed * _sprintSpeed));
-				else
-					PersueTargetReached(enemyStateMachine);
-				return;
-			}
-			//if (banditSprite.GetSpriteDirection() == 1)
-			if (trackingDir == 1)
-			{
-				if (_transform.position.x < collisionData.GetCachedTargetTransform().position.x - 1.0f)
-					_targetVelocityX = 0.5f * (_moveSpeed * _sprintSpeed);
-				else
-					PersueTargetReached(enemyStateMachine);
-				return;
-			}
+
+			//if(trackingDir == -1)
+			//{
+			//	if (_transform.position.x > collisionData.GetCachedTargetTransform().position.x + 1.0f)
+			//		_targetVelocityX = -(0.5f * (_moveSpeed * _sprintSpeed));
+			//	else
+			//		PersueTargetReached(enemyStateMachine);
+			//	return;
+			//}
+			////if (banditSprite.GetSpriteDirection() == 1)
+			//if (trackingDir == 1)
+			//{
+			//	if (_transform.position.x < collisionData.GetCachedTargetTransform().position.x - 1.0f)
+			//		_targetVelocityX = 0.5f * (_moveSpeed * _sprintSpeed);
+			//	else
+			//		PersueTargetReached(enemyStateMachine);
+			//	return;
+			//}
 		}
 		private void PersueTargetReached(IEnemyStateMachine enemyStateMachine)
 		{
@@ -242,16 +236,14 @@ namespace DoomBreakers
 		}
 		public void HitByPowerAttackProcess(int banditId)//IEnemyStateMachine enemyStateMachine, IBanditSprite banditSprite)
 		{
-			if (collisionData.SomeDataIsNull())// == null)
-				return;
 
 
-			SetBehaviourTextureFlash(_textureFlashTime, collisionData.GetCachedBanditSprite(banditId), Color.red);
+			//SetBehaviourTextureFlash(_textureFlashTime, collisionData.GetCachedBanditSprite(banditId), Color.red);
 
-			int playerId = collisionData.GetLastCollidedPlayerID();
-			int banditFaceDir = collisionData.GetCachedBanditSprite(banditId).GetSpriteDirection();
-			int playerFaceDir = collisionData.GetCachedPlayerSprite(playerId).GetSpriteDirection();
-			WeaponChargeHold weaponChargeHoldFlag = collisionData.GetCachedPlayerSprite(playerId).GetWeaponTexChargeFlag();
+			//int playerId = collisionData.GetLastCollidedPlayerID();
+			//int banditFaceDir = collisionData.GetCachedBanditSprite(banditId).GetSpriteDirection();
+			//int playerFaceDir = collisionData.GetCachedPlayerSprite(playerId).GetSpriteDirection();
+			WeaponChargeHold weaponChargeHoldFlag = WeaponChargeHold.Minimal;
 			float multiplier = 1.2f;// 1.66f;
 			float heightCap = 0f;
 			//print("\nweaponChargeHoldFlag =" + weaponChargeHoldFlag);
@@ -275,12 +267,12 @@ namespace DoomBreakers
 					break;
 			}
 
-			if (_velocity.y >= _maxPowerStruckVelocityY - heightCap)// + (multiplier/4)))//_maxPowerStruckVelocityY) //Near peak of jump velocity, set falling state.
+			if (_velocity.y >= _maxPowerStruckVelocityY - heightCap)//Near peak of jump velocity, set falling state.
 			{
-				if (_collidedData != collisionData)//== null)
-					_collidedData = collisionData;
+				//if (_collidedData != collisionData)//== null)
+				//	_collidedData = collisionData;
 				_velocity.x = 0f;
-				collisionData.GetCachedEnemyState(banditId).SetEnemyState(state.IsFalling);
+				//collisionData.GetCachedEnemyState(banditId).SetEnemyState(state.IsFalling);
 				return;
 			}
 			else
@@ -288,26 +280,26 @@ namespace DoomBreakers
 				_velocity.y += _maxPowerStruckVelocityY / 6;// (6-multiplier);// = 0f;
 				_targetVelocityX = _maxPowerStruckVelocityX * multiplier; //Carries on over to FallProcess() where appropriate.
 
-				if (banditFaceDir == 1 && playerFaceDir == -1) //Enemy facing right & player facing left, knock enemy to the left.
-				{
-					_velocity.x -= _targetVelocityX;
-					return;
-				}
-				if (banditFaceDir == -1 && playerFaceDir == 1) //Enemy facing left & player facing right, knock enemy to the right.
-				{
-					_velocity.x += _targetVelocityX;
-					return;
-				}
-				if (banditFaceDir == 1 && playerFaceDir == 1) //Enemy facing right & player facing right behind enemy, knock enemy to the right.
-				{
-					_velocity.x += _targetVelocityX;
-					return;
-				}
-				if (banditFaceDir == -1 && playerFaceDir == -1) //Enemy facing left & player facing left behind enemy, knock enemy to the left.
-				{
-					_velocity.x -= _targetVelocityX;
-					return;
-				}
+				//if (banditFaceDir == 1 && playerFaceDir == -1) //Enemy facing right & player facing left, knock enemy to the left.
+				//{
+				//	_velocity.x -= _targetVelocityX;
+				//	return;
+				//}
+				//if (banditFaceDir == -1 && playerFaceDir == 1) //Enemy facing left & player facing right, knock enemy to the right.
+				//{
+				//	_velocity.x += _targetVelocityX;
+				//	return;
+				//}
+				//if (banditFaceDir == 1 && playerFaceDir == 1) //Enemy facing right & player facing right behind enemy, knock enemy to the right.
+				//{
+				//	_velocity.x += _targetVelocityX;
+				//	return;
+				//}
+				//if (banditFaceDir == -1 && playerFaceDir == -1) //Enemy facing left & player facing left behind enemy, knock enemy to the left.
+				//{
+				//	_velocity.x -= _targetVelocityX;
+				//	return;
+				//}
 			}
 		}
 		void Update()

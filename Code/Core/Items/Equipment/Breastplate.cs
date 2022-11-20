@@ -15,6 +15,7 @@ namespace DoomBreakers
 		public PlayerEquipType _playerEquip;
 
 		private AnimationState _animState; //Apply as appropriate based on _playerEquip.
+		private IEquipmentSprite _breastplateSprite;
 
 		public PlayerEquipType GetArmorType()
 		{
@@ -54,7 +55,13 @@ namespace DoomBreakers
 									   AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType)
 		{
 			SetupArmor();
-			base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);
+			//base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);
+
+			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
+			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>());
+			_itemAnimator = new ItemAnimator(animator, animController, animationState);
+			_breastplateSprite = this.gameObject.AddComponent<BreastplateSprite>();
+			_breastplateSprite.Setup(ref spriteRenderer, _itemID, itemType, playerEquipType);
 		}
 		public override void Start()
 		{

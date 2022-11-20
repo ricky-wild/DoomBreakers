@@ -20,21 +20,21 @@ namespace DoomBreakers
         [Tooltip("ID ranges from 0 to ?")]   //Max ? items.
         public int _itemID;                  //Set in editor per item or else where.
 
-        IItemBehaviour _itemBehaviour;
-        IItemAnimator _itemAnimator;
-        IItemSprite _itemSprite;
+        protected IItemBehaviour _itemBehaviour;
+        protected IItemAnimator _itemAnimator;
+        //protected ISprite _itemSprite;
 
         public ItemBase(){}
 		public virtual void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
                                        AnimationState animationState, PlayerItem itemType, PlayerEquipType playerEquipType)
 		{
-			//_itemBehaviour = new ItemBehaviour();
+
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
 			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>());
             _itemAnimator = new ItemAnimator(animator, animController, animationState);
-            _itemSprite = this.gameObject.AddComponent<ItemSprite>();
-            _itemSprite.Setup(ref spriteRenderer, _itemID, itemType, playerEquipType);
-            //_itemSprite.Setup(this.GetComponent<SpriteRenderer>(), _itemID, itemType, playerEquipType);
+            //_itemSprite = this.gameObject.AddComponent<Sprite>();
+            //_itemSprite.Setup(spriteRenderer, "empty", _itemID);
+
         }
         public virtual void Awake()
 		{
@@ -49,15 +49,6 @@ namespace DoomBreakers
             _itemAnimator.UpdateAnimator();
             _itemBehaviour.UpdateMovement();
         }
-
-   //     void OnTriggerEnter2D(Collider2D collision)
-   //     {
-   //         //ProcessCollisionFlags(collision);
-   //         if(collision.CompareTag("Player"))
-			//{
-   //             print("\nregister and calling collision here.");
-			//}
-   //     }
 
         public void Destroy()
 		{
