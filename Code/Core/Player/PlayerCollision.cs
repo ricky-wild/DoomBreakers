@@ -95,12 +95,12 @@ namespace DoomBreakers
 
         void Update() 
         { }
-        public void UpdateCollision(ref MyPlayerStateMachine playerStateMachine, ref Vector3 velocity, int playerId, IPlayerEquipment playerEquipment)
+        public void UpdateCollision(ref BaseState playerState, int playerId, ref IPlayerEquipment playerEquipment)
 		{
-            UpdateDetectEnemyTargets(ref playerStateMachine, ref velocity, playerId);
-            UpdateDetectItemTargets(playerEquipment, ref playerStateMachine, ref velocity);
+            UpdateDetectEnemyTargets(ref playerState, playerId);
+            UpdateDetectItemTargets(ref playerEquipment);
         }
-        public void UpdateDetectEnemyTargets(ref MyPlayerStateMachine playerStateMachine, ref Vector3 velocity, int playerId)
+        public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId)
         {
             if (!_attackCollisionEnabled)
                 return;
@@ -108,7 +108,7 @@ namespace DoomBreakers
             for (int i = 0; i < _enemyLayerMasks.Length; i++)
 			{
                 
-                DetermineCollisionPurpose(ref playerStateMachine, i);
+                DetermineCollisionPurpose(ref playerState, i);
 
                 if (_enemyTargetsHit == null)
                     break;
@@ -133,9 +133,9 @@ namespace DoomBreakers
             _attackCollisionEnabled = false;
         }
 
-        private void DetermineCollisionPurpose(ref MyPlayerStateMachine playerStateMachine, int i)
+        private void DetermineCollisionPurpose(ref BaseState playerState, int i)
         {
-            BaseState playerState = playerStateMachine.GetState();
+
             if (playerState.GetType() == typeof(PlayerQuickAttack))
 			{
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_enemyLayerMaskStr));
@@ -152,9 +152,9 @@ namespace DoomBreakers
                 return;
             }
         }
+        
 
-
-        public void UpdateDetectItemTargets(IPlayerEquipment playerEquipment, ref MyPlayerStateMachine playerStateMachine, ref Vector3 velocity)
+        public void UpdateDetectItemTargets(ref IPlayerEquipment playerEquipment)
         {
             if (_playerEquipment == null)
                 _playerEquipment = playerEquipment; //For ProcessCollisionFlags() Item use.
@@ -163,8 +163,10 @@ namespace DoomBreakers
                 return;
 
             playerEquipment = _playerEquipment; //Any changes made apply to original parent class, Player.cs.
-            //playerState = new PlayerGainedEquipment()
-            playerStateMachine.SetState(new PlayerGainedEquipment(playerStateMachine, velocity));
+            playerEquipment.NewEquipmentGained(true);
+            //playerState = new PlayerGainedEquipment(null, Vector3.zero);
+            //playerState = new BaseState(new Vector3());
+            //playerStateMachine.SetState(new PlayerGainedEquipment(playerStateMachine, velocity));
             //playerStateMachine.SetPlayerState(state.IsGainedEquipment);
 
             _itemCollisionEnabled = false;

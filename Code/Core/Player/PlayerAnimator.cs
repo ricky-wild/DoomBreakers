@@ -34,7 +34,7 @@ namespace DoomBreakers
 			_animControllerFilepath = "HumanAnimControllers/Unarmored/";
 		}
 
-		public void SetAnimatorController(IPlayerEquipment playerEquipment)//AnimatorController animatorController, bool withArmor)
+		public void SetAnimatorController(ref IPlayerEquipment playerEquipment)//AnimatorController animatorController, bool withArmor)
 		{
 			SetupAnimControllerBasedOnEquip(playerEquipment);
 

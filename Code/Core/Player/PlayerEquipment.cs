@@ -23,15 +23,33 @@ namespace DoomBreakers
         private ItemBase _torsoEquipment;
         private ItemBase _leftHandEquip;
         private ItemBase _rightHandEquip;
+        private bool _equipmentGainedFlag;
 
-        public PlayerEquipment(ItemBase torsoEquipment, ItemBase leftHandEquip, ItemBase rightHandEquip)
+        public PlayerEquipment()
 		{
-
+            if (_torsoEquipment == null)
+                _torsoEquipment = new EmptyHand(EquipmentWeaponType.None, EquipmentMaterialType.None);
+            if (_leftHandEquip == null)
+                _leftHandEquip = new EmptyHand(EquipmentWeaponType.None, EquipmentMaterialType.None);
+            if (_rightHandEquip == null)
+                _rightHandEquip = new EmptyHand(EquipmentWeaponType.None, EquipmentMaterialType.None);
+        }
+        public PlayerEquipment(ItemBase torsoEquipment, ItemBase leftHandEquip, ItemBase rightHandEquip)
+        {
             _torsoEquipment = torsoEquipment;
             _leftHandEquip = leftHandEquip;
             _rightHandEquip = rightHandEquip;
+        }
+
+        public bool NewEquipmentGained()
+		{
+            return _equipmentGainedFlag;
 
         }
+        public void NewEquipmentGained(bool flag)
+		{
+            _equipmentGainedFlag = flag;
+		}
 
         public void ApplySword(ItemBase playerEquip)
 		{
@@ -182,6 +200,7 @@ namespace DoomBreakers
 		{
             if(equipHand == EquipHand.Left_Hand)
 			{
+                
                 if (_leftHandEquip.GetType() == typeof(Sword))
 				{
                     ISword sword = (Sword)_leftHandEquip;
@@ -262,12 +281,16 @@ namespace DoomBreakers
         {
             if (equipHand == EquipHand.Left_Hand)
             {
-                if (_leftHandEquip.GetType() == typeof(ItemBase))
+                if (_leftHandEquip == null)//.GetType() == typeof(ItemBase))
+                    return true;
+                if (_leftHandEquip.GetType() == typeof(EmptyHand))
                     return true;
             }
             if (equipHand == EquipHand.Right_Hand)
             {
-                if (_rightHandEquip.GetType() == typeof(ItemBase))
+                if (_rightHandEquip == null)//.GetType() == typeof(ItemBase))
+                    return true;
+                if (_rightHandEquip.GetType() == typeof(EmptyHand))
                     return true;
             }
 

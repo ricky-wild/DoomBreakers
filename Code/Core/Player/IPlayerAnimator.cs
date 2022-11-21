@@ -3,7 +3,7 @@ namespace DoomBreakers
 {
 	interface IPlayerAnimator //: MonoBehaviour
 	{
-		void SetAnimatorController(IPlayerEquipment playerEquipment);
+		void SetAnimatorController(ref IPlayerEquipment playerEquipment);
 
 	}
 }

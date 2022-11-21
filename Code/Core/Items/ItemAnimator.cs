@@ -7,6 +7,7 @@ namespace DoomBreakers
 
 	public enum AnimationState
 	{
+		Empty = -1,
 		IdleBroadSword = 0,
 		IdleLongsword = 1,
 		IdleShield = 2,

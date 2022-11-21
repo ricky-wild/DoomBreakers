@@ -20,7 +20,8 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerUpwardAttack) &&
                 _state.GetType() != typeof(PlayerHoldAttack) &&
                 _state.GetType() != typeof(PlayerReleaseAttack) &&
-                _state.GetType() != typeof(PlayerDefend))
+                _state.GetType() != typeof(PlayerDefend) &&
+                _state.GetType() != typeof(PlayerGainedEquipment)) 
                 return true;
 
             return false;
@@ -36,14 +37,16 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerUpwardAttack) &&
                 _state.GetType() != typeof(PlayerHoldAttack) &&
                 _state.GetType() != typeof(PlayerReleaseAttack) &&
-                _state.GetType() != typeof(PlayerDefend)) 
+                _state.GetType() != typeof(PlayerDefend) &&
+                _state.GetType() != typeof(PlayerGainedEquipment))
                 return true;
             return false;
         }
 
         public bool SafeToSetJump()
         {
-            if (_state.GetType() != typeof(PlayerJump))
+            if (_state.GetType() != typeof(PlayerJump) &&
+                _state.GetType() != typeof(PlayerGainedEquipment))
                 return true;
 
             return false;

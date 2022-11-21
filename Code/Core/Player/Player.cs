@@ -42,8 +42,8 @@ namespace DoomBreakers
 
             _playerCollider = this.gameObject.AddComponent<PlayerCollision>(); //Required for OnTriggerEnter2D()
             _playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints);
-            ItemBase emptyItem = new ItemBase();
-            _playerEquipment = new PlayerEquipment(emptyItem, emptyItem, emptyItem);
+            
+            _playerEquipment = new PlayerEquipment();
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
             _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
             _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
@@ -60,7 +60,7 @@ namespace DoomBreakers
 		void Start()
         {
             //_playerEquipment.ApplySword(PlayerEquipType.Broadsword_Steel, PlayerItem.IsBroadsword);
-            _playerAnimator.SetAnimatorController(_playerEquipment);//AnimatorController.Player_with_broadsword_with_shield_controller, false);
+            _playerAnimator.SetAnimatorController(ref _playerEquipment);//AnimatorController.Player_with_broadsword_with_shield_controller, false);
 
             _playerStateMachine = this;
             SetState(new PlayerIdle(this, _inputVector2));
@@ -168,7 +168,7 @@ namespace DoomBreakers
         public void UpdateStateBehaviours()
 		{
             _state.IsIdle(ref _animator);
-            _state.IsGainedEquipment(ref _animator, ref _playerSprite);
+            _state.IsGainedEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
             _state.IsMoving(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
             _state.IsJumping(ref _animator, ref _controller2D, ref _inputVector2);
             _state.IsFalling(ref _animator, ref _controller2D, ref _inputVector2);
@@ -186,7 +186,13 @@ namespace DoomBreakers
 
         public void UpdateCollisions()
 		{
-            _playerCollider.UpdateCollision(ref _playerStateMachine, ref _velocity, _playerID, _playerEquipment);
+            _playerCollider.UpdateCollision(ref _state, _playerID, ref _playerEquipment);
+            if(_playerEquipment.NewEquipmentGained())
+			{
+                SetState(new PlayerGainedEquipment(this, _velocity));
+                _playerAnimator.SetAnimatorController(ref _playerEquipment);
+                _playerEquipment.NewEquipmentGained(false);
+			}
 		}
 
         private void AttackedByBandit()
