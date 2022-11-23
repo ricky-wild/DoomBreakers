@@ -107,14 +107,17 @@ namespace DoomBreakers
                 {
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player)))
                     {
-                        ProcessCollisionWithPlayer(banditStateMachine, banditSprite, enemy, 0);
+                        if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
+                            AITargetTrackingManager.AssignTargetTransform(enemy.transform, _banditID, EnemyAI.Bandit);
+                        if (_collisionTargetPurpose == CollisionTargetPurpose.toAttack)
+                            BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer");                      
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2)))
-                        ProcessCollisionWithPlayer(banditStateMachine, banditSprite, enemy, 1);
+                    { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player3)))
-                        ProcessCollisionWithPlayer(banditStateMachine, banditSprite, enemy, 2);
+                    { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player4)))
-                        ProcessCollisionWithPlayer(banditStateMachine, banditSprite, enemy, 3);
+                    { }
 
                     //if (enemy.CompareTag(GetCompareTag(CompareTags.Enemy))){}
                 }
@@ -123,25 +126,7 @@ namespace DoomBreakers
 
             _detectTargetCollisionEnabled = false;
         }
-        private void ProcessCollisionWithPlayer(IEnemyStateMachine banditStateMachine, IBanditSprite banditSprite, Collider2D player, int playerId)
-		{
 
-            if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
-                return;
-
-
-            //if (_collisionData.GetCachedPlayer(playerId) == null)
-            //{
-            //    if (player.GetComponent<Player>() == null) //Guard clause.
-            //        return;
-            //    _collisionData.PluginPlayer(player.GetComponent<Player>(), playerId); //Only 1 call ever made with GetComponent<Player>() thanks to cache.
-            //}
-
-            //_collisionData.PluginEnemyState(banditStateMachine, _banditID);
-            //_collisionData.PluginBanditSprite(banditSprite, _banditID);
-
-
-        }
         private void DetermineCollisionPurpose(IEnemyStateMachine banditStateMachine, int i)
         {
 

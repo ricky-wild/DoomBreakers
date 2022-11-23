@@ -6,8 +6,15 @@ namespace DoomBreakers
 {
 	public class BattleColliderManager : MonoBehaviour
 	{
+        //<summary>
+        //The battle collider manager' purpose is too communicate collisions between enemy AI & player, vice versa.
+        //We will need to communicate position data between player and enemy objects.
+        //We will use a fixed array[4] holding player transform data for enemy obj to use.
+        //We will use a dictionary<playerID, enemyTransform> for player obj to use.
+        //</summary>
         private Dictionary<string, Action> _battleEventDictionary;
         private static BattleColliderManager _battleEventManager;
+
         public static BattleColliderManager _instance
         {
             get //When we access our instance from another place, we'll setup as appropriate if required.
@@ -78,5 +85,7 @@ namespace DoomBreakers
                 //thisEvent.Invoke();
             }
         }
+
+
     }
 }

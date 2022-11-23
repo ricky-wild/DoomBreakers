@@ -23,5 +23,6 @@ namespace DoomBreakers
 		bool IsShield(EquipHand equipHand);//bool isLeftHand);
 		bool IsArmor();
 		bool IsEmptyHanded(EquipHand equipHand);//bool isLeftHand);
+		//bool IsSwordBetterThanCurrent(Sword playerEquip);
 	}
 }

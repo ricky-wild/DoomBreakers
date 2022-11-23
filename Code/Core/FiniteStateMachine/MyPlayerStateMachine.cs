@@ -63,5 +63,27 @@ namespace DoomBreakers
             return false;
 
         }
+
+        protected bool IsDefendingSelf()
+        {
+            if (_state.GetType() == typeof(PlayerDefend))
+                return true;
+            //if (playerStateMachine.IsQuickHitWhenDefending())
+            //    return true;
+            //if (playerStateMachine.IsPowerHitWhenDefending())
+            //    return true;
+
+            return false;
+        }
+        protected bool IsIgnoreDamage()
+        {
+            if (_state.GetType() == typeof(PlayerDodge))
+                return true;
+            if (_state.GetType() == typeof(PlayerDodged))
+                return true;
+
+
+            return false;
+        }
     }
 }

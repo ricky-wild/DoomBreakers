@@ -296,6 +296,17 @@ namespace DoomBreakers
 
             return false;
 		}
+
+  //      public bool IsSwordBetterThanCurrent(Sword playerEquip)
+		//{
+  //          ISword sword = (Sword)_leftHandEquip;
+
+  //          if (playerEquip.GetMaterialType() == EquipmentMaterialType.Bronze &&
+  //              sword.ge)
+
+
+  //          return false;
+		//}
     }
 }
 

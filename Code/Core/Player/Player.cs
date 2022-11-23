@@ -25,7 +25,6 @@ namespace DoomBreakers
         private Controller2D _controller2D;
         private Animator _animator;
 
-        private MyPlayerStateMachine _playerStateMachine;
         private IPlayerCollision _playerCollider;
         private IPlayerEquipment _playerEquipment;
         private IPlayerAnimator _playerAnimator;
@@ -51,8 +50,16 @@ namespace DoomBreakers
 
             _actionListener = new Action(AttackedByBandit);//AttackedByBandit()
         }
-
-		private void Awake()
+        private void OnEnable()
+        {
+            ////Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
+            BattleColliderManager.Subscribe("ReportCollisionWithPlayer", _actionListener);
+        }
+        private void OnDisable()
+        {
+            BattleColliderManager.Unsubscribe("ReportCollisionWithPlayer", _actionListener);
+        }
+        private void Awake()
 		{
             InitializePlayer();
 		}
@@ -62,17 +69,7 @@ namespace DoomBreakers
             //_playerEquipment.ApplySword(PlayerEquipType.Broadsword_Steel, PlayerItem.IsBroadsword);
             _playerAnimator.SetAnimatorController(ref _playerEquipment);//AnimatorController.Player_with_broadsword_with_shield_controller, false);
 
-            _playerStateMachine = this;
             SetState(new PlayerIdle(this, _inputVector2));
-        }
-        private void OnEnable()
-        {
-            ////Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
-            BattleColliderManager.Subscribe("ReportCollisionWithPlayer", _actionListener);
-        }
-        private void OnDisable()
-        {
-            BattleColliderManager.Unsubscribe("ReportCollisionWithPlayer", _actionListener);
         }
 
         void Update()
@@ -216,27 +213,7 @@ namespace DoomBreakers
 
             return false;
         }
-        private bool IsDefendingSelf()
-        {
-            if (_state.GetType() == typeof(PlayerDefend))
-                return true;
-            //if (playerStateMachine.IsQuickHitWhenDefending())
-            //    return true;
-            //if (playerStateMachine.IsPowerHitWhenDefending())
-            //    return true;
 
-            return false;
-        }
-        private bool IsIgnoreDamage()
-        {
-            if (_state.GetType() == typeof(PlayerDodge))
-                return true;
-            if (_state.GetType() == typeof(PlayerDodged))
-                return true;
-
-
-            return false;
-        }
 
         private void OnDrawGizmosSelected()
         {
