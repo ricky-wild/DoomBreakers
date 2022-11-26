@@ -15,19 +15,20 @@ namespace DoomBreakers
 			print("\nIdle State.");
 		}
 
-		public override void IsIdle(ref Animator animator)
+		public override void IsIdle(ref Animator animator, ref IBanditCollision banditCollider)
 		{
 			animator.Play("Idle");//, 0, 0.0f);
 			_velocity.x = 0f;
-			//if (Mathf.Abs(_velocity.y) >= 3.0f)
-			//	_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
 
+			_behaviourTimer.StartTimer(_idleWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
 			{
 				//if (_cooldownTimer.HasTimerFinished())
 				//	_attackCooldownCounter = 0;
-				//banditCollider.EnableTargetCollisionDetection(); //Begin player detection & trigger PersueTarget() Method here.
+				banditCollider.EnableTargetCollisionDetection(); //Begin player detection & trigger PersueTarget() Method here.
 			}
+			if (Mathf.Abs(_velocity.y) >= 3.0f)
+				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID));
 
 			//base.UpdateBehaviour();
 		}

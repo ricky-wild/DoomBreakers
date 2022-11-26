@@ -66,7 +66,7 @@ namespace DoomBreakers
 
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
 			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>());
-			_itemAnimator = new ItemAnimator(animator, animController, animationState);
+			_itemAnimator = new ItemAnimator(animator, animController, _animState);//animationState);
 			_swordSprite = this.gameObject.AddComponent<SwordSprite>();
 			_swordSprite.Setup(ref spriteRenderer, _itemID, itemType, _materialType);
 		}

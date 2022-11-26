@@ -88,29 +88,32 @@ namespace DoomBreakers
 
         void Update() { }
 
-        public void UpdateCollision(IEnemyStateMachine banditStateMachine, IBanditSprite banditSprite)
+        public void UpdateCollision(ref BanditBaseState banditState, IBanditSprite banditSprite)
         {
-            UpdateDetectEnemyTargets(banditStateMachine, banditSprite);
+            UpdateDetectEnemyTargets(ref banditState, banditSprite);
 
-            if (_banditStateMachine != banditStateMachine) //RegisterHitByAttack()
-                _banditStateMachine = banditStateMachine;
         }
-        public void UpdateDetectEnemyTargets(IEnemyStateMachine banditStateMachine, IBanditSprite banditSprite)
+        public void UpdateDetectEnemyTargets(ref BanditBaseState banditState, IBanditSprite banditSprite)
         {
             if (!_detectTargetCollisionEnabled)
                 return;
 
             for (int i = 0; i < _enemyLayerMasks.Length; i++)
             {
-                DetermineCollisionPurpose(banditStateMachine, i);
+                DetermineCollisionPurpose(ref banditState, i);
                 foreach (Collider2D enemy in _enemyTargetsHit)
                 {
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player)))
                     {
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
+                        {
                             AITargetTrackingManager.AssignTargetTransform(enemy.transform, _banditID, EnemyAI.Bandit);
+                            AITargetTrackingManager.TriggerEvent("ReportDetectionWithPlayer");
+                        }
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toAttack)
-                            BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer");                      
+						{
+                            BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer");
+                        }           
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2)))
                     { }
@@ -127,39 +130,36 @@ namespace DoomBreakers
             _detectTargetCollisionEnabled = false;
         }
 
-        private void DetermineCollisionPurpose(IEnemyStateMachine banditStateMachine, int i)
+        private void DetermineCollisionPurpose(ref BanditBaseState banditState, int i)
         {
 
-            //switch (banditStateMachine.GetEnemyState())
-            //{
-            //    case state.IsQuickAttack:
-            //        break;
-            //}
-            if (banditStateMachine.IsIdle())
+
+            if (banditState.GetType() == typeof(BanditIdle))
             {
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, 12.0f, LayerMask.GetMask(_playerLayerMaskStr));
-                banditStateMachine.SetEnemyState(state.IsMoving);
+                //AITargetTrackingManager.TriggerEvent("ReportDetectionWithPlayer");//Through this we can set the state machine as appropriate.
                 _collisionTargetPurpose = CollisionTargetPurpose.toPersue;
                 return;
             }
-            if (banditStateMachine.IsQuickAttack())
-			{
+            if (banditState.GetType() == typeof(BanditQuickAttack))
+            {
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_playerLayerMaskStr));
                 _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
+                
                 return;
             }
-            if (banditStateMachine.IsPowerAttackRelease())
-            {
-                _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], _enemyLayerMasks[i]);
-                _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
-                return;
-            }
-            if (banditStateMachine.IsUpwardAttack())
-            {
-                _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], _enemyLayerMasks[i]);
-                _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
-                return;
-            }
+            //if (banditStateMachine.IsPowerAttackRelease())
+            //{
+            //    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], _enemyLayerMasks[i]);
+            //    _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
+            //    return;
+            //}
+            //if (banditStateMachine.IsUpwardAttack())
+            //{
+            //    _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[2].position, _attackRadius[2], _enemyLayerMasks[i]);
+            //    _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
+            //    return;
+            //}
         }
         
         public void ProcessCollisionFlags(Collider2D collision)

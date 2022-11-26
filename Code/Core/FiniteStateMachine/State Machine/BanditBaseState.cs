@@ -18,7 +18,7 @@ namespace DoomBreakers
 		protected int _banditID;
 		protected EnemyStateMachine _stateMachine;
 		protected Transform _transform;
-		protected Vector3 _velocity;
+		protected Vector3 _velocity, _cachedVector3;
 		protected const float _maxJumpVelocity = 12.0f;
 		protected float _targetVelocityX, _moveSpeed, _sprintSpeed, _jumpSpeed, _gravity,
 			_targetVelocityY, _maxPowerStruckVelocityY, _maxPowerStruckVelocityX;
@@ -41,6 +41,9 @@ namespace DoomBreakers
 			_dodgedLeftFlag = false;
 			_quickAtkWaitTime = 0.133f;
 
+			_cooldownWaitTime = 3.0f;
+			_idleWaitTime = 1.5f;
+			_quickAtkWaitTime = 0.133f;
 		}
 
 		public virtual void UpdateBehaviour(ref Controller2D controller2D, ref Animator animator)
@@ -66,9 +69,11 @@ namespace DoomBreakers
 			if (controller2D.collisions.below)
 				_velocity.y = 0f;
 		}
-		public virtual void IsIdle(ref Animator animator) { }
+		public virtual void IsIdle(ref Animator animator, ref IBanditCollision banditCollider) { }
 		public virtual void IsWaiting(ref Animator animator) { }
 		public virtual void IsPersueTarget(ref Animator animator) { }
+		public virtual void IsFalling(ref Animator animator, ref Controller2D controller2D) { }
+		public virtual void IsQuickAttack(ref Animator animator, ref IBanditCollision banditCollider, ref IBanditSprite banditSprite, ref int quickAttackIncrement) { }
 	}
 }
 

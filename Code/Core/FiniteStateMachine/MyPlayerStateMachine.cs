@@ -9,7 +9,7 @@ namespace DoomBreakers
         protected int _quickAttackIncrement;
         protected Vector3 _velocity;
 
-        public bool SafeToSetIdle() //Still require these checks to have player behave as desired.
+        protected bool SafeToSetIdle() //Still require these checks to have player behave as desired.
         {
             //We don't want to set to idle each frame if already Idle AND is Jumping AND is Falling ect.
             if (_state.GetType() != typeof(PlayerIdle) && 
@@ -27,7 +27,7 @@ namespace DoomBreakers
             return false;
         }
 
-        public bool SafeToSetMove()
+        protected bool SafeToSetMove()
         {
             if (_state.GetType() != typeof(PlayerMove) && 
                 _state.GetType() != typeof(PlayerFall) && 
@@ -43,7 +43,7 @@ namespace DoomBreakers
             return false;
         }
 
-        public bool SafeToSetJump()
+        protected bool SafeToSetJump()
         {
             if (_state.GetType() != typeof(PlayerJump) &&
                 _state.GetType() != typeof(PlayerGainedEquipment))
@@ -53,7 +53,7 @@ namespace DoomBreakers
 
         }
 
-        public bool SafeToSetHoldAttack()
+        protected bool SafeToSetHoldAttack()
         {
             if (_state.GetType() != typeof(PlayerJump) &&
                 _state.GetType() != typeof(PlayerReleaseAttack) &&

@@ -19,13 +19,17 @@ namespace DoomBreakers
 		{
 			animator.Play("Idle");//, 0, 0.0f);
 			_velocity.x = 0f;
-			//if (Mathf.Abs(_velocity.y) >= 3.0f)
-			//	_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
 
-			if (_behaviourTimer.HasTimerFinished())
+			_cooldownTimer.StartTimer(_cooldownWaitTime);
+			if (_cooldownTimer.HasTimerFinished())
 			{
-
+				_attackCooldownCounter = 0;
+				_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _banditID));
+				return;
 			}
+
+			if (Mathf.Abs(_velocity.y) >= 3.0f)
+				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID));
 
 			//base.UpdateBehaviour();
 		}

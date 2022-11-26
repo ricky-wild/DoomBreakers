@@ -18,6 +18,7 @@ namespace DoomBreakers
         [Header("Enemy Attack Points")]
         [Tooltip("Vectors that represent point of attack radius")]
         public Transform[] _attackPoints; //1=quickATK, 2=powerATK, 3=upwardATK
+        private Transform _transform;
         private Controller2D _controller2D;
         private Animator _animator;
 
@@ -25,10 +26,11 @@ namespace DoomBreakers
         private IBanditAnimator _banditAnimator;
         private IBanditSprite _banditSprite;
 
-        private Action _actionListener;
+        private Action[] _actionListener = new Action[2];
 
         private void InitializeBandit()
         {
+            _transform = this.transform;
             _controller2D = this.GetComponent<Controller2D>();
             _animator = this.GetComponent<Animator>();
 
@@ -37,17 +39,20 @@ namespace DoomBreakers
             _banditSprite = this.gameObject.AddComponent<BanditSprite>();
             _banditSprite.Setup(this.GetComponent<SpriteRenderer>(), _banditID);
 
-            _actionListener = new Action(AttackedByPlayer);//AttackedByPlayer()
+            _actionListener[0] = new Action(AttackedByPlayer);//AttackedByPlayer()
+            _actionListener[1] = new Action(DetectedAnPlayer);//DetectedAnPlayer()
 
         }
         private void OnEnable()
         {
-            //Player.cs->PlayerCollision.cs->enemy.GetComponent<Bandit>()->BattleColliderManager.TriggerEvent("ReportCollisionWithBandit"); 
-            BattleColliderManager.Subscribe("ReportCollisionWithBandit", _actionListener);
+            //Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
+            BattleColliderManager.Subscribe("ReportCollisionWithBandit", _actionListener[0]);
+            AITargetTrackingManager.Subscribe("ReportDetectionWithPlayer", _actionListener[1]);
         }
         private void OnDisable()
         {
-            BattleColliderManager.Unsubscribe("ReportCollisionWithBandit", _actionListener);
+            BattleColliderManager.Unsubscribe("ReportCollisionWithBandit", _actionListener[0]);
+            AITargetTrackingManager.Unsubscribe("ReportDetectionWithPlayer", _actionListener[1]);
         }
         private void Awake()
         {
@@ -61,30 +66,35 @@ namespace DoomBreakers
         }
         void Update() 
         {
-            //UpdateStateBehaviours();
+            UpdateStateBehaviours();
             UpdateCollisions();
         }
-
-        public void UpdatePlayerPathFinding()
-		{
-
-		}
         public void UpdateStateBehaviours()
 		{
-            _state.IsIdle(ref _animator);
+            _state.IsIdle(ref _animator, ref _banditCollider);
             _state.IsWaiting(ref _animator);
+            _state.IsFalling(ref _animator, ref _controller2D);
             _state.IsPersueTarget(ref _animator);
+            _state.IsQuickAttack(ref _animator, ref _banditCollider, ref _banditSprite, ref _quickAttackIncrement);
+
+            _state.UpdateBehaviour(ref _controller2D, ref _animator);
         }
 
         public void UpdateCollisions()
 		{
-            //_banditCollider.UpdateCollision(_banditState, _banditSprite);
+            _banditCollider.UpdateCollision(ref _state, _banditSprite);
         }
 
         private void AttackedByPlayer()
 		{
             print("\nBandit.cs= AttackedByPlayer() called!");
 		}
+        private void DetectedAnPlayer()
+		{
+            print("\nBandit.cs= DetectedAnPlayer() called!");
+            SetState(new BanditPersue(this, _velocity, 
+                _transform,_banditID));
+        }
 
         private void OnDrawGizmosSelected()
         {
