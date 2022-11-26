@@ -10,6 +10,7 @@ namespace DoomBreakers
 		void ResetTexture2DColor();
 		void ApplyCustomTexture2DColours();
 		void SetTexture2DColor(float time, Color color);
+		void SetBehaviourTextureFlash(float time, Color colour);
 		void SetWeaponChargeTextureFXFlag(bool b);
 	}
 }

@@ -11,6 +11,7 @@ namespace DoomBreakers
 			_banditID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
+			_idleWaitTime = 0.25f;
 			_behaviourTimer = new Timer();
 			print("\nIdle State.");
 		}
@@ -23,8 +24,6 @@ namespace DoomBreakers
 			_behaviourTimer.StartTimer(_idleWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
 			{
-				//if (_cooldownTimer.HasTimerFinished())
-				//	_attackCooldownCounter = 0;
 				banditCollider.EnableTargetCollisionDetection(); //Begin player detection & trigger PersueTarget() Method here.
 			}
 			if (Mathf.Abs(_velocity.y) >= 3.0f)

@@ -12,12 +12,17 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_behaviourTimer = new Timer();
-			//_cooldownTimer = new Timer();
+			_cooldownTimer = new Timer();
 			print("\nQuickAttack State.");
 		}
 
 		public override void IsQuickAttack(ref Animator animator, ref IBanditCollision banditCollider, ref IBanditSprite banditSprite, ref int quickAttackIncrement)
 		{
+
+			_cooldownTimer.StartTimer(_quickAtkWaitTime/2);
+			if (_cooldownTimer.HasTimerFinished())
+				banditCollider.EnableTargetCollisionDetection(); //Must be set before changing state here.
+
 			switch (quickAttackIncrement)
 			{
 				case 0:
@@ -33,7 +38,7 @@ namespace DoomBreakers
 					animator.Play("SmallAttack4");
 					break;
 			}
-			//banditSprite.SetBehaviourTextureFlash(0.25f, Color.white);
+			banditSprite.SetBehaviourTextureFlash(0.25f, Color.white);
 			_behaviourTimer.StartTimer(_quickAtkWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
 			{
@@ -44,13 +49,9 @@ namespace DoomBreakers
 				else
 					quickAttackIncrement = 0;
 
-				banditCollider.EnableTargetCollisionDetection(); //Also needs enabling for attacks duh.
-				
-				//_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _banditID));
+				_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _banditID));
 			}
-			//_cooldownTimer.StartTimer(1.0f);
-			//if (_cooldownTimer.HasTimerFinished())
-			//	_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _banditID));
+
 			//base.UpdateBehaviour();
 		}
 	}

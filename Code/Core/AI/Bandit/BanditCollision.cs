@@ -112,6 +112,7 @@ namespace DoomBreakers
                         }
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toAttack)
 						{
+                            //BattleColliderManager.AssignPlayerFaceDir(0, enemy.GetComponent<IPlayerSprite>());
                             BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer");
                         }           
                     }

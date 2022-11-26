@@ -21,7 +21,7 @@ namespace DoomBreakers
 		protected Vector3 _velocity, _cachedVector3;
 		protected const float _maxJumpVelocity = 12.0f;
 		protected float _targetVelocityX, _moveSpeed, _sprintSpeed, _jumpSpeed, _gravity,
-			_targetVelocityY, _maxPowerStruckVelocityY, _maxPowerStruckVelocityX;
+			_targetVelocityY, _maxPowerStruckVelocityY, _maxPowerStruckVelocityX, _attackDist;
 		protected bool _dodgedLeftFlag;
 		protected int _quickAttackIncrement; //2+ variations of this animation.
 		protected int _attackCooldownCounter;
@@ -40,9 +40,10 @@ namespace DoomBreakers
 			_gravity = wildlogicgames.DoomBreakers.GetGravity();
 			_dodgedLeftFlag = false;
 			_quickAtkWaitTime = 0.133f;
+			_attackDist = 1.5f;
 
 			_cooldownWaitTime = 3.0f;
-			_idleWaitTime = 1.5f;
+			_idleWaitTime = 0.5f;
 			_quickAtkWaitTime = 0.133f;
 		}
 
@@ -71,9 +72,11 @@ namespace DoomBreakers
 		}
 		public virtual void IsIdle(ref Animator animator, ref IBanditCollision banditCollider) { }
 		public virtual void IsWaiting(ref Animator animator) { }
-		public virtual void IsPersueTarget(ref Animator animator) { }
+		public virtual void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider) { }
 		public virtual void IsFalling(ref Animator animator, ref Controller2D controller2D) { }
 		public virtual void IsQuickAttack(ref Animator animator, ref IBanditCollision banditCollider, ref IBanditSprite banditSprite, ref int quickAttackIncrement) { }
+		public virtual void IsHitByPowerAttack(ref Animator animator, ref IBanditSprite banditSprite) { }
+		public virtual void IsHitByQuickAttack(ref Animator animator, ref IBanditSprite banditSprite) { }
 	}
 }
 

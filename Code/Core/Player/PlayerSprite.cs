@@ -648,25 +648,14 @@ namespace DoomBreakers
         }
         public override void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor)
 		{
-            //_colorSwapTextureColors[(int)indexOfColourToSwap] = replacementColor;
-            //_colorSwapTexture2D.SetPixel((int)indexOfColourToSwap, 0, replacementColor);
             base.SwapTexture2DColor(indexOfColourToSwap, replacementColor);
         }
         public override Color ColorFromInt(int c, float alpha = 1.0f)
         {
-            //int r = (c >> 16) & 0x000000FF;
-            //int g = (c >> 8) & 0x000000FF;
-            //int b = c & 0x000000FF;
-
-            //Color ret = ColorFromIntRGB(r, g, b);
-            //ret.a = alpha;
-
-            //return ret;
             return base.ColorFromInt(c, alpha);
         }
         public override Color ColorFromIntRGB(int r, int g, int b)
         {
-            //return new Color((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, 1.0f);
             return base.ColorFromIntRGB(r, g, b);
         }
 

@@ -95,12 +95,12 @@ namespace DoomBreakers
 
         void Update() 
         { }
-        public void UpdateCollision(ref BaseState playerState, int playerId, ref IPlayerEquipment playerEquipment)
+        public void UpdateCollision(ref BaseState playerState, int playerId, ref IPlayerEquipment playerEquipment, ref IPlayerSprite playerSprite)
 		{
-            UpdateDetectEnemyTargets(ref playerState, playerId);
+            UpdateDetectEnemyTargets(ref playerState, playerId, ref playerSprite);
             UpdateDetectItemTargets(ref playerEquipment);
         }
-        public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId)
+        public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite)
         {
             if (!_attackCollisionEnabled)
                 return;
@@ -125,7 +125,7 @@ namespace DoomBreakers
                         if (enemy.GetComponent<Bandit>() == null) //Guard clause.
                             return;
 
-                        BattleColliderManager.TriggerEvent("ReportCollisionWithBandit");
+                        BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBandit", ref playerState, playerId, playerSprite);
                     }
                 }
 

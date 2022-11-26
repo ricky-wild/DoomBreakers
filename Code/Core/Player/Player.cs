@@ -183,7 +183,7 @@ namespace DoomBreakers
 
         public void UpdateCollisions()
 		{
-            _playerCollider.UpdateCollision(ref _state, _playerID, ref _playerEquipment);
+            _playerCollider.UpdateCollision(ref _state, _playerID, ref _playerEquipment, ref _playerSprite);
             if(_playerEquipment.NewEquipmentGained())
 			{
                 SetState(new PlayerGainedEquipment(this, _velocity));

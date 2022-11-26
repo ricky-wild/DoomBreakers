@@ -15,13 +15,14 @@ namespace DoomBreakers
 		{
 			animator.Play("Run");
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed));
-			DetectFaceDirection(playerSprite, playerCollider);
+			DetectFaceDirection(ref playerSprite, ref playerCollider);
+			print("\nplayerSprite.GetSpriteDirection()=" + playerSprite.GetSpriteDirection());
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
 				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
 			//base.UpdateBehaviour();
 		}
 
-		private void DetectFaceDirection(IPlayerSprite playerSprite, IPlayerCollision playerCollider)
+		private void DetectFaceDirection(ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider)
 		{
 			if (_velocity.x < 0f)
 			{

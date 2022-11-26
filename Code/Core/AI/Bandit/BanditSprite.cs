@@ -8,15 +8,12 @@ namespace DoomBreakers
     {
 
         private SpriteColourIndex _spriteColourIndex;
-        private SpriteRenderer _spriteRenderer;
-        private Texture2D _colorSwapTexture2D;
-        private Color[] _colorSwapTextureColors;
         private int _banditID, _spriteFaceDirection;
         private ITimer _colorSwappedTimer;
         private bool _colorSwappedFlag;
 
         //private ITimer[] _weaponChargeTimer;// = new Timer[1];
-        private ITimer _weaponChargeTimer;
+        private ITimer _behaviourTimer, _weaponChargeTimer;
         private const float _weaponChargeTime = 0.25f;
         private int _weaponTimerIncrement;
         private const int _weaponTimerIncrementMax = 10;
@@ -37,6 +34,9 @@ namespace DoomBreakers
             _spriteRenderer = spriteRenderer;
             _banditID = banditID;
             _spriteFaceDirection = 1; //1 = face right, -1 = face left.
+
+            _behaviourTimer = this.gameObject.AddComponent<Timer>();
+            _behaviourTimer.Setup("_behaviourTimer");
 
             _colorSwappedTimer = this.gameObject.AddComponent<Timer>();
             _colorSwappedTimer.Setup("_colorSwappedTimer");
@@ -189,7 +189,7 @@ namespace DoomBreakers
             _colorSwapTexture2D.Apply();
         }
 
-        public override void  SetupTexture2DColorSwap(string texName, int texId)
+        public override void SetupTexture2DColorSwap(string texName, int texId)
         {
             _colorSwapTexture2D = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
             _colorSwapTexture2D.filterMode = FilterMode.Point;
@@ -239,7 +239,12 @@ namespace DoomBreakers
             _colorSwapTexture2D.Apply();
 
         }
-
+        public override void SetBehaviourTextureFlash(float time, Color colour)
+        {
+            _behaviourTimer.StartTimer(time);//flash sprite colour timer.
+            if (_behaviourTimer.HasTimerFinished())
+                SetTexture2DColor(time, colour);
+        }
         private void UpdateColorTextureResetInternally()
         {
             //Ensure we reset internally upon failure to do so externally (ie a state change)
@@ -332,20 +337,12 @@ namespace DoomBreakers
 
         public override void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor)
         {
-            _colorSwapTextureColors[(int)indexOfColourToSwap] = replacementColor;
-            _colorSwapTexture2D.SetPixel((int)indexOfColourToSwap, 0, replacementColor);
+            base.SwapTexture2DColor(indexOfColourToSwap, replacementColor);
         }
 
         public override Color ColorFromInt(int c, float alpha = 1.0f)
         {
-            int r = (c >> 16) & 0x000000FF;
-            int g = (c >> 8) & 0x000000FF;
-            int b = c & 0x000000FF;
-
-            Color ret = ColorFromIntRGB(r, g, b);
-            ret.a = alpha;
-
-            return ret;
+            return base.ColorFromInt(c, alpha);
         }
 
         public override Color ColorFromIntRGB(int r, int g, int b)
