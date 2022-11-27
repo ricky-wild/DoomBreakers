@@ -8,6 +8,9 @@ namespace DoomBreakers
         void StartTimer(float waitingTime);
         bool HasTimerFinished();
         float GetTheWaitTime();
+        void BeginTimeRecord();
+        void FinishTimeRecord();
+        float GetTimeRecord();
     }
 }
 

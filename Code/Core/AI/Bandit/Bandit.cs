@@ -25,6 +25,7 @@ namespace DoomBreakers
         private IBanditCollision _banditCollider;
         private IBanditAnimator _banditAnimator;
         private IBanditSprite _banditSprite;
+        private float _playerAttackedButtonTime;
 
         private Action[] _actionListener = new Action[2];
 
@@ -77,7 +78,7 @@ namespace DoomBreakers
             _state.IsPersueTarget(ref _animator, ref _banditSprite, ref _banditCollider);
             _state.IsQuickAttack(ref _animator, ref _banditCollider, ref _banditSprite, ref _quickAttackIncrement);
             _state.IsHitByQuickAttack(ref _animator, ref _banditSprite);
-            _state.IsHitByPowerAttack(ref _animator, ref _banditSprite);
+            _state.IsHitByPowerAttack(ref _animator, ref _banditSprite, _playerAttackedButtonTime);
 
             _state.UpdateBehaviour(ref _controller2D, ref _animator);
         }
@@ -91,6 +92,7 @@ namespace DoomBreakers
 		{
             print("\nBandit.cs= AttackedByPlayer() called!");
 
+
             int playerId = BattleColliderManager.GetRecentCollidedPlayerId();
             BaseState attackingPlayerState = BattleColliderManager.GetAssignedPlayerState(playerId);
 
@@ -98,7 +100,10 @@ namespace DoomBreakers
                 SetState(new BanditHitByQuickAttack(this, _velocity, _banditID));
 
             if (attackingPlayerState.GetType() == typeof(PlayerReleaseAttack))
+            {
+                _playerAttackedButtonTime = BattleColliderManager.GetPlayerHeldAttackButtonTime();
                 SetState(new BanditHitByPowerAttack(this, _velocity, _banditID));
+            }
 
             //if (attackingPlayerState.GetType() == typeof(PlayerUpwardAttack))
             //    SetState(new BanditHitByPowerAttack(this, _velocity, _banditID));

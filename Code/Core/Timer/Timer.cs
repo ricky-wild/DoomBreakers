@@ -11,6 +11,7 @@ namespace DoomBreakers
         private float _timeStamp;
         private float _waitTime;
         private bool _timeStamped, _timerCompleted;
+        private float _recordedTimePassed;
 
         public Timer()
 		{
@@ -18,6 +19,7 @@ namespace DoomBreakers
             _waitTime = 0f;
             _timeStamped = false;
             _timerCompleted = false;
+            _recordedTimePassed = 0f;
         }
 
         public void Setup(string timerTitle)
@@ -75,6 +77,16 @@ namespace DoomBreakers
 		{
             return _waitTime;
 		}
+
+
+
+        public void BeginTimeRecord()
+		{
+            _timeStamp = Time.time;
+            _timeStamped = true;
+        }
+        public void FinishTimeRecord() => _recordedTimePassed = Time.time - _timeStamp;
+        public float GetTimeRecord() => _recordedTimePassed;
 
     }
 }

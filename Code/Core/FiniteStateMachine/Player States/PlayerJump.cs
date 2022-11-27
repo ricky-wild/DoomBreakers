@@ -11,8 +11,6 @@ namespace DoomBreakers
 			//_behaviourTimer = new Timer();
 			print("\nJump State.");
 		}
-
-
 		public override void IsJumping(ref Animator animator, ref Controller2D controller2D, ref Vector2 input)
 		{
 			animator.Play("Jump");//, -1, 0.0f);

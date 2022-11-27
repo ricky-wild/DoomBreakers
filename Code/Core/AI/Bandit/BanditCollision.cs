@@ -35,8 +35,6 @@ namespace DoomBreakers
 
         private bool _detectTargetCollisionEnabled;
 
-        //private Action _eventListener;
-        private IEnemyStateMachine _banditStateMachine;
 
         public BanditCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints, int banditId)
         {
@@ -112,8 +110,7 @@ namespace DoomBreakers
                         }
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toAttack)
 						{
-                            //BattleColliderManager.AssignPlayerFaceDir(0, enemy.GetComponent<IPlayerSprite>());
-                            BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer");
+                            BattleColliderManager.AssignCollisionDetails("ReportCollisionWithPlayer", ref banditState, _banditID, banditSprite);
                         }           
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2)))

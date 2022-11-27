@@ -12,7 +12,7 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_transform = transform;
 			_velocity = v; //We want to carry this on between states.
-			_attackDist = 1.5f;
+			_attackDist = 1.25f;
 			_cachedVector3 = new Vector3();
 			_behaviourTimer = new Timer();
 			print("\nPersue State.");

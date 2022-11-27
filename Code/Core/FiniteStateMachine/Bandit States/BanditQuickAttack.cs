@@ -11,6 +11,7 @@ namespace DoomBreakers
 			_banditID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
+			_quickAtkWaitTime = 0.2f;//0.133f;
 			_behaviourTimer = new Timer();
 			_cooldownTimer = new Timer();
 			print("\nQuickAttack State.");
@@ -44,7 +45,7 @@ namespace DoomBreakers
 			{
 				banditSprite.ResetTexture2DColor();
 
-				if (quickAttackIncrement >= 0 && quickAttackIncrement < 4)
+				if (quickAttackIncrement >= 0 && quickAttackIncrement < 2)
 					quickAttackIncrement++;
 				else
 					quickAttackIncrement = 0;

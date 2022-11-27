@@ -8,6 +8,7 @@ namespace DoomBreakers
 {
     public enum EnemyAI
 	{
+        None = -1,
         Bandit = 0,
         Skeleton = 1
 	};

@@ -11,7 +11,7 @@ namespace DoomBreakers
 			_banditID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			_idleWaitTime = 0.25f;
+			_idleWaitTime = 0.44f;
 			_behaviourTimer = new Timer();
 			print("\nIdle State.");
 		}

@@ -13,9 +13,16 @@ namespace DoomBreakers
         private Dictionary<string, Action> _battleEventDictionary;
         private static BattleColliderManager _battleEventManager;
 
+
         private static int _mostRecentCollidedPlayerId;
         private static Dictionary<int, int> _playerFaceDir;
         private static Dictionary<int, BaseState> _playerState;
+        private static float _playerAttackButtonHeldTime;
+
+        //private static EnemyAI _enemyType;
+        private static int _mostRecentCollidedBanditId; //Needed for Enemy Hit By Power Attack behaviour state.
+        private static Dictionary<int, int> _banditFaceDir;
+        private static Dictionary<int, BanditBaseState> _banditState;
 
         public static BattleColliderManager _instance
         {
@@ -39,14 +46,25 @@ namespace DoomBreakers
         {
             if (_battleEventDictionary == null)
                 _battleEventDictionary = new Dictionary<string, Action>();
+
             if (_playerFaceDir == null)
                 _playerFaceDir = new Dictionary<int, int>();
             if (_playerState == null)
                 _playerState = new Dictionary<int, BaseState>();
+
+            if (_banditFaceDir == null)
+                _banditFaceDir = new Dictionary<int, int>();
+            if (_banditState == null)
+                _banditState = new Dictionary<int, BanditBaseState>();
+
+            _mostRecentCollidedPlayerId = 0;
+            _playerAttackButtonHeldTime = 0f;
+            //_enemyType = EnemyAI.None;
         }
+
         //<summary>
         //Bundle all appropriate collision assignment calls into one method call.
-        //This is so fasr, AssignPlayerState(), AssignPlayerFaceDir() and TriggerEvent("ReportCollisionWithSomething").
+        //This is so far, AssignPlayerState(), AssignPlayerFaceDir() and TriggerEvent("ReportCollisionWithSomething").
         //</summary>
         public static void AssignCollisionDetails(string eventName, ref BaseState playerState, int forPlayerId, IPlayerSprite playerSprite)
 		{
@@ -54,6 +72,7 @@ namespace DoomBreakers
             AssignPlayerState(ref playerState, forPlayerId);
             BaseTriggerEvent(eventName);
         }
+        
         //<summary>
         //AssignPlayerState() is used to communicate player state during an attack. 
         //We will need this for enemy AI regarding the Bandit.cs->AttackedByPlayer() so
@@ -73,6 +92,7 @@ namespace DoomBreakers
             }
 		}
         public static BaseState GetAssignedPlayerState(int playerId) => _playerState[playerId];
+        
         //<summary>
         //AssignPlayerFaceDir() is used to communicate player face direction during an attack. 
         //We will need this for enemy AI regarding the HitByPowerAttack obj state. 
@@ -94,6 +114,56 @@ namespace DoomBreakers
         }
         public static int GetAssignedPlayerFaceDir(int forPlayerId) => _playerFaceDir[forPlayerId];
         public static int GetRecentCollidedPlayerId() => _mostRecentCollidedPlayerId;
+        public static void SetPlayerHeldAttackButtonTime(float time) => _playerAttackButtonHeldTime = time;
+        public static float GetPlayerHeldAttackButtonTime() => _playerAttackButtonHeldTime;
+
+
+
+
+        //<summary>
+        //Bundle all appropriate collision assignment calls into one method call.
+        //This is so far, AssignBanditState(), AssignBanditFaceDir() and TriggerEvent("ReportCollisionWithSomething").
+        //We'll overload this from Player use for Bandit use.
+        //</summary>
+        public static void AssignCollisionDetails(string eventName, ref BanditBaseState banditState, int forBanditId, IBanditSprite banditSprite)
+        {
+            AssignBanditFaceDir(forBanditId, banditSprite);
+            AssignBanditState(ref banditState, forBanditId);
+            BaseTriggerEvent(eventName);
+        }
+        public static void AssignBanditState(ref BanditBaseState banditState, int banditId)
+        {
+            if (!_banditState.ContainsKey(banditId))
+                _banditState.Add(banditId, banditState);
+            else
+            {
+                if (banditState.GetType() != _banditState[banditId].GetType())
+                {
+                    _banditState.Remove(banditId);
+                    _banditState.Add(banditId, banditState);
+                }
+            }
+        }
+        public static BanditBaseState GetAssignedBanditState(int banditId) => _banditState[banditId];
+        public static void AssignBanditFaceDir(int forBanditId, IBanditSprite banditSprite)
+        {
+            //BanditCollision.cs->UpdateDetectEnemyTargets()
+
+            _mostRecentCollidedBanditId = forBanditId;
+            if (!_banditFaceDir.ContainsKey(forBanditId))
+                _banditFaceDir.Add(forBanditId, banditSprite.GetSpriteDirection());
+            else
+            {
+                if (_banditFaceDir[forBanditId] != banditSprite.GetSpriteDirection())
+                {
+                    _banditFaceDir.Remove(forBanditId);
+                    _banditFaceDir.Add(forBanditId, banditSprite.GetSpriteDirection());
+                }
+            }
+        }
+        public static int GetRecentCollidedBanditId() => _mostRecentCollidedBanditId;
+
+
 
         public static void Subscribe(string eventName, Action listener)
         {
@@ -132,7 +202,6 @@ namespace DoomBreakers
                 _instance._battleEventDictionary[eventName] = thisEvent;
             }
         }
-
         private static void BaseTriggerEvent(string eventName)
 		{
             Action thisEvent = null;

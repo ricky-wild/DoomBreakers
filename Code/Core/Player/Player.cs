@@ -29,6 +29,7 @@ namespace DoomBreakers
         private IPlayerEquipment _playerEquipment;
         private IPlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
+        private ITimer _buttonHeldTimer;
 
         private Action _actionListener;
 
@@ -47,6 +48,7 @@ namespace DoomBreakers
             _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
             _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
 
+            _buttonHeldTimer = new Timer();
 
             _actionListener = new Action(AttackedByBandit);//AttackedByBandit()
         }
@@ -80,7 +82,7 @@ namespace DoomBreakers
         }
 
 
-
+        public float GetAttackButtonHeldTime() => _buttonHeldTimer.GetTimeRecord();
         public void UpdateInput()
 		{
             if (_rewirdInputPlayer == null)
@@ -142,20 +144,26 @@ namespace DoomBreakers
 			{
                 SetState(new PlayerDefend(this, _inputVector2));
 			}
+
             if (_rewirdInputPlayer.GetButtonUp("Defend"))
 			{
-                if (_state.GetType() == typeof(PlayerDefend))
+                //if (_state.GetType() == typeof(PlayerDefend))
                     SetState(new PlayerIdle(this, _inputVector2));
 			}
             if (_rewirdInputPlayer.GetButtonTimedPressDown("Attack", 0.25f))
 			{
                 if(SafeToSetHoldAttack())
+				{
+                    _buttonHeldTimer.BeginTimeRecord();
                     SetState(new PlayerHoldAttack(this, _inputVector2));
+                }
             }
             if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.25f))
 			{
                 if (_state.GetType() == typeof(PlayerHoldAttack))
                 {
+                    _buttonHeldTimer.FinishTimeRecord();
+                    BattleColliderManager.SetPlayerHeldAttackButtonTime(_buttonHeldTimer.GetTimeRecord());
                     SetState(new PlayerReleaseAttack(this, _inputVector2));
                     _playerCollider.EnableAttackCollisions();
                 }
@@ -177,7 +185,8 @@ namespace DoomBreakers
             _state.IsHoldAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsReleaseAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsDefending(ref _animator, ref _inputVector2);
-            _state.IsHitBySmallAttack(ref _animator, ref _playerSprite, ref _inputVector2);
+            _state.IsHitByQuickAttack(ref _animator, ref _playerSprite, ref _inputVector2);
+            _state.IsHitWhileDefending(ref _animator, ref _inputVector2);
             _state.UpdateBehaviour(ref _controller2D, ref _animator);
         }
 
@@ -195,6 +204,26 @@ namespace DoomBreakers
         private void AttackedByBandit()
 		{
             print("\nPlayer.cs= AttackedByBandit() called!");
+
+            int banditId = BattleColliderManager.GetRecentCollidedBanditId();
+            BanditBaseState attackingBanditState = BattleColliderManager.GetAssignedBanditState(banditId);
+
+            if (IsIgnoreDamage())
+                return;
+
+
+            if (attackingBanditState.GetType() == typeof(BanditQuickAttack))
+			{
+                if(!IsDefendingSelf())
+                    SetState(new PlayerHitByQuickAttack(this, _velocity));
+                else
+				{
+                    SetState(new PlayerHitDefending(this, _velocity));
+                }
+            }
+
+            //if (attackingPlayerState.GetType() == typeof(BanditReleaseAttack))
+            //    SetState(new PlayerHitByPowerAttack(this, _velocity));
         }
         private bool IsDefendingCorrectDirection(IBanditSprite banditSprite)
         {

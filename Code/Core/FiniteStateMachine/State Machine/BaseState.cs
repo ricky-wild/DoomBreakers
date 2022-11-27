@@ -42,13 +42,11 @@ namespace DoomBreakers
 
 
 		}
-
 		public virtual void UpdateBehaviour(ref Controller2D controller2D, ref Animator animator)
 		{
 			UpdateGravity(ref controller2D, ref animator);
 			UpdateTransform(ref controller2D);		
 		}
-
 		private void UpdateTransform(ref Controller2D controller2D)
 		{
 			//if(_controller2D == null) return;
@@ -80,7 +78,8 @@ namespace DoomBreakers
 		public virtual void IsHoldAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
 		public virtual void IsReleaseAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
 		public virtual void IsDefending(ref Animator animator, ref Vector2 input) { }
-		public virtual void IsHitBySmallAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
+		public virtual void IsHitByQuickAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
+		public virtual void IsHitWhileDefending(ref Animator animator, ref Vector2 input) { }
 	}
 }
 

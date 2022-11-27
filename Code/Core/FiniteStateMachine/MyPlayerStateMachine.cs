@@ -21,7 +21,9 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerHoldAttack) &&
                 _state.GetType() != typeof(PlayerReleaseAttack) &&
                 _state.GetType() != typeof(PlayerDefend) &&
-                _state.GetType() != typeof(PlayerGainedEquipment)) 
+                _state.GetType() != typeof(PlayerGainedEquipment) &&
+                _state.GetType() != typeof(PlayerHitByQuickAttack) &&
+                _state.GetType() != typeof(PlayerHitDefending))
                 return true;
 
             return false;
@@ -38,7 +40,9 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerHoldAttack) &&
                 _state.GetType() != typeof(PlayerReleaseAttack) &&
                 _state.GetType() != typeof(PlayerDefend) &&
-                _state.GetType() != typeof(PlayerGainedEquipment))
+                _state.GetType() != typeof(PlayerGainedEquipment) &&
+                _state.GetType() != typeof(PlayerHitByQuickAttack) &&
+                _state.GetType() != typeof(PlayerHitDefending))
                 return true;
             return false;
         }
@@ -68,10 +72,8 @@ namespace DoomBreakers
         {
             if (_state.GetType() == typeof(PlayerDefend))
                 return true;
-            //if (playerStateMachine.IsQuickHitWhenDefending())
-            //    return true;
-            //if (playerStateMachine.IsPowerHitWhenDefending())
-            //    return true;
+            if (_state.GetType() == typeof(PlayerHitDefending))
+                return true;
 
             return false;
         }

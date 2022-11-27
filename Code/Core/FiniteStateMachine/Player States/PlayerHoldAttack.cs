@@ -19,14 +19,18 @@ namespace DoomBreakers
 			animator.Play("Attack");
 			_velocity.x = 0f;
 			_velocity.y = 0f;
-			playerSprite.SetBehaviourTextureFlash(0.25f, Color.white);
+			
 			playerSprite.SetWeaponChargeTextureFXFlag(true);
 
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
 				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
 
-			//_behaviourTimer.StartTimer(0.01f);
-			//if (_behaviourTimer.HasTimerFinished())
+			_behaviourTimer.StartTimer(0.5f);
+			if (_behaviourTimer.HasTimerFinished())
+			{
+				playerSprite.SetBehaviourTextureFlash(0.25f, Color.white);
+				_behaviourTimer.StartTimer(0.5f);
+			}
 			//	playerSprite.SetWeaponChargeTextureFXFlag(true);
 			//base.UpdateBehaviour();
 		}
