@@ -6,5 +6,6 @@ namespace DoomBreakers
     public interface ISword
     {
         EquipmentWeaponType GetSwordType();
+        EquipmentMaterialType GetMaterialType();
     }
 }

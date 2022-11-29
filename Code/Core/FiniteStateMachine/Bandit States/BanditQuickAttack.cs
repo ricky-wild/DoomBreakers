@@ -14,7 +14,7 @@ namespace DoomBreakers
 			_quickAtkWaitTime = 0.2f;//0.133f;
 			_behaviourTimer = new Timer();
 			_cooldownTimer = new Timer();
-			print("\nQuickAttack State.");
+			//print("\nQuickAttack State.");
 		}
 
 		public override void IsQuickAttack(ref Animator animator, ref IBanditCollision banditCollider, ref IBanditSprite banditSprite, ref int quickAttackIncrement)

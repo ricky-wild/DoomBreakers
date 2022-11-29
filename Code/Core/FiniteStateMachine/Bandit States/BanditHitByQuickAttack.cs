@@ -15,7 +15,7 @@ namespace DoomBreakers
 
 			_behaviourTimer = new Timer();
 			_cooldownTimer = new Timer();
-			print("\nHitByQuickAttack State.");
+			//print("\nHitByQuickAttack State.");
 		}
 
 		public override void IsHitByQuickAttack(ref Animator animator, ref IBanditSprite banditSprite)

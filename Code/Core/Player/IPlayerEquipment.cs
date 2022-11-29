@@ -7,9 +7,9 @@ namespace DoomBreakers
 		//void ApplyEquipment(PlayerEquipType playerEquip, PlayerItem equip);
 		bool NewEquipmentGained();
 		void NewEquipmentGained(bool flag);
-		void ApplySword(ItemBase playerEquip);
-		void ApplyShield(ItemBase playerEquip);
-		void ApplyArmor(ItemBase playerEquip);
+		bool ApplySword(ItemBase playerEquip);
+		bool ApplyShield(ItemBase playerEquip);
+		bool ApplyArmor(ItemBase playerEquip);
 		ItemBase GetTorsoEquip();
 		ItemBase GetLeftHandEquip();
 		ItemBase GetRightHandEquip();

@@ -23,14 +23,10 @@ namespace DoomBreakers
 		private AnimationState _animState; //Apply as appropriate based on _playerEquip.
 		private IEquipmentSprite _swordSprite;
 
-		public EquipmentWeaponType GetSwordType()
-		{
-			return _weaponType;
-		}
-		public EquipmentMaterialType GetMaterialType() //=> return _materialType;
-		{
-			return _materialType;
-		}
+		public EquipmentWeaponType GetSwordType() => _weaponType;
+		
+		public EquipmentMaterialType GetMaterialType() => _materialType;
+
 		private void SetupSword()
 		{
 			//Ensure a sword type has been applied within the inspector.

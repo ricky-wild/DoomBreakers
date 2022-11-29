@@ -176,11 +176,11 @@ namespace DoomBreakers
             if (collision.GetComponent<Sword>() == null)
                 return; //Then NOT a Sword. Get outta here!
 
-            //_playerEquipment = collision.GetComponent<PlayerEquipment>();
-            _playerEquipment.ApplySword(collision.GetComponent<Sword>());
-            collision.GetComponent<Sword>().Destroy();
-
-            _itemCollisionEnabled = true; //Flag so we update players equipment.
+            if(_playerEquipment.ApplySword(collision.GetComponent<Sword>()))
+			{
+                collision.GetComponent<Sword>().Destroy();
+                _itemCollisionEnabled = true; //Flag so we update players equipment.
+            }
             return;
         }
         private void ProcessCollisionWithShield(Collider2D collision)
@@ -188,10 +188,11 @@ namespace DoomBreakers
             if (collision.GetComponent<Shield>() == null)
                 return; //Then NOT a Shield. Get outta here!
 
-            _playerEquipment.ApplyShield(collision.GetComponent<Shield>());
-            collision.GetComponent<Shield>().Destroy();
-
-            _itemCollisionEnabled = true;
+            if(_playerEquipment.ApplyShield(collision.GetComponent<Shield>()))
+			{
+                collision.GetComponent<Shield>().Destroy();
+                _itemCollisionEnabled = true;
+            }
             return;
         }
         private void ProcessCollisionWithArmor(Collider2D collision)
@@ -199,10 +200,11 @@ namespace DoomBreakers
             if (collision.GetComponent<Breastplate>() == null)
                 return; //Then NOT a Armor. Get outta here!
 
-            _playerEquipment.ApplyArmor(collision.GetComponent<Breastplate>());
-            collision.GetComponent<Breastplate>().Destroy();
-
-            _itemCollisionEnabled = true;
+            if(_playerEquipment.ApplyArmor(collision.GetComponent<Breastplate>()))
+			{
+                collision.GetComponent<Breastplate>().Destroy();
+                _itemCollisionEnabled = true;
+            }
             return;
         }
         public void ProcessCollisionFlags(Collider2D collision)

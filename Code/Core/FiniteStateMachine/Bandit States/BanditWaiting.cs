@@ -12,7 +12,7 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_behaviourTimer = new Timer();
-			print("\nWaiting State.");
+			//print("\nWaiting State.");
 		}
 
 		public override void IsWaiting(ref Animator animator)

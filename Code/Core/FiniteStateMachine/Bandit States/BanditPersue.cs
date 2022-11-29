@@ -15,7 +15,7 @@ namespace DoomBreakers
 			_attackDist = 1.25f;
 			_cachedVector3 = new Vector3();
 			_behaviourTimer = new Timer();
-			print("\nPersue State.");
+			//print("\nPersue State.");
 		}
 
 		public override void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider)

@@ -74,7 +74,7 @@ namespace DoomBreakers
 		{
             _state.IsIdle(ref _animator, ref _banditCollider);
             _state.IsWaiting(ref _animator);
-            _state.IsFalling(ref _animator, ref _controller2D);
+            _state.IsFalling(ref _animator, ref _controller2D, ref _banditSprite);
             _state.IsPersueTarget(ref _animator, ref _banditSprite, ref _banditCollider);
             _state.IsQuickAttack(ref _animator, ref _banditCollider, ref _banditSprite, ref _quickAttackIncrement);
             _state.IsHitByQuickAttack(ref _animator, ref _banditSprite);
@@ -90,7 +90,7 @@ namespace DoomBreakers
 
         private void AttackedByPlayer()
 		{
-            print("\nBandit.cs= AttackedByPlayer() called!");
+            //print("\nBandit.cs= AttackedByPlayer() called!");
 
 
             int playerId = BattleColliderManager.GetRecentCollidedPlayerId();
@@ -110,7 +110,7 @@ namespace DoomBreakers
         }
         private void DetectedAnPlayer()
 		{
-            print("\nBandit.cs= DetectedAnPlayer() called!");
+            //print("\nBandit.cs= DetectedAnPlayer() called!");
             SetState(new BanditPersue(this, _velocity, 
                 _transform,_banditID));
         }

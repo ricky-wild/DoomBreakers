@@ -15,7 +15,7 @@ namespace DoomBreakers
 			_maxPowerStruckVelocityX = 0.75f;
 			_behaviourTimer = new Timer();
 			_cooldownTimer = new Timer();
-			print("\nHitByPowerAttack State.");
+			//print("\nHitByPowerAttack State.");
 		}
 
 		public override void IsHitByPowerAttack(ref Animator animator, ref IBanditSprite banditSprite, float playerAttackChargeTime)
@@ -25,10 +25,11 @@ namespace DoomBreakers
 
 			banditSprite.SetBehaviourTextureFlash(0.25f, Color.red);
 
-			WeaponChargeHold weaponChargeHoldFlag = WeaponChargeHold.Moderate;
-			if (playerAttackChargeTime <= 0.75f) weaponChargeHoldFlag = WeaponChargeHold.Minimal;
-			if (playerAttackChargeTime > 0.75f && playerAttackChargeTime < 3.25f) weaponChargeHoldFlag = WeaponChargeHold.Moderate;
-			if (playerAttackChargeTime > 3.25f) weaponChargeHoldFlag = WeaponChargeHold.Maximal;
+			WeaponChargeHold weaponChargeHoldFlag = WeaponChargeHold.None;
+			if (playerAttackChargeTime < 0.5f) weaponChargeHoldFlag = WeaponChargeHold.None;
+			if (playerAttackChargeTime > 0.5f && playerAttackChargeTime < 1.5f) weaponChargeHoldFlag = WeaponChargeHold.Minimal;
+			if (playerAttackChargeTime > 1.5f && playerAttackChargeTime < 3.0f) weaponChargeHoldFlag = WeaponChargeHold.Moderate;
+			if (playerAttackChargeTime > 3.0f) weaponChargeHoldFlag = WeaponChargeHold.Maximal;
 
 			float multiplier = 1.2f;// 1.66f;
 			float heightCap = 0f;
@@ -36,20 +37,28 @@ namespace DoomBreakers
 			switch (weaponChargeHoldFlag)
 			{
 				case WeaponChargeHold.None:
-					multiplier = 0.75f;
-					heightCap = 1.75f;
+					multiplier = 0.5f;
+					heightCap = 0.65f;
+					_maxPowerStruckVelocityY = 10.0f;
+					//print("\nWeaponChargeHold.None");
 					break;
 				case WeaponChargeHold.Minimal:
-					multiplier = 1.2f;
-					heightCap = 1.25f;
+					multiplier = 0.85f;
+					heightCap = 0.485f;
+					_maxPowerStruckVelocityY = 10.65f;
+					//print("\nWeaponChargeHold.Minimal");
 					break;
 				case WeaponChargeHold.Moderate:
-					multiplier = 1.65f;
-					heightCap = 0.85f;
+					multiplier = 1.1f;
+					heightCap = 0.365f;
+					_maxPowerStruckVelocityY = 11.5f;
+					//print("\nWeaponChargeHold.Moderate");
 					break;
 				case WeaponChargeHold.Maximal:
 					multiplier = 2.0f;
-					heightCap = 0.2f;
+					heightCap = 0.1f;
+					_maxPowerStruckVelocityY = 12.5f;
+					//print("\nWeaponChargeHold.Maximal");
 					break;
 			}
 
@@ -57,17 +66,17 @@ namespace DoomBreakers
 			int banditFaceDir = banditSprite.GetSpriteDirection();
 			int playerFaceDir = BattleColliderManager.GetAssignedPlayerFaceDir(playerId);
 
-			if (_velocity.y >= (_maxPowerStruckVelocityY + (multiplier/2)) - heightCap)//Near peak of jump velocity, set falling state.
+			if (_velocity.y >= (_maxPowerStruckVelocityY - heightCap))//Near peak of jump velocity, set falling state.//(_maxPowerStruckVelocityY + (multiplier)) - (heightCap))
 			{
 				banditSprite.SetBehaviourTextureFlash(0.25f, Color.red);
-				_velocity.x = 0f;
+				//_velocity.x = 0f;
 				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID));
 				return;
 			}
 			else
 			{
 				_velocity.y += _maxPowerStruckVelocityY + multiplier /6;
-				_targetVelocityX = _maxPowerStruckVelocityX * multiplier; //Carries on over to FallProcess() where appropriate.
+				_targetVelocityX = _maxPowerStruckVelocityX * (1+ multiplier); //Carries on over to FallProcess() where appropriate.
 
 				if (banditFaceDir == 1 && playerFaceDir == -1) //Enemy facing right & player facing left, knock enemy to the left.
 				{

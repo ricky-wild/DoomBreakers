@@ -24,6 +24,7 @@ namespace DoomBreakers
         private ItemBase _leftHandEquip;
         private ItemBase _rightHandEquip;
         private bool _equipmentGainedFlag;
+        private EquipmentRating _equipmentChecker;
 
         public PlayerEquipment()
 		{
@@ -33,6 +34,7 @@ namespace DoomBreakers
                 _leftHandEquip = new EmptyHand(EquipmentWeaponType.None, EquipmentMaterialType.None);
             if (_rightHandEquip == null)
                 _rightHandEquip = new EmptyHand(EquipmentWeaponType.None, EquipmentMaterialType.None);
+            _equipmentChecker = new EquipmentRating();
         }
         public PlayerEquipment(ItemBase torsoEquipment, ItemBase leftHandEquip, ItemBase rightHandEquip)
         {
@@ -51,79 +53,160 @@ namespace DoomBreakers
             _equipmentGainedFlag = flag;
 		}
 
-        public void ApplySword(ItemBase playerEquip)
+        public bool ApplySword(ItemBase playerEquip)
 		{
             //Now determine where we apply this equipment.
 
             if (!IsEquipSword(playerEquip))
-                return;
+                return false;
 
 
-            if (IsBroadsword(EquipHand.Left_Hand))          //No Dual Weapons
-                return;
-            if (IsBroadsword(EquipHand.Right_Hand))         //No Dual Weapons
-                return;
-            if (IsLongsword(EquipHand.Left_Hand))           //No Dual Weapons
-                return;
-            if (IsLongsword(EquipHand.Right_Hand))          //No Dual Weapons
-                return;
+            //if (IsBroadsword(EquipHand.Left_Hand))          //No Dual Weapons
+            //    return;
+            //if (IsBroadsword(EquipHand.Right_Hand))         //No Dual Weapons
+            //    return;
+            //if (IsLongsword(EquipHand.Left_Hand))           //No Dual Weapons
+            //    return;
+            //if (IsLongsword(EquipHand.Right_Hand))          //No Dual Weapons
+            //    return;
 
+            //NO EQUIPMENT APPLY SWORD.
             if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
             {
                 _leftHandEquip = playerEquip;
-                return;
+                return true;
             }
+
+            //SHIELD IN LEFT HAND, EQUIP SWORD IN RIGHT HAND.
             if (IsShield(EquipHand.Left_Hand))
 			{
                 _rightHandEquip = playerEquip;
-                return;
-			}
+                return true;
+            }
+
+            //SHIELD IN RIGHT HAND, EQUIP SWORD IN LEFT HAND.
             if (IsShield(EquipHand.Right_Hand))
             {
                 _leftHandEquip = playerEquip;
-                return;
+                return true;
             }
 
-            //if (IsEquipShield(equip)) { }
-            //if (IsEquipArmor(equip)) { }
+
+
+            if (ApplySwordForLeftHand(playerEquip))
+                return true;
+            if (ApplySwordForRightHand(playerEquip))
+                return true;
+
+
+            if (IsBroadsword(EquipHand.Left_Hand))          //No Dual Weapons
+				return false;
+			if (IsBroadsword(EquipHand.Right_Hand))         //No Dual Weapons
+                return false;
+			if (IsLongsword(EquipHand.Left_Hand))           //No Dual Weapons
+				return false;
+			if (IsLongsword(EquipHand.Right_Hand))          //No Dual Weapons
+				return false;
+
+            return false;
         }
-        public void ApplyShield(ItemBase playerEquip)
+        private bool ApplySwordForLeftHand(ItemBase playerEquip)
+		{
+            if (IsSword(EquipHand.Left_Hand))
+            {
+                if (IsSwordBetterThanCurrent(playerEquip, EquipHand.Left_Hand))
+                {
+                    _leftHandEquip = playerEquip;
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool ApplySwordForRightHand(ItemBase playerEquip)
+        {
+            if (IsSword(EquipHand.Right_Hand))
+            {
+                if (IsSwordBetterThanCurrent(playerEquip, EquipHand.Right_Hand))
+                {
+                    _rightHandEquip = playerEquip;
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool ApplyShield(ItemBase playerEquip)
 		{
             if (!IsEquipShield(playerEquip))
-                return;
+                return false;
 
-            if (IsShield(EquipHand.Left_Hand))          //No Dual Shields
-                return;
-            if (IsShield(EquipHand.Right_Hand))         //No Dual Shields
-                return;
 
             if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
             {
                 _leftHandEquip = playerEquip;
-                return;
+                return true;
             }
 
             if (IsEmptyHanded(EquipHand.Left_Hand) && !IsShield(EquipHand.Right_Hand))
             {
                 _leftHandEquip = playerEquip;
-                return;
+                return true;
             }
             if (IsEmptyHanded(EquipHand.Right_Hand) && !IsShield(EquipHand.Left_Hand))
             {
                 _rightHandEquip = playerEquip;
-                return;
+                return true;
             }
+
+            if (ApplyShieldForLeftHand(playerEquip))
+                return true;
+            if (ApplyShieldForRightHand(playerEquip))
+                return true;
+
+            if (IsShield(EquipHand.Left_Hand))          //No Dual Shields
+                return false;
+            if (IsShield(EquipHand.Right_Hand))         //No Dual Shields
+                return false;
+
+
+            return false;
         }
-        public void ApplyArmor(ItemBase playerEquip)
+        private bool ApplyShieldForLeftHand(ItemBase playerEquip)
+        {
+            if (IsShield(EquipHand.Left_Hand))
+            {
+                if (IsShieldBetterThanCurrent(playerEquip, EquipHand.Left_Hand))
+                {
+                    _leftHandEquip = playerEquip;
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool ApplyShieldForRightHand(ItemBase playerEquip)
+        {
+            if (IsShield(EquipHand.Right_Hand))
+            {
+                if (IsShieldBetterThanCurrent(playerEquip, EquipHand.Right_Hand))
+                {
+                    _rightHandEquip = playerEquip;
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool ApplyArmor(ItemBase playerEquip)
 		{
             if (!IsEquipArmor(playerEquip))
-                return;
+                return false;
 
             if(!IsArmor())
 			{
                 _torsoEquipment = playerEquip;
-                return;
+                return true;
 			}
+
+
+            return false;
         }
         private bool IsEquipSword(ItemBase equip)
 		{
@@ -196,6 +279,21 @@ namespace DoomBreakers
             return EquipmentMaterialType.None;
         }
 
+        public bool IsSword(EquipHand equipHand)
+        {
+            if (equipHand == EquipHand.Left_Hand)
+            {
+                if (_leftHandEquip.GetType() == typeof(Sword))
+                    return true;
+            }
+            if (equipHand == EquipHand.Right_Hand)
+            {
+                if (_rightHandEquip.GetType() == typeof(Sword))
+                    return true;
+            }
+
+            return false;
+        }
         public bool IsBroadsword(EquipHand equipHand)
 		{
             if(equipHand == EquipHand.Left_Hand)
@@ -297,16 +395,43 @@ namespace DoomBreakers
             return false;
 		}
 
-  //      public bool IsSwordBetterThanCurrent(Sword playerEquip)
-		//{
-  //          ISword sword = (Sword)_leftHandEquip;
+        public bool IsSwordBetterThanCurrent(ItemBase equipToApply, EquipHand equipHand)
+		{
+            Sword swordToApply = (Sword)equipToApply;
+            Sword currentSword;
 
-  //          if (playerEquip.GetMaterialType() == EquipmentMaterialType.Bronze &&
-  //              sword.ge)
+            if (equipHand == EquipHand.Left_Hand)
+			{
+                currentSword = (Sword)_leftHandEquip;
+                return _equipmentChecker.CompareSwords(ref swordToApply, ref currentSword);
+            }
+            if (equipHand == EquipHand.Right_Hand)
+			{
+                currentSword = (Sword)_rightHandEquip;
+                return _equipmentChecker.CompareSwords(ref swordToApply, ref currentSword);
+            }
 
+            return false;
+		}
+        public bool IsShieldBetterThanCurrent(ItemBase equipToApply, EquipHand equipHand)
+        {
+            Shield shieldToApply = (Shield)equipToApply;
+            Shield currentShield;
 
-  //          return false;
-		//}
+            if (equipHand == EquipHand.Left_Hand)
+            {
+                currentShield = (Shield)_leftHandEquip;
+                return _equipmentChecker.CompareShields(ref shieldToApply, ref currentShield);
+            }
+            if (equipHand == EquipHand.Right_Hand)
+            {
+                currentShield = (Shield)_rightHandEquip;
+                return _equipmentChecker.CompareShields(ref shieldToApply, ref currentShield);
+            }
+
+            return false;
+        }
+
     }
 }
 

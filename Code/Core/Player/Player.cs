@@ -88,6 +88,9 @@ namespace DoomBreakers
             if (_rewirdInputPlayer == null)
                 return;
 
+            if (_state.GetType() == typeof(PlayerGainedEquipment))
+                return;
+
             _inputVector2.x = _rewirdInputPlayer.GetAxis("MoveHorizontal");
             _inputVector2.y = _rewirdInputPlayer.GetAxis("MoveVertical");
 
@@ -203,7 +206,7 @@ namespace DoomBreakers
 
         private void AttackedByBandit()
 		{
-            print("\nPlayer.cs= AttackedByBandit() called!");
+            //print("\nPlayer.cs= AttackedByBandit() called!");
 
             int banditId = BattleColliderManager.GetRecentCollidedBanditId();
             BanditBaseState attackingBanditState = BattleColliderManager.GetAssignedBanditState(banditId);

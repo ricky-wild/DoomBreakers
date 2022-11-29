@@ -10,7 +10,7 @@ namespace DoomBreakers
 			_velocity = v; //We want to carry this on between states.
 						   //_quickAttackIncrement = quickAttackIncrement;
 			_behaviourTimer = new Timer();
-			print("\nRelease Attack State.");
+			//print("\nRelease Attack State.");
 		}
 
 

@@ -13,7 +13,7 @@ namespace DoomBreakers
 			_velocity = v; //We want to carry this on between states.
 			_idleWaitTime = 0.44f;
 			_behaviourTimer = new Timer();
-			print("\nIdle State.");
+			//print("\nIdle State.");
 		}
 
 		public override void IsIdle(ref Animator animator, ref IBanditCollision banditCollider)
