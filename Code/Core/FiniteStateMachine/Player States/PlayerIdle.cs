@@ -10,7 +10,7 @@ namespace DoomBreakers
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			print("\nIdle State.");
+			//print("\nIdle State.");
 		}
 
 		public override void IsIdle(ref Animator animator)

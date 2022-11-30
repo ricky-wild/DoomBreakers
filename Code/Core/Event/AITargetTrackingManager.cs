@@ -54,13 +54,26 @@ namespace DoomBreakers
         }
 
 
-        public static void AssignTargetTransform(Transform targetTransform, int forEnemyId, EnemyAI forEnemyType)
+        public static void AssignTargetTransform(string eventName, Transform targetTransform, int forEnemyId, EnemyAI forEnemyType)
         {
             switch(forEnemyType)
 			{
                 case EnemyAI.Bandit:
                     if(!_banditTargetTransforms.ContainsKey(forEnemyId))
+					{
                         _banditTargetTransforms.Add(forEnemyId, targetTransform);
+                        //TriggerEvent(eventName);
+                    }
+                    else
+                    {
+                        if(_banditTargetTransforms[forEnemyId] != targetTransform)
+						{
+                            _banditTargetTransforms.Remove(forEnemyId);
+                            _banditTargetTransforms.Add(forEnemyId, targetTransform);
+                            //TriggerEvent(eventName);
+                        }
+                    }
+                    TriggerEvent(eventName);
                     break;
                 case EnemyAI.Skeleton:
                     break;
@@ -71,7 +84,7 @@ namespace DoomBreakers
 		{
             switch (forEnemyType)
             {
-                case EnemyAI.Bandit:
+                case EnemyAI.Bandit:   
                     return _banditTargetTransforms[forEnemyId];
                 case EnemyAI.Skeleton:
                     return null;

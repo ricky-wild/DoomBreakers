@@ -10,7 +10,7 @@ namespace DoomBreakers
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			print("\nKnock Attack State.");
+			//print("\nKnock Attack State.");
 		}
 
 		public override void IsKnockAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input)

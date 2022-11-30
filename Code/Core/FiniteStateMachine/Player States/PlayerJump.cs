@@ -9,7 +9,7 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			//_behaviourTimer = new Timer();
-			print("\nJump State.");
+			//print("\nJump State.");
 		}
 		public override void IsJumping(ref Animator animator, ref Controller2D controller2D, ref Vector2 input)
 		{

@@ -125,7 +125,8 @@ namespace DoomBreakers
                         if (enemy.GetComponent<Bandit>() == null) //Guard clause.
                             return;
 
-                        BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBandit", ref playerState, playerId, playerSprite);
+                        int banditID = enemy.GetComponent<Bandit>()._banditID;
+                        BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBandit" + banditID.ToString(), ref playerState, playerId, playerSprite);
                     }
                 }
 

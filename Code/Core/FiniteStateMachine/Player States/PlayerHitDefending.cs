@@ -12,7 +12,7 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_behaviourTimer = new Timer();
-			print("\nHitDefending State.");
+			//print("\nHitDefending State.");
 		}
 
 		public override void IsHitWhileDefending(ref Animator animator, ref Vector2 input)

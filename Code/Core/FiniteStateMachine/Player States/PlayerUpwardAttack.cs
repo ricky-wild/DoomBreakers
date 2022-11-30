@@ -9,7 +9,7 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_behaviourTimer = new Timer();
-			print("\nUpward Attack State.");
+			//print("\nUpward Attack State.");
 		}
 
 

@@ -24,6 +24,7 @@ namespace DoomBreakers
         private static Dictionary<int, int> _banditFaceDir;
         private static Dictionary<int, BanditBaseState> _banditState;
 
+
         public static BattleColliderManager _instance
         {
             get //When we access our instance from another place, we'll setup as appropriate if required.
@@ -161,6 +162,7 @@ namespace DoomBreakers
                 }
             }
         }
+        public static int GetAssignedBanditFaceDir(int forBanditId) => _banditFaceDir[forBanditId];
         public static int GetRecentCollidedBanditId() => _mostRecentCollidedBanditId;
 
 

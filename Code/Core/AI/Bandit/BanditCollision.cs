@@ -103,15 +103,12 @@ namespace DoomBreakers
                 {
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player)))
                     {
+                        int playerID = enemy.GetComponent<Player>()._playerID;
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
-                        {
-                            AITargetTrackingManager.AssignTargetTransform(enemy.transform, _banditID, EnemyAI.Bandit);
-                            AITargetTrackingManager.TriggerEvent("ReportDetectionWithPlayer");
-                        }
+                            AITargetTrackingManager.AssignTargetTransform("ReportDetectionWithPlayerForBandit" + _banditID.ToString(), enemy.transform, _banditID, EnemyAI.Bandit);
+
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toAttack)
-						{
-                            BattleColliderManager.AssignCollisionDetails("ReportCollisionWithPlayer", ref banditState, _banditID, banditSprite);
-                        }           
+                            BattleColliderManager.AssignCollisionDetails("ReportCollisionWithPlayerFor" + playerID.ToString(), ref banditState, _banditID, banditSprite);
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2)))
                     { }

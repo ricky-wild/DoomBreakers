@@ -11,6 +11,7 @@ namespace DoomBreakers
 			_banditID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
+			_cooldownWaitTime = 3.0f;
 			_behaviourTimer = new Timer();
 			//print("\nWaiting State.");
 		}

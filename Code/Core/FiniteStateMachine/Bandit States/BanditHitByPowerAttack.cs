@@ -76,7 +76,7 @@ namespace DoomBreakers
 			else
 			{
 				_velocity.y += _maxPowerStruckVelocityY + multiplier /6;
-				_targetVelocityX = _maxPowerStruckVelocityX * (1+ multiplier); //Carries on over to FallProcess() where appropriate.
+				_targetVelocityX = _maxPowerStruckVelocityX * (1.25f+ multiplier); //Carries on over to FallProcess() where appropriate.
 
 				if (banditFaceDir == 1 && playerFaceDir == -1) //Enemy facing right & player facing left, knock enemy to the left.
 				{

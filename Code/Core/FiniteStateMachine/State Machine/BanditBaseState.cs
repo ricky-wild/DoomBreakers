@@ -21,7 +21,7 @@ namespace DoomBreakers
 		protected Vector3 _velocity, _cachedVector3;
 		protected const float _maxJumpVelocity = 12.0f;
 		protected float _targetVelocityX, _moveSpeed, _sprintSpeed, _jumpSpeed, _gravity,
-			_targetVelocityY, _maxPowerStruckVelocityY, _maxPowerStruckVelocityX, _attackDist;
+			_targetVelocityY, _maxPowerStruckVelocityY, _maxPowerStruckVelocityX, _attackDist, _randSpeedModifier;
 		protected bool _dodgedLeftFlag;
 		protected int _quickAttackIncrement; //2+ variations of this animation.
 		protected int _attackCooldownCounter;
@@ -33,10 +33,13 @@ namespace DoomBreakers
 		{
 			_banditID = banditId;
 			_velocity = velocity;//new Vector3();
-			_moveSpeed = 4.0f;//3.75f;//3.5f;
+			_moveSpeed = wildlogicgames.Utilities.GetRandomNumberInt(3, 5);//4.0f;//3.75f;//3.5f;
+			_moveSpeed = _moveSpeed - 0.5f;
 			_sprintSpeed = 1.0f;
 			_targetVelocityX = 1.0f;
 			_jumpSpeed = 4.6f;// 4.0f;
+			_randSpeedModifier = wildlogicgames.Utilities.GetRandomNumberInt(1, 7);
+			_randSpeedModifier = (_randSpeedModifier / 4f); //1/4=0.25f    7/4=1.75f
 			_gravity = wildlogicgames.DoomBreakers.GetGravity();
 			_dodgedLeftFlag = false;
 			_quickAtkWaitTime = 0.133f;
@@ -74,6 +77,7 @@ namespace DoomBreakers
 		public virtual void IsWaiting(ref Animator animator) { }
 		public virtual void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider) { }
 		public virtual void IsFalling(ref Animator animator, ref Controller2D controller2D, ref IBanditSprite banditSprite) { }
+		public virtual void IsDefending(ref Animator animator, ref Controller2D controller2D, ref IBanditSprite banditSprite) { }
 		public virtual void IsQuickAttack(ref Animator animator, ref IBanditCollision banditCollider, ref IBanditSprite banditSprite, ref int quickAttackIncrement) { }
 		public virtual void IsHitByPowerAttack(ref Animator animator, ref IBanditSprite banditSprite, float playerAttackChargeTime) { }
 		public virtual void IsHitByQuickAttack(ref Animator animator, ref IBanditSprite banditSprite) { }

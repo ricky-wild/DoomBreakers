@@ -9,7 +9,7 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_dodgedLeftFlag = dodgedLeft;
-			print("\nDodged State.");
+			//print("\nDodged State.");
 		}
 
 		public override void IsDodged(ref Animator animator, ref Controller2D controller2D, ref Vector2 input)

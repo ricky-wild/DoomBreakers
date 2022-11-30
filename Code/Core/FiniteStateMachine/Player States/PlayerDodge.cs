@@ -11,7 +11,7 @@ namespace DoomBreakers
 			_velocity = v; //We want to carry this on between states.
 			_behaviourTimer = new Timer();
 			_initialDirFlag = false;
-			print("\nDodge State.");
+			//print("\nDodge State.");
 		}
 
 		public override void IsDodging(ref Animator animator, ref Controller2D controller2D, ref Vector2 input,

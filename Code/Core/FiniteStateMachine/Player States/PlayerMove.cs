@@ -8,7 +8,7 @@ namespace DoomBreakers
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			print("\nMove State.");
+			//print("\nMove State.");
 		}
 
 		public override void IsMoving(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider)
@@ -16,7 +16,7 @@ namespace DoomBreakers
 			animator.Play("Run");
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed));
 			DetectFaceDirection(ref playerSprite, ref playerCollider);
-			print("\nplayerSprite.GetSpriteDirection()=" + playerSprite.GetSpriteDirection());
+			//print("\nplayerSprite.GetSpriteDirection()=" + playerSprite.GetSpriteDirection());
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
 				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
 			//base.UpdateBehaviour();

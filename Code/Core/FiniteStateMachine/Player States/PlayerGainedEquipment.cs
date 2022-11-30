@@ -11,7 +11,7 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_behaviourTimer = new Timer();
-			print("\nGained Equipment State.");
+			//print("\nGained Equipment State.");
 		}
 
 		public override void IsGainedEquipment(ref Animator animator, ref IPlayerSprite playerSprite, ref IPlayerEquipment playerEquipment)

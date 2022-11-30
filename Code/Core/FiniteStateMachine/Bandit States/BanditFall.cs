@@ -19,10 +19,7 @@ namespace DoomBreakers
 		{
 			if (_velocity.y <= _maxJumpVelocity)
 				animator.Play("Fall");
-			if(banditSprite.GetSpriteDirection() == -1)
-				_velocity.x = (_moveSpeed * _sprintSpeed);
-			if (banditSprite.GetSpriteDirection() == 1)
-				_velocity.x = -(_moveSpeed * _sprintSpeed);
+			_velocity.x = (_moveSpeed * _sprintSpeed);
 			if (controller2D.collisions.below) //Means we're finished jumping/falling.
 			{
 				_velocity.x = 0f;

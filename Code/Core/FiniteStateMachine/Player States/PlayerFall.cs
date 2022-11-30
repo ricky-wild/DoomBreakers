@@ -8,7 +8,7 @@ namespace DoomBreakers
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			print("\nFall State.");
+			//print("\nFall State.");
 		}
 		public override void IsFalling(ref Animator animator, ref Controller2D controller2D, ref Vector2 input)
 		{

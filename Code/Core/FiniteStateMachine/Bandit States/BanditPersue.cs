@@ -13,6 +13,8 @@ namespace DoomBreakers
 			_transform = transform;
 			_velocity = v; //We want to carry this on between states.
 			_attackDist = 1.25f;
+			_randSpeedModifier = wildlogicgames.Utilities.GetRandomNumberInt(1, 3);
+			_randSpeedModifier = (_randSpeedModifier / 2f); 
 			_cachedVector3 = new Vector3();
 			_behaviourTimer = new Timer();
 			//print("\nPersue State.");
@@ -36,14 +38,14 @@ namespace DoomBreakers
 			if (trackingDir == -1)
 			{
 				if (_transform.position.x > _cachedVector3.x + _attackDist)
-					_targetVelocityX = -(0.5f * (_moveSpeed * _sprintSpeed));
+					_targetVelocityX = -(_randSpeedModifier * (_moveSpeed * _sprintSpeed));
 				else
 					_stateMachine.SetState(new BanditQuickAttack(_stateMachine, _velocity, _banditID));
 			}
 			if (trackingDir == 1)
 			{
 				if (_transform.position.x < _cachedVector3.x - _attackDist)
-					_targetVelocityX = 0.5f * (_moveSpeed * _sprintSpeed);
+					_targetVelocityX = _randSpeedModifier * (_moveSpeed * _sprintSpeed);
 				else
 					_stateMachine.SetState(new BanditQuickAttack(_stateMachine, _velocity, _banditID));
 			}

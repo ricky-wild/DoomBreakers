@@ -55,11 +55,12 @@ namespace DoomBreakers
         private void OnEnable()
         {
             ////Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
-            BattleColliderManager.Subscribe("ReportCollisionWithPlayer", _actionListener);
+            //BattleColliderManager.Subscribe("ReportCollisionWithPlayer" + _playerID.ToString(), _actionListener);
+            BattleColliderManager.Subscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener);
         }
         private void OnDisable()
         {
-            BattleColliderManager.Unsubscribe("ReportCollisionWithPlayer", _actionListener);
+            BattleColliderManager.Unsubscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener);
         }
         private void Awake()
 		{
@@ -219,22 +220,26 @@ namespace DoomBreakers
 			{
                 if(!IsDefendingSelf())
                     SetState(new PlayerHitByQuickAttack(this, _velocity));
-                else
-				{
-                    SetState(new PlayerHitDefending(this, _velocity));
+                else//if (IsDefendingSelf())
+                {
+                    int banditFaceDir = BattleColliderManager.GetAssignedBanditFaceDir(banditId);
+                    if (IsDefendingCorrectDirection(banditFaceDir))
+                        SetState(new PlayerHitDefending(this, _velocity));
+                    else
+                        SetState(new PlayerHitByQuickAttack(this, _velocity));
                 }
             }
 
             //if (attackingPlayerState.GetType() == typeof(BanditReleaseAttack))
             //    SetState(new PlayerHitByPowerAttack(this, _velocity));
         }
-        private bool IsDefendingCorrectDirection(IBanditSprite banditSprite)
+        private bool IsDefendingCorrectDirection(int enemyFaceDir)//IBanditSprite banditSprite)
         {
             //Detrmine which way the player is facing whilst defending & the enemy bandit is attacking.
             //Why? Player doesn't successfully defend against enemy attack defending the wrong face direction.
 
             int playerFaceDir = _playerSprite.GetSpriteDirection();
-            int enemyFaceDir = banditSprite.GetSpriteDirection();
+            //int enemyFaceDir = banditSprite.GetSpriteDirection();
 
             //Enemy would only ever be attacking if directly in front of player.
             //So if player face direction is 1 (right) then enemy would have to be -1 (left) 

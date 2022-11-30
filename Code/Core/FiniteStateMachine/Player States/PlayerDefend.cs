@@ -10,7 +10,7 @@ namespace DoomBreakers
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			print("\nDefence State.");
+			//print("\nDefence State.");
 		}
 
 		public override void IsDefending(ref Animator animator, ref Vector2 input)

@@ -47,13 +47,13 @@ namespace DoomBreakers
         private void OnEnable()
         {
             //Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
-            BattleColliderManager.Subscribe("ReportCollisionWithBandit", _actionListener[0]);
-            AITargetTrackingManager.Subscribe("ReportDetectionWithPlayer", _actionListener[1]);
+            BattleColliderManager.Subscribe("ReportCollisionWithBandit" + _banditID.ToString(), _actionListener[0]);
+            AITargetTrackingManager.Subscribe("ReportDetectionWithPlayerForBandit" + _banditID.ToString(), _actionListener[1]);
         }
         private void OnDisable()
         {
-            BattleColliderManager.Unsubscribe("ReportCollisionWithBandit", _actionListener[0]);
-            AITargetTrackingManager.Unsubscribe("ReportDetectionWithPlayer", _actionListener[1]);
+            BattleColliderManager.Unsubscribe("ReportCollisionWithBandit" + _banditID.ToString(), _actionListener[0]);
+            AITargetTrackingManager.Unsubscribe("ReportDetectionWithPlayerForBandit" + _banditID.ToString(), _actionListener[1]);
         }
         private void Awake()
         {
@@ -76,6 +76,7 @@ namespace DoomBreakers
             _state.IsWaiting(ref _animator);
             _state.IsFalling(ref _animator, ref _controller2D, ref _banditSprite);
             _state.IsPersueTarget(ref _animator, ref _banditSprite, ref _banditCollider);
+            _state.IsDefending(ref _animator, ref _controller2D, ref _banditSprite);
             _state.IsQuickAttack(ref _animator, ref _banditCollider, ref _banditSprite, ref _quickAttackIncrement);
             _state.IsHitByQuickAttack(ref _animator, ref _banditSprite);
             _state.IsHitByPowerAttack(ref _animator, ref _banditSprite, _playerAttackedButtonTime);
@@ -97,7 +98,12 @@ namespace DoomBreakers
             BaseState attackingPlayerState = BattleColliderManager.GetAssignedPlayerState(playerId);
 
             if(attackingPlayerState.GetType() == typeof(PlayerQuickAttack))
-                SetState(new BanditHitByQuickAttack(this, _velocity, _banditID));
+			{
+                if(_state.GetType() != typeof(BanditDefending))
+                    SetState(new BanditHitByQuickAttack(this, _velocity, _banditID));
+                else
+                    SetState(new BanditHitDefending(this, _velocity, _banditID));
+            }
 
             if (attackingPlayerState.GetType() == typeof(PlayerReleaseAttack))
             {
