@@ -14,7 +14,7 @@ namespace DoomBreakers
 			_velocity = v; //We want to carry this on between states.
 			_attackDist = 1.25f;
 			_randSpeedModifier = wildlogicgames.Utilities.GetRandomNumberInt(1, 3);
-			_randSpeedModifier = (_randSpeedModifier / 2f); 
+			_randSpeedModifier = (_randSpeedModifier / 2.15f); 
 			_cachedVector3 = new Vector3();
 			_behaviourTimer = new Timer();
 			//print("\nPersue State.");

@@ -11,14 +11,14 @@ namespace DoomBreakers
 			_banditID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			_idleWaitTime = 1.0f;
+			_idleWaitTime = 0.44f;
 			_behaviourTimer = new Timer();
 			//print("\nFall State.");
 		}
 
-		public override void IsDefending(ref Animator animator, ref Controller2D controller2D, ref IBanditSprite banditSprite)
+		public override void IsHitWhileDefending(ref Animator animator, ref Controller2D controller2D, ref IBanditSprite banditSprite)
 		{
-			animator.Play("DefQuickHit");
+			animator.Play("DefHit");
 			_velocity.x = 0f;
 
 			_behaviourTimer.StartTimer(_idleWaitTime);

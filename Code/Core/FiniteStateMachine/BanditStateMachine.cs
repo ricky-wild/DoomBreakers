@@ -12,36 +12,25 @@ namespace DoomBreakers
 
         protected bool SafeToSetPersue() 
         {
+            if (_state.GetType() == typeof(BanditDefending))
+                return false;
+            if (_state.GetType() == typeof(BanditHitDefending))
+                return false;
 
-            //if (_state.GetType() != typeof(PlayerIdle) &&
-            //    _state.GetType() != typeof(PlayerFall) &&
-            //    _state.GetType() != typeof(PlayerJump) &&
-            //    _state.GetType() != typeof(PlayerDodge) &&
-            //    _state.GetType() != typeof(PlayerQuickAttack) &&
-            //    _state.GetType() != typeof(PlayerUpwardAttack) &&
-            //    _state.GetType() != typeof(PlayerHoldAttack) &&
-            //    _state.GetType() != typeof(PlayerReleaseAttack) &&
-            //    _state.GetType() != typeof(PlayerDefend) &&
-            //    _state.GetType() != typeof(PlayerGainedEquipment))
-            //    return true;
+            return true;
+        }
 
-            //if (enemyStateMachine.IsQuickAttackHit())
-            //    return false;
-            //if (enemyStateMachine.IsQuickAttack())
-            //    return false;
-            //if (enemyStateMachine.IsPowerAttackHit())
-            //    return false;
-            //if (enemyStateMachine.IsQuickHitWhenDefending())
-            //    return false;
-            //if (enemyStateMachine.IsPowerHitWhenDefending())
-            //    return false;
-            //if (enemyStateMachine.IsImpactHit())
-            //    return false;
+        protected bool NotDefending()
+		{
+            if (_state.GetType() != typeof(BanditDefending) && _state.GetType() != typeof(BanditHitDefending)) //This one caught me off guard, AND required.
+                return true;
+            return false;
+        }
 
-
-            //if (enemyStateMachine.IsFalling())
-            //    return false;
-
+        protected bool IsDefending()
+        {
+            if (_state.GetType() == typeof(BanditDefending))
+                return true;
             return false;
         }
     }

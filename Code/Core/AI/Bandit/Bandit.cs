@@ -77,9 +77,11 @@ namespace DoomBreakers
             _state.IsFalling(ref _animator, ref _controller2D, ref _banditSprite);
             _state.IsPersueTarget(ref _animator, ref _banditSprite, ref _banditCollider);
             _state.IsDefending(ref _animator, ref _controller2D, ref _banditSprite);
+            
             _state.IsQuickAttack(ref _animator, ref _banditCollider, ref _banditSprite, ref _quickAttackIncrement);
             _state.IsHitByQuickAttack(ref _animator, ref _banditSprite);
             _state.IsHitByPowerAttack(ref _animator, ref _banditSprite, _playerAttackedButtonTime);
+            _state.IsHitWhileDefending(ref _animator, ref _controller2D, ref _banditSprite);
 
             _state.UpdateBehaviour(ref _controller2D, ref _animator);
         }
@@ -93,16 +95,23 @@ namespace DoomBreakers
 		{
             //print("\nBandit.cs= AttackedByPlayer() called!");
 
-
+            
             int playerId = BattleColliderManager.GetRecentCollidedPlayerId();
             BaseState attackingPlayerState = BattleColliderManager.GetAssignedPlayerState(playerId);
+            
 
-            if(attackingPlayerState.GetType() == typeof(PlayerQuickAttack))
+            if (attackingPlayerState.GetType() == typeof(PlayerQuickAttack))
 			{
-                if(_state.GetType() != typeof(BanditDefending))
-                    SetState(new BanditHitByQuickAttack(this, _velocity, _banditID));
+
+                if (NotDefending()) SetState(new BanditHitByQuickAttack(this, _velocity, _banditID));
                 else
-                    SetState(new BanditHitDefending(this, _velocity, _banditID));
+                {
+                    int playerFaceDir = BattleColliderManager.GetAssignedPlayerFaceDir(playerId);
+                    if (IsDefendingCorrectDirection(playerFaceDir))
+                        SetState(new BanditHitDefending(this, _velocity, _banditID));
+                    else
+                        SetState(new BanditHitByQuickAttack(this, _velocity, _banditID));
+                }
             }
 
             if (attackingPlayerState.GetType() == typeof(PlayerReleaseAttack))
@@ -117,8 +126,23 @@ namespace DoomBreakers
         private void DetectedAnPlayer()
 		{
             //print("\nBandit.cs= DetectedAnPlayer() called!");
+
+            if (!SafeToSetPersue())
+                return;
+
             SetState(new BanditPersue(this, _velocity, 
-                _transform,_banditID));
+            _transform,_banditID));
+        }
+
+        private bool IsDefendingCorrectDirection(int playerFaceDir)
+        {
+            int banditFaceDir = _banditSprite.GetSpriteDirection();
+
+            if (banditFaceDir == 1 && playerFaceDir == -1 ||
+                banditFaceDir == -1 && playerFaceDir == 1)
+                return true;
+
+            return false;
         }
 
         private void OnDrawGizmosSelected()

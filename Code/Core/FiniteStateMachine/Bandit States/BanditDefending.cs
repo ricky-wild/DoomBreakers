@@ -11,7 +11,7 @@ namespace DoomBreakers
 			_banditID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			_idleWaitTime = 1.44f;
+			_idleWaitTime = wildlogicgames.Utilities.GetRandomNumberInt(1, 4);
 			_behaviourTimer = new Timer();
 			//print("\nFall State.");
 		}

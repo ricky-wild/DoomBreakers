@@ -83,6 +83,8 @@ namespace DoomBreakers
                 return true;
             if (_state.GetType() == typeof(PlayerDodged))
                 return true;
+            if (_state.GetType() == typeof(PlayerGainedEquipment))
+                return true;
 
 
             return false;
