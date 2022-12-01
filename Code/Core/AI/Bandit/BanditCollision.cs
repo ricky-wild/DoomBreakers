@@ -139,8 +139,13 @@ namespace DoomBreakers
             if (banditState.GetType() == typeof(BanditQuickAttack))
             {
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_playerLayerMaskStr));
+                _collisionTargetPurpose = CollisionTargetPurpose.toAttack;            
+                return;
+            }
+            if (banditState.GetType() == typeof(BanditReleaseAttack))
+            {
+                _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], LayerMask.GetMask(_playerLayerMaskStr));
                 _collisionTargetPurpose = CollisionTargetPurpose.toAttack;
-                
                 return;
             }
             //if (banditStateMachine.IsPowerAttackRelease())

@@ -24,6 +24,7 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerDefend) &&
                 _state.GetType() != typeof(PlayerGainedEquipment) &&
                 _state.GetType() != typeof(PlayerHitByQuickAttack) &&
+                _state.GetType() != typeof(PlayerHitByPowerAttack) &&
                 _state.GetType() != typeof(PlayerHitDefending))
                 return true;
 
@@ -44,6 +45,7 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerDefend) &&
                 _state.GetType() != typeof(PlayerGainedEquipment) &&
                 _state.GetType() != typeof(PlayerHitByQuickAttack) &&
+                _state.GetType() != typeof(PlayerHitByPowerAttack) &&
                 _state.GetType() != typeof(PlayerHitDefending))
                 return true;
             return false;
@@ -84,6 +86,10 @@ namespace DoomBreakers
                         SetState(new PlayerHitByQuickAttack(this, _velocity));
                 }
             }
+        }
+        protected void ProcessPowerAttackFromBandit(ref BanditBaseState attackingBanditState, int banditFaceDir, int playerFaceDir)
+        {
+            if (attackingBanditState.GetType() == typeof(BanditReleaseAttack)) SetState(new PlayerHitByPowerAttack(this, _velocity));
         }
         protected bool IsDefendingCorrectDirection(int enemyFaceDir, int playerFaceDir)
         {

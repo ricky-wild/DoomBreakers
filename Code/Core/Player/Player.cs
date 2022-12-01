@@ -190,6 +190,7 @@ namespace DoomBreakers
             _state.IsReleaseAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsDefending(ref _animator, ref _inputVector2);
             _state.IsHitByQuickAttack(ref _animator, ref _playerSprite, ref _inputVector2);
+            _state.IsHitByReleaseAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsHitWhileDefending(ref _animator, ref _inputVector2);
             _state.UpdateBehaviour(ref _controller2D, ref _animator);
         }
@@ -217,10 +218,8 @@ namespace DoomBreakers
                 return;
 
             ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection());
+            ProcessPowerAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection());
 
-
-            //if (attackingPlayerState.GetType() == typeof(BanditReleaseAttack))
-            //    SetState(new PlayerHitByPowerAttack(this, _velocity));
         }
 
 

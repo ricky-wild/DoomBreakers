@@ -79,6 +79,9 @@ namespace DoomBreakers
             _state.IsDefending(ref _animator, ref _controller2D, ref _banditSprite);
             
             _state.IsQuickAttack(ref _animator, ref _banditCollider, ref _banditSprite, ref _quickAttackIncrement);
+            _state.IsHoldAttack(ref _animator, ref _banditSprite);
+            _state.IsReleaseAttack(ref _animator, ref _banditCollider, ref _banditSprite);
+
             _state.IsHitByQuickAttack(ref _animator, ref _banditSprite);
             _state.IsHitByPowerAttack(ref _animator, ref _banditSprite, _playerAttackedButtonTime);
             _state.IsHitWhileDefending(ref _animator, ref _controller2D, ref _banditSprite);
@@ -115,8 +118,7 @@ namespace DoomBreakers
             if (!SafeToSetPersue())
                 return;
 
-            SetState(new BanditPersue(this, _velocity, 
-            _transform,_banditID));
+            SetState(new BanditPersue(this, _velocity, _transform,_banditID));
         }
 
         private void OnDrawGizmosSelected()

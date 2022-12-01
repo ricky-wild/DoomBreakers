@@ -18,7 +18,7 @@ namespace DoomBreakers
 		protected StateMachine _stateMachine;
 		protected Vector3 _velocity;
 		protected const float _maxJumpVelocity = 12.0f;
-		protected float _targetVelocityX, _moveSpeed, _sprintSpeed, _jumpSpeed, _gravity;
+		protected float _targetVelocityX, _moveSpeed, _sprintSpeed, _jumpSpeed, _gravity, _maxPowerStruckVelocityY, _maxPowerStruckVelocityX;
 		protected int _quickAttackIncrement; //4+ variations of this animation.
 		protected bool _dodgedLeftFlag;//, _jumpedFlag;
 
@@ -79,6 +79,7 @@ namespace DoomBreakers
 		public virtual void IsReleaseAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
 		public virtual void IsDefending(ref Animator animator, ref Vector2 input) { }
 		public virtual void IsHitByQuickAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
+		public virtual void IsHitByReleaseAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
 		public virtual void IsHitWhileDefending(ref Animator animator, ref Vector2 input) { }
 	}
 }

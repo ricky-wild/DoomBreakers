@@ -146,10 +146,10 @@ namespace DoomBreakers
 		{
             SetupTexture2DColorSwap("_SwapTex", _playerID);
 
-            int temp = 3;
+            int skinOption = wildlogicgames.Utilities.GetRandomNumberInt(1, 10);
 
             //switch (MenuManager._instance.GetPlayerCustomSkinId(_playerID))
-            switch(temp)
+            switch (skinOption)
             {
                 default: //STANDARD SKIN
                     SwapTexture2DColor(SpriteColourIndex.Hair, ColorFromInt(0x3b370c));    //HAIR

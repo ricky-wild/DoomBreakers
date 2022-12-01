@@ -67,6 +67,8 @@ namespace DoomBreakers
                 return false;
             if (_state.GetType() == typeof(BanditHitDefending))
                 return false;
+            if (_state.GetType() == typeof(BanditReleaseAttack))
+                return false;
 
             return true;
         }

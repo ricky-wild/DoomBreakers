@@ -73,9 +73,9 @@ namespace DoomBreakers
         {
             SetupTexture2DColorSwap("_SwapTexBandit", _banditID);
 
-            int temp = 2;
+            int skinOption = wildlogicgames.Utilities.GetRandomNumberInt(0, 6);
             //switch (MenuManager._instance.GetPlayerCustomSkinId(_playerID))
-            switch (temp)
+            switch (skinOption)
             {
                 default: //STANDARD SKIN
                     SwapTexture2DColor(SpriteColourIndex.Hair, ColorFromInt(0x3b370c));    //HAIR
@@ -145,9 +145,9 @@ namespace DoomBreakers
                     break;
             }
 
-            temp = 3;
-            //Base the colour variation of the enemy from the AI difficulty applied.
-            switch (temp)
+            skinOption = wildlogicgames.Utilities.GetRandomNumberInt(0, 4);
+
+            switch (skinOption)
             {
                 case 0: //Default sprite colours.
                     SwapTexture2DColor(SpriteColourIndex.Bandit_Mask_Gloves_Boots, ColorFromInt(0x4e3624));

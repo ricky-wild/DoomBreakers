@@ -7,6 +7,7 @@ namespace DoomBreakers
 	{
 		private int _playerFaceDir;
 		private bool _receivedFaceDirFlag;
+		private int _randomStateDir;
 		public BanditFall(EnemyStateMachine s, Vector3 v, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
 		{
 			_banditID = id;
@@ -14,6 +15,7 @@ namespace DoomBreakers
 			_velocity = v; //We want to carry this on between states.
 			_playerFaceDir = 0; // -1 or 1
 			_receivedFaceDirFlag = false; //Used to get the face dir of player and this enemy during the attack.
+			_randomStateDir = 0;
 			_behaviourTimer = new Timer();
 			//print("\nFall State.");
 		}
@@ -43,7 +45,15 @@ namespace DoomBreakers
 			{
 				_velocity.x = 0f;
 				_velocity.y = 0f;
-				_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity,_banditID));
+
+				_randomStateDir = wildlogicgames.Utilities.GetRandomNumberInt(0, 100);
+
+				if (_randomStateDir < 50)
+					_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity,_banditID));
+				else if (_randomStateDir > 50 && _randomStateDir < 80)
+					_stateMachine.SetState(new BanditHoldAttack(_stateMachine, _velocity, _banditID));
+				else
+					_stateMachine.SetState(new BanditDefending(_stateMachine, _velocity, _banditID));
 			}
 			//base.UpdateBehaviour();
 		}
