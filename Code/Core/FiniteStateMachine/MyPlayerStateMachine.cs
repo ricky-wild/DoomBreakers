@@ -18,6 +18,7 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerDodge) && 
                 _state.GetType() != typeof(PlayerQuickAttack) &&
                 _state.GetType() != typeof(PlayerUpwardAttack) &&
+                _state.GetType() != typeof(PlayerKnockAttack) &&
                 _state.GetType() != typeof(PlayerHoldAttack) &&
                 _state.GetType() != typeof(PlayerReleaseAttack) &&
                 _state.GetType() != typeof(PlayerDefend) &&
@@ -37,6 +38,7 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerDodge) && 
                 _state.GetType() != typeof(PlayerQuickAttack) &&
                 _state.GetType() != typeof(PlayerUpwardAttack) &&
+                _state.GetType() != typeof(PlayerKnockAttack) &&
                 _state.GetType() != typeof(PlayerHoldAttack) &&
                 _state.GetType() != typeof(PlayerReleaseAttack) &&
                 _state.GetType() != typeof(PlayerDefend) &&
@@ -68,6 +70,35 @@ namespace DoomBreakers
 
         }
 
+        protected void ProcessQuickAttackFromBandit(ref BanditBaseState attackingBanditState, int banditFaceDir, int playerFaceDir)
+		{
+            if (attackingBanditState.GetType() == typeof(BanditQuickAttack))
+            {
+                if (!IsDefendingSelf())
+                    SetState(new PlayerHitByQuickAttack(this, _velocity));
+                else//if (IsDefendingSelf())
+                {
+                    if (IsDefendingCorrectDirection(banditFaceDir, playerFaceDir))
+                        SetState(new PlayerHitDefending(this, _velocity));
+                    else
+                        SetState(new PlayerHitByQuickAttack(this, _velocity));
+                }
+            }
+        }
+        protected bool IsDefendingCorrectDirection(int enemyFaceDir, int playerFaceDir)
+        {
+            //Detrmine which way the player is facing whilst defending & the enemy bandit is attacking.
+            //Why? Player doesn't successfully defend against enemy attack defending the wrong face direction.
+
+            //Enemy would only ever be attacking if directly in front of player.
+            //So if player face direction is 1 (right) then enemy would have to be -1 (left) 
+            //case sceneria true for successful defence.
+            if (playerFaceDir == 1 && enemyFaceDir == -1 ||
+                playerFaceDir == -1 && enemyFaceDir == 1)
+                return true;
+
+            return false;
+        }
         protected bool IsDefendingSelf()
         {
             if (_state.GetType() == typeof(PlayerDefend))

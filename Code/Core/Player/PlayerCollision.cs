@@ -142,7 +142,12 @@ namespace DoomBreakers
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_enemyLayerMaskStr));
                 return;
 			}
-            if(playerState.GetType() == typeof(PlayerReleaseAttack))
+            if (playerState.GetType() == typeof(PlayerKnockAttack))
+            {
+                _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, _attackRadius[0], LayerMask.GetMask(_enemyLayerMaskStr));
+                return;
+            }
+            if (playerState.GetType() == typeof(PlayerReleaseAttack))
 			{
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[1].position, _attackRadius[1], LayerMask.GetMask(_enemyLayerMaskStr));
                 return;

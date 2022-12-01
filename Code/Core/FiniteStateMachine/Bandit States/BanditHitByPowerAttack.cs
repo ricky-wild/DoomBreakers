@@ -23,7 +23,14 @@ namespace DoomBreakers
 
 			animator.Play("Hit");//, 0, 0.0f);
 
-			banditSprite.SetBehaviourTextureFlash(0.25f, Color.red);
+			
+
+			_behaviourTimer.StartTimer(0.3f);
+			if (_behaviourTimer.HasTimerFinished())
+			{
+				banditSprite.SetBehaviourTextureFlash(0.15f, Color.red);
+				_behaviourTimer.StartTimer(0.3f);
+			}
 
 			WeaponChargeHold weaponChargeHoldFlag = WeaponChargeHold.None;
 			if (playerAttackChargeTime < 0.5f) weaponChargeHoldFlag = WeaponChargeHold.None;
@@ -40,24 +47,28 @@ namespace DoomBreakers
 					multiplier = 0.5f;
 					heightCap = 0.65f;
 					_maxPowerStruckVelocityY = 10.0f;
+					_maxPowerStruckVelocityX = 0.75f;
 					//print("\nWeaponChargeHold.None");
 					break;
 				case WeaponChargeHold.Minimal:
 					multiplier = 0.85f;
 					heightCap = 0.485f;
 					_maxPowerStruckVelocityY = 10.65f;
+					_maxPowerStruckVelocityX = 0.925f;
 					//print("\nWeaponChargeHold.Minimal");
 					break;
 				case WeaponChargeHold.Moderate:
 					multiplier = 1.1f;
 					heightCap = 0.365f;
-					_maxPowerStruckVelocityY = 11.5f;
+					_maxPowerStruckVelocityY = 11.25f;
+					_maxPowerStruckVelocityX = 1.15f;
 					//print("\nWeaponChargeHold.Moderate");
 					break;
 				case WeaponChargeHold.Maximal:
 					multiplier = 2.0f;
 					heightCap = 0.1f;
-					_maxPowerStruckVelocityY = 12.5f;
+					_maxPowerStruckVelocityY = 12.0f;
+					_maxPowerStruckVelocityX = 1.25f;
 					//print("\nWeaponChargeHold.Maximal");
 					break;
 			}

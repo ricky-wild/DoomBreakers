@@ -210,45 +210,17 @@ namespace DoomBreakers
             //print("\nPlayer.cs= AttackedByBandit() called!");
 
             int banditId = BattleColliderManager.GetRecentCollidedBanditId();
+            int banditFaceDir = BattleColliderManager.GetAssignedBanditFaceDir(banditId);
             BanditBaseState attackingBanditState = BattleColliderManager.GetAssignedBanditState(banditId);
 
             if (IsIgnoreDamage())
                 return;
 
+            ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection());
 
-            if (attackingBanditState.GetType() == typeof(BanditQuickAttack))
-			{
-                if(!IsDefendingSelf())
-                    SetState(new PlayerHitByQuickAttack(this, _velocity));
-                else//if (IsDefendingSelf())
-                {
-                    int banditFaceDir = BattleColliderManager.GetAssignedBanditFaceDir(banditId);
-                    if (IsDefendingCorrectDirection(banditFaceDir))
-                        SetState(new PlayerHitDefending(this, _velocity));
-                    else
-                        SetState(new PlayerHitByQuickAttack(this, _velocity));
-                }
-            }
 
             //if (attackingPlayerState.GetType() == typeof(BanditReleaseAttack))
             //    SetState(new PlayerHitByPowerAttack(this, _velocity));
-        }
-        private bool IsDefendingCorrectDirection(int enemyFaceDir)//IBanditSprite banditSprite)
-        {
-            //Detrmine which way the player is facing whilst defending & the enemy bandit is attacking.
-            //Why? Player doesn't successfully defend against enemy attack defending the wrong face direction.
-
-            int playerFaceDir = _playerSprite.GetSpriteDirection();
-            //int enemyFaceDir = banditSprite.GetSpriteDirection();
-
-            //Enemy would only ever be attacking if directly in front of player.
-            //So if player face direction is 1 (right) then enemy would have to be -1 (left) 
-            //case sceneria true for successful defence.
-            if (playerFaceDir == 1 && enemyFaceDir == -1 ||
-                playerFaceDir == -1 && enemyFaceDir == 1)
-                return true;
-
-            return false;
         }
 
 

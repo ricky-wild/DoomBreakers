@@ -80,15 +80,21 @@ namespace DoomBreakers
             //SHIELD IN LEFT HAND, EQUIP SWORD IN RIGHT HAND.
             if (IsShield(EquipHand.Left_Hand))
 			{
-                _rightHandEquip = playerEquip;
-                return true;
+                if (IsEmptyHanded(EquipHand.Right_Hand))
+				{
+                    _rightHandEquip = playerEquip;
+                    return true;
+                }
             }
 
             //SHIELD IN RIGHT HAND, EQUIP SWORD IN LEFT HAND.
             if (IsShield(EquipHand.Right_Hand))
             {
-                _leftHandEquip = playerEquip;
-                return true;
+                if (IsEmptyHanded(EquipHand.Left_Hand))
+				{
+                    _leftHandEquip = playerEquip;
+                    return true;
+                }
             }
 
 
@@ -204,6 +210,14 @@ namespace DoomBreakers
                 _torsoEquipment = playerEquip;
                 return true;
 			}
+            else
+			{
+                if(IsArmorBetterThanCurrent(playerEquip))
+				{
+                    _torsoEquipment = playerEquip;
+                    return true;
+                }
+            }
 
 
             return false;
@@ -431,6 +445,13 @@ namespace DoomBreakers
 
             return false;
         }
+        public bool IsArmorBetterThanCurrent(ItemBase equipToApply)
+		{
+            Breastplate armorToApply = (Breastplate)equipToApply;
+            Breastplate currentArmor = (Breastplate)_torsoEquipment;
+
+            return _equipmentChecker.CompareArmors(ref armorToApply, ref currentArmor);
+		}
 
     }
 }

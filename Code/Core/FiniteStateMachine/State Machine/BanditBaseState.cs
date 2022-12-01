@@ -82,6 +82,8 @@ namespace DoomBreakers
 		public virtual void IsHitByPowerAttack(ref Animator animator, ref IBanditSprite banditSprite, float playerAttackChargeTime) { }
 		public virtual void IsHitByQuickAttack(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsHitWhileDefending(ref Animator animator, ref Controller2D controller2D, ref IBanditSprite banditSprite) { }
+		public virtual void IsHitByUpwardAttack(ref Animator animator, ref IBanditSprite banditSprite) { }
+		public virtual void IsHitByKnockAttack(ref Animator animator, ref IBanditSprite banditSprite) { }
 	}
 }
 

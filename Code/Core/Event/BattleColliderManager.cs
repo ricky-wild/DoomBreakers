@@ -113,7 +113,13 @@ namespace DoomBreakers
                 }
             }
         }
-        public static int GetAssignedPlayerFaceDir(int forPlayerId) => _playerFaceDir[forPlayerId];
+        public static int GetAssignedPlayerFaceDir(int forPlayerId)
+		{
+            if (_playerFaceDir.ContainsKey(forPlayerId))
+                return _playerFaceDir[forPlayerId];
+            else
+                return 1;
+        }
         public static int GetRecentCollidedPlayerId() => _mostRecentCollidedPlayerId;
         public static void SetPlayerHeldAttackButtonTime(float time) => _playerAttackButtonHeldTime = time;
         public static float GetPlayerHeldAttackButtonTime() => _playerAttackButtonHeldTime;

@@ -32,6 +32,10 @@ namespace DoomBreakers
 				thanThisSword.GetMaterialType() == EquipmentMaterialType.Bronze)
 				return true;
 
+			if (isThisSwordBetter.GetMaterialType() == EquipmentMaterialType.Bronze &&
+				thanThisSword.GetMaterialType() != EquipmentMaterialType.Bronze)
+				return false;
+
 
 			return false; //Return false will allow the player to aquire the sword.
 		}
@@ -53,6 +57,24 @@ namespace DoomBreakers
 
 
 			return false; //Return false will allow the player to aquire the sword.
+		}
+
+		public bool CompareArmors(ref Breastplate isThisArmorBetter, ref Breastplate thanThisArmor)
+		{
+			if (isThisArmorBetter.GetMaterialType() == EquipmentMaterialType.Ebony &&
+				thanThisArmor.GetMaterialType() != EquipmentMaterialType.Ebony)
+				return true;
+
+			if (isThisArmorBetter.GetMaterialType() == EquipmentMaterialType.Steel &&
+					thanThisArmor.GetMaterialType() == EquipmentMaterialType.Iron ||
+					thanThisArmor.GetMaterialType() == EquipmentMaterialType.Bronze)
+				return true;
+
+			if (isThisArmorBetter.GetMaterialType() == EquipmentMaterialType.Iron &&
+				thanThisArmor.GetMaterialType() == EquipmentMaterialType.Bronze)
+				return true;
+
+			return false;
 		}
 	}
 }

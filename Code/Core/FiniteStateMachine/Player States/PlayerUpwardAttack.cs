@@ -17,7 +17,7 @@ namespace DoomBreakers
 		{
 			animator.Play("SmallAttackUpward");
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed));
-			playerSprite.SetBehaviourTextureFlash(0.25f, Color.white);
+			playerSprite.SetBehaviourTextureFlash(0.1f, Color.white);
 			_behaviourTimer.StartTimer(0.66f);//anim length
 			if (_behaviourTimer.HasTimerFinished())
 			{
