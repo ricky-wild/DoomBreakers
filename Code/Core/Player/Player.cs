@@ -29,9 +29,10 @@ namespace DoomBreakers
         private IPlayerEquipment _playerEquipment;
         private IPlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
+        private IPlayerStats _playerStats;
         private ITimer _buttonHeldTimer;
 
-        private Action _actionListener;
+        private Action[] _actionListener = new Action[2];
 
         private void InitializePlayer()
 		{
@@ -47,20 +48,21 @@ namespace DoomBreakers
             _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
             _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
             _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
+            _playerStats = new PlayerStats(100.0, 100.0, 0.0);
 
             _buttonHeldTimer = new Timer();
 
-            _actionListener = new Action(AttackedByBandit);//AttackedByBandit()
+            _actionListener[0] = new Action(AttackedByBandit);//AttackedByBandit()
         }
         private void OnEnable()
         {
             ////Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
             //BattleColliderManager.Subscribe("ReportCollisionWithPlayer" + _playerID.ToString(), _actionListener);
-            BattleColliderManager.Subscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener);
+            BattleColliderManager.Subscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener[0]);
         }
         private void OnDisable()
         {
-            BattleColliderManager.Unsubscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener);
+            BattleColliderManager.Unsubscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener[0]);
         }
         private void Awake()
 		{
