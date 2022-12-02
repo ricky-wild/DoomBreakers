@@ -72,24 +72,31 @@ namespace DoomBreakers
 
         }
 
-        protected void ProcessQuickAttackFromBandit(ref BanditBaseState attackingBanditState, int banditFaceDir, int playerFaceDir)
+        protected bool ProcessQuickAttackFromBandit(ref BanditBaseState attackingBanditState, int banditFaceDir, int playerFaceDir)
 		{
             if (attackingBanditState.GetType() == typeof(BanditQuickAttack))
             {
                 if (!IsDefendingSelf())
+				{
                     SetState(new PlayerHitByQuickAttack(this, _velocity));
+                    return true;
+                }
                 else//if (IsDefendingSelf())
                 {
                     if (IsDefendingCorrectDirection(banditFaceDir, playerFaceDir))
                         SetState(new PlayerHitDefending(this, _velocity));
                     else
+					{
                         SetState(new PlayerHitByQuickAttack(this, _velocity));
+                        return true;
+                    }
                 }
             }
+            return false;
         }
-        protected void ProcessPowerAttackFromBandit(ref BanditBaseState attackingBanditState, int banditFaceDir, int playerFaceDir)
+        protected bool ProcessPowerAttackFromBandit(ref BanditBaseState attackingBanditState, int banditFaceDir, int playerFaceDir)
         {
-            if (attackingBanditState.GetType() == typeof(BanditReleaseAttack)) SetState(new PlayerHitByPowerAttack(this, _velocity));
+            if (attackingBanditState.GetType() == typeof(BanditReleaseAttack)) SetState(new PlayerHitByPowerAttack(this, _velocity)); return true;
         }
         protected bool IsDefendingCorrectDirection(int enemyFaceDir, int playerFaceDir)
         {

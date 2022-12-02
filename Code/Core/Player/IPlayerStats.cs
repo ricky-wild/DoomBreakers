@@ -1,7 +1,7 @@
 ﻿
 namespace DoomBreakers
 {
-	interface IPlayerStats
+	public interface IPlayerStats
 	{
 		double Health
 		{

@@ -1,10 +1,10 @@
 ﻿//using System.Collections;
 //using System.Collections.Generic;
-//using UnityEngine;
+using UnityEngine;
 
 namespace DoomBreakers
 {
-	public class PlayerStats : IPlayerStats //: MonoBehaviour 
+	public class PlayerStats : MonoBehaviour, IPlayerStats //
 	{
 		private const double _maxHealth = 1.0;
 		private const double _minHealth = 0;
@@ -33,6 +33,7 @@ namespace DoomBreakers
 					_health = _maxHealth;
 				if (_health < _minHealth)
 					_health = _minHealth;
+				print("\nHEALTH=" + _health);
 			}
 			get
 			{
@@ -44,11 +45,12 @@ namespace DoomBreakers
 		{
 			set
 			{
-				_stamina = value;
+				_stamina = value; 
 				if (_stamina > _maxStamina)
 					_stamina = _maxStamina;
 				if (_stamina < _minStamina)
 					_stamina = _minStamina;
+				print("\nSTAMINA=" + _stamina);
 			}
 			get
 			{
@@ -65,6 +67,7 @@ namespace DoomBreakers
 					_defence = _maxDefence;
 				if (_defence < _minDefence)
 					_defence = _minDefence;
+				print("\nDEFENSE=" + _defence);
 			}
 			get
 			{

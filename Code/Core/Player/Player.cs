@@ -29,7 +29,7 @@ namespace DoomBreakers
         private IPlayerEquipment _playerEquipment;
         private IPlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
-        private IPlayerStats _playerStats;
+        private PlayerStats _playerStats;
         private ITimer _buttonHeldTimer;
 
         private Action[] _actionListener = new Action[2];
@@ -219,9 +219,18 @@ namespace DoomBreakers
             if (IsIgnoreDamage())
                 return;
 
-            ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection());
-            ProcessPowerAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection());
+            double banditQuickAttackDamage = 0.0025;
+            double banditPowerAttackDamage = 0.005;
 
+            if (ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
+			{
+                _playerStats.Health -= banditQuickAttackDamage;
+			}
+            if(ProcessPowerAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
+			{
+                _playerStats.Health -= banditPowerAttackDamage;
+            }
+            UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
         }
 
 

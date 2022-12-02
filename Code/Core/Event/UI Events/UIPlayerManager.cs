@@ -15,6 +15,8 @@ namespace DoomBreakers
         private static UIPlayerManager _UIPlayerEventManager;
 
         private Dictionary<string, Action> _UIEventDictionary;
+
+        private static Dictionary<int, PlayerStats> _playerStatsEventDictionary;
         public static UIPlayerManager _instance
         {
             get //When we access our instance from another place, we'll setup as appropriate if required.
@@ -35,8 +37,8 @@ namespace DoomBreakers
         }
         private void Setup()
         {
-            if (_UIEventDictionary == null)
-                _UIEventDictionary = new Dictionary<string, Action>();
+            if (_UIEventDictionary == null) _UIEventDictionary = new Dictionary<string, Action>();
+            if (_playerStatsEventDictionary == null) _playerStatsEventDictionary = new Dictionary<int, PlayerStats>();
         }
 
         public static void Subscribe(string eventName, Action listener)
@@ -77,14 +79,28 @@ namespace DoomBreakers
             }
         }
 
-        public static void TriggerEvent(string eventName)
+        public static void TriggerEvent(string eventName, ref PlayerStats playerStats, int playerId)
         {
             Action thisEvent = null;
             if (_instance._UIEventDictionary.TryGetValue(eventName, out thisEvent))
             {
+                if(!_playerStatsEventDictionary.ContainsKey(playerId)) _playerStatsEventDictionary.Add(playerId, playerStats);
+                else
+				{
+                    if(_playerStatsEventDictionary[playerId] != playerStats)
+					{
+                        _playerStatsEventDictionary.Remove(playerId);
+                        _playerStatsEventDictionary.Add(playerId, playerStats);
+					}
+				}
                 _instance._UIEventDictionary[eventName]();
                 //thisEvent.Invoke();
             }
         }
+
+        public static PlayerStats GetPlayerStats(int playerId)
+		{
+            return _playerStatsEventDictionary[playerId];
+		}
     }
 }

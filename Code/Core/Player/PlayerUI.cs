@@ -44,8 +44,16 @@ namespace DoomBreakers
 		[Header("Torso Equipment Animator")]
 		public Animator _torsoEquipAnim;
 
+		[Header("Health Image")]
+		public Image _healthUIImage;
+		[Header("Stamina Image")]
+		public Image _staminaUIImage;
+		[Header("Defense Image")]
+		public Image _defenseUIImage;
 
-		private Action[] _actionListener = new Action[0];
+		private PlayerStats _playerStats;
+
+		private Action[] _actionListener = new Action[1];
 
 		private void InitializeUI()
 		{
@@ -59,17 +67,33 @@ namespace DoomBreakers
 			_rightHandEquipAnim.Play("nothing");//_rightHandEquipAnim.gameObject.SetActive(false);
 			_torsoEquipAnim.Play("nothing");//_torsoEquipAnim.gameObject.SetActive(false);
 
-
+			_healthUIImage.fillAmount = 1.0f;
+			_staminaUIImage.fillAmount = 1.0f;
+			_defenseUIImage.fillAmount = 0.0f;
+			_playerStats = new PlayerStats(0, 0, 0);
 
 			_actionListener[0] = new Action(UIPlayerEvent);//UIPlayerEvent()
 		}
 
 		private void Awake() => InitializeUI();
 
-		private void UIPlayerEvent() { }
+		private void UIPlayerEvent() 
+		{
+			_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
 
-		private void OnEnable() => UIPlayerManager.Subscribe("ReportUIPlayerEvent", _actionListener[0]);
-		private void OnDisable() => UIPlayerManager.Unsubscribe("ReportUIPlayerEvent", _actionListener[0]);
+			//Then this indicates health has lowered.
+			if (_playerStats.Health > UIPlayerManager.GetPlayerStats(_playerID).Health) PlayUIAnimation(UIAnimationFlag.UIFrame, "hit");
+
+			UIHealthUpdate((float)_playerStats.Health);
+			UIStaminaUpdate((float)_playerStats.Stamina);
+			UIDefenseUpdate((float)_playerStats.Defence);
+		}
+		private void UIHealthUpdate(float value) => _healthUIImage.fillAmount = value;
+		private void UIStaminaUpdate(float value) => _staminaUIImage.fillAmount = value;
+		private void UIDefenseUpdate(float value) => _defenseUIImage.fillAmount = value;
+
+		private void OnEnable() => UIPlayerManager.Subscribe("ReportUIPlayerStatEvent", _actionListener[0]);
+		private void OnDisable() => UIPlayerManager.Unsubscribe("ReportUIPlayerStatEvent", _actionListener[0]);
 
 		void Start()
 		{
