@@ -12,11 +12,14 @@ namespace DoomBreakers
         //between each Player.cs class that relates to each PlayerUI.cs panel.
         //</summary>
 
+
+
         private static UIPlayerManager _UIPlayerEventManager;
 
         private Dictionary<string, Action> _UIEventDictionary;
 
         private static Dictionary<int, PlayerStats> _playerStatsEventDictionary;
+        private static UIAnimationFlag[] _equipmentGainedEvent;// = new EquipmentGainedFlag[4]; //Max 4 players
         public static UIPlayerManager _instance
         {
             get //When we access our instance from another place, we'll setup as appropriate if required.
@@ -39,6 +42,7 @@ namespace DoomBreakers
         {
             if (_UIEventDictionary == null) _UIEventDictionary = new Dictionary<string, Action>();
             if (_playerStatsEventDictionary == null) _playerStatsEventDictionary = new Dictionary<int, PlayerStats>();
+            _equipmentGainedEvent = new UIAnimationFlag[4]; //Max 4 players
         }
 
         public static void Subscribe(string eventName, Action listener)
@@ -98,9 +102,25 @@ namespace DoomBreakers
             }
         }
 
-        public static PlayerStats GetPlayerStats(int playerId)
+        public static PlayerStats GetPlayerStats(int playerId) => _playerStatsEventDictionary[playerId];
+        public static void SetPlayerStats(ref PlayerStats playerStats, int playerId) => _playerStatsEventDictionary[playerId] = playerStats;
+
+        public static void TriggerEvent(string eventName, UIAnimationFlag equipmentGainedFlag, int playerId)
+        {
+            Action thisEvent = null;
+            if (_instance._UIEventDictionary.TryGetValue(eventName, out thisEvent))
+            {
+                if (_equipmentGainedEvent[playerId] != equipmentGainedFlag)
+                    _equipmentGainedEvent[playerId] = equipmentGainedFlag;
+                _instance._UIEventDictionary[eventName]();
+                //thisEvent.Invoke();
+            }
+        }
+        public static UIAnimationFlag GetEquipmentGainedFlag(int playerId)
 		{
-            return _playerStatsEventDictionary[playerId];
-		}
+            UIAnimationFlag temp = _equipmentGainedEvent[playerId];
+            _equipmentGainedEvent[playerId] = UIAnimationFlag.None;
+            return temp;
+        }
     }
 }

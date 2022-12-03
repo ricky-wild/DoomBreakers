@@ -4,7 +4,7 @@ namespace DoomBreakers
 {
 	public interface IPlayerCollision //: MonoBehaviour
 	{
-		void Setup(Collider2D collider2D, ref Transform[] arrayAtkPoints);
+		void Setup(Collider2D collider2D, ref Transform[] arrayAtkPoints, int playerId);
 		void SetupLayerMasks();
 		void SetupAttackRadius();
 		void SetupCompareTags();

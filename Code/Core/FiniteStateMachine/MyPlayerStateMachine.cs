@@ -84,7 +84,10 @@ namespace DoomBreakers
                 else//if (IsDefendingSelf())
                 {
                     if (IsDefendingCorrectDirection(banditFaceDir, playerFaceDir))
+					{
                         SetState(new PlayerHitDefending(this, _velocity));
+                        return false;
+                    }
                     else
 					{
                         SetState(new PlayerHitByQuickAttack(this, _velocity));

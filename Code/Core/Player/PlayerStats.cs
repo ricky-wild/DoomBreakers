@@ -18,11 +18,14 @@ namespace DoomBreakers
 		private double _stamina;
 		private double _defence;
 
+		private bool _armored;
+
 		public PlayerStats(double health, double stamina, double defence)
 		{
 			_health = health;
 			_stamina = stamina;
 			_defence = defence;
+			_armored = false;
 		}
 		public double Health
 		{
@@ -33,7 +36,7 @@ namespace DoomBreakers
 					_health = _maxHealth;
 				if (_health < _minHealth)
 					_health = _minHealth;
-				print("\nHEALTH=" + _health);
+				//print("\nHEALTH=" + _health);
 			}
 			get
 			{
@@ -50,7 +53,7 @@ namespace DoomBreakers
 					_stamina = _maxStamina;
 				if (_stamina < _minStamina)
 					_stamina = _minStamina;
-				print("\nSTAMINA=" + _stamina);
+				//print("\nSTAMINA=" + _stamina);
 			}
 			get
 			{
@@ -67,7 +70,10 @@ namespace DoomBreakers
 					_defence = _maxDefence;
 				if (_defence < _minDefence)
 					_defence = _minDefence;
-				print("\nDEFENSE=" + _defence);
+
+				if (_defence <= 0)
+					_armored = false;
+				//print("\nDEFENSE=" + _defence);
 			}
 			get
 			{
@@ -75,6 +81,12 @@ namespace DoomBreakers
 			}
 		}
 
+		public bool IsArmored() => _armored;
+		public void IsArmored(bool b)
+		{
+			_armored = b;
+			_defence = _maxDefence;
+		}
 
 	}
 }

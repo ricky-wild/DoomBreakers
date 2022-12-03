@@ -16,7 +16,7 @@ namespace DoomBreakers
 
     public class PlayerCollision : MonoBehaviour, IPlayerCollision
     {
-
+        private int _playerID;
         private CompareTags _compareTags;
 
         private Collider2D _collider2d;
@@ -40,8 +40,9 @@ namespace DoomBreakers
         private IPlayerEquipment _playerEquipment;
 
         //public PlayerCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints) { }
-        public void Setup(Collider2D collider2D, ref Transform[] arrayAtkPoints)
+        public void Setup(Collider2D collider2D, ref Transform[] arrayAtkPoints, int playerId)
 		{
+            _playerID = playerId;
             _collider2d = collider2D;
             _attackPoints = arrayAtkPoints;
 
@@ -184,6 +185,7 @@ namespace DoomBreakers
 
             if(_playerEquipment.ApplySword(collision.GetComponent<Sword>()))
 			{
+                //UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.Sword,_playerID);
                 collision.GetComponent<Sword>().Destroy();
                 _itemCollisionEnabled = true; //Flag so we update players equipment.
             }
@@ -196,6 +198,7 @@ namespace DoomBreakers
 
             if(_playerEquipment.ApplyShield(collision.GetComponent<Shield>()))
 			{
+                //UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandShield, _playerID);
                 collision.GetComponent<Shield>().Destroy();
                 _itemCollisionEnabled = true;
             }
@@ -208,6 +211,7 @@ namespace DoomBreakers
 
             if(_playerEquipment.ApplyArmor(collision.GetComponent<Breastplate>()))
 			{
+                //UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.Sword, _playerID);
                 collision.GetComponent<Breastplate>().Destroy();
                 _itemCollisionEnabled = true;
             }
