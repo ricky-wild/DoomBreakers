@@ -115,6 +115,7 @@ namespace DoomBreakers
 			if (_UIAnimFlag == UIAnimationFlag.UITorsoEquip)
 			{
 				PlayUIAnimation("armor");
+				_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
 				_playerStats.IsArmored(true);
 				UIPlayerManager.SetPlayerStats(ref _playerStats, _playerID);
 			}
@@ -125,11 +126,15 @@ namespace DoomBreakers
 			//Then this indicates health has lowered.
 			if (_prevPlayerStats.Health > UIPlayerManager.GetPlayerStats(_playerID).Health)
 			{
-				_UIAnimFlag = UIAnimationFlag.UIFrame;
-				PlayUIAnimation(GetFrameAnim(UIFrameAnimID.Hit));//("P" + (_playerID + 1).ToString() + "_Hit"); //anim length 1.017 sec
-				_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
-				_prevPlayerStats.Health = _playerStats.Health;
-				_timer.StartTimer(1.0f); //We don't loop P1_Hit anim.
+				if(!_playerStats.IsArmored())
+				{
+					_UIAnimFlag = UIAnimationFlag.UIFrame;
+					PlayUIAnimation(GetFrameAnim(UIFrameAnimID.Hit));//("P" + (_playerID + 1).ToString() + "_Hit"); //anim length 1.017 sec
+					_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
+					_prevPlayerStats.Health = _playerStats.Health;
+					_timer.StartTimer(1.0f); //We don't loop P1_Hit anim.
+
+				}
 			}
 			//Then this indicates stamina has lowered.
 			if (_prevPlayerStats.Stamina > UIPlayerManager.GetPlayerStats(_playerID).Stamina)
@@ -142,13 +147,6 @@ namespace DoomBreakers
 			{
 				_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
 				_prevPlayerStats.Defence = _playerStats.Defence;
-			}
-			else
-			{
-				if(UIPlayerManager.GetPlayerStats(_playerID).Defence <= 0)
-				{
-
-				}
 			}
 
 			UIHealthUpdate((float)_playerStats.Health);

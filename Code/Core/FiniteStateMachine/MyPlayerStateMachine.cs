@@ -23,6 +23,7 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerReleaseAttack) &&
                 _state.GetType() != typeof(PlayerDefend) &&
                 _state.GetType() != typeof(PlayerGainedEquipment) &&
+                _state.GetType() != typeof(PlayerBrokenEquipment) &&
                 _state.GetType() != typeof(PlayerHitByQuickAttack) &&
                 _state.GetType() != typeof(PlayerHitByPowerAttack) &&
                 _state.GetType() != typeof(PlayerHitDefending))
@@ -44,6 +45,7 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerReleaseAttack) &&
                 _state.GetType() != typeof(PlayerDefend) &&
                 _state.GetType() != typeof(PlayerGainedEquipment) &&
+                _state.GetType() != typeof(PlayerBrokenEquipment) &&
                 _state.GetType() != typeof(PlayerHitByQuickAttack) &&
                 _state.GetType() != typeof(PlayerHitByPowerAttack) &&
                 _state.GetType() != typeof(PlayerHitDefending))
@@ -65,6 +67,8 @@ namespace DoomBreakers
         {
             if (_state.GetType() != typeof(PlayerJump) &&
                 _state.GetType() != typeof(PlayerReleaseAttack) &&
+                _state.GetType() != typeof(PlayerGainedEquipment) &&
+                _state.GetType() != typeof(PlayerBrokenEquipment) &&
                 _state.GetType() != typeof(PlayerFall))
                 return true;
 
@@ -99,7 +103,28 @@ namespace DoomBreakers
         }
         protected bool ProcessPowerAttackFromBandit(ref BanditBaseState attackingBanditState, int banditFaceDir, int playerFaceDir)
         {
-            if (attackingBanditState.GetType() == typeof(BanditReleaseAttack)) SetState(new PlayerHitByPowerAttack(this, _velocity)); return true;
+            if (attackingBanditState.GetType() == typeof(BanditReleaseAttack))
+            {
+                if (!IsDefendingSelf())
+                {
+                    SetState(new PlayerHitByPowerAttack(this, _velocity));
+                    return true;
+                }
+                else//if (IsDefendingSelf())
+                {
+                    if (IsDefendingCorrectDirection(banditFaceDir, playerFaceDir))
+                    {
+                        SetState(new PlayerHitDefending(this, _velocity));
+                        return false;
+                    }
+                    else
+                    {
+                        SetState(new PlayerHitByPowerAttack(this, _velocity));
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         protected bool IsDefendingCorrectDirection(int enemyFaceDir, int playerFaceDir)
         {
@@ -131,6 +156,8 @@ namespace DoomBreakers
             if (_state.GetType() == typeof(PlayerDodged))
                 return true;
             if (_state.GetType() == typeof(PlayerGainedEquipment))
+                return true;
+            if (_state.GetType() == typeof(PlayerBrokenEquipment))
                 return true;
 
 

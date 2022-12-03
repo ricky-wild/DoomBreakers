@@ -44,7 +44,7 @@ namespace DoomBreakers
             _leftHandEquip = leftHandEquip;
             _rightHandEquip = rightHandEquip;
         }
-
+        public void RemoveArmor() => _torsoEquipment = new EmptyHand(EquipmentWeaponType.None, EquipmentMaterialType.None);
         public bool NewEquipmentGained()
 		{
             return _equipmentGainedFlag;

@@ -71,8 +71,8 @@ namespace DoomBreakers
 				if (_defence < _minDefence)
 					_defence = _minDefence;
 
-				if (_defence <= 0)
-					_armored = false;
+				//if (_defence <= 0)
+				//	_armored = false;
 				//print("\nDEFENSE=" + _defence);
 			}
 			get
@@ -85,7 +85,8 @@ namespace DoomBreakers
 		public void IsArmored(bool b)
 		{
 			_armored = b;
-			_defence = _maxDefence;
+			if (b) _defence = _maxDefence;
+			else _defence = _minDefence;
 		}
 
 	}

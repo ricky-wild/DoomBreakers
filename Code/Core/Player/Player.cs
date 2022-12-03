@@ -194,6 +194,7 @@ namespace DoomBreakers
 		{
             _state.IsIdle(ref _animator);
             _state.IsGainedEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
+            _state.IsBrokenEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
             _state.IsMoving(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
             _state.IsJumping(ref _animator, ref _controller2D, ref _inputVector2);
             _state.IsFalling(ref _animator, ref _controller2D, ref _inputVector2);
@@ -235,25 +236,26 @@ namespace DoomBreakers
 
             double banditQuickAttackDamage = 0.0025;
             double banditPowerAttackDamage = 0.005;
+            bool process = false;
 
-            if (ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
+            if(process = ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
 			{
                 if(!_playerStats.IsArmored()) _playerStats.Health -= banditQuickAttackDamage;
                 else
                     _playerStats.Defence -= banditQuickAttackDamage;
             }
-            if(ProcessPowerAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
+            if(process = ProcessPowerAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
 			{
                 if (!_playerStats.IsArmored()) _playerStats.Health -= banditPowerAttackDamage;
                 else
                     _playerStats.Defence -= banditPowerAttackDamage;
             }
-            UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
+            if(process) UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
         }
-        private void UpdateStats()
+        private void UpdateStats() //Encapsulate all of this into the PlayerStat class.
 		{
             UpdateStamina();
-
+            UpdateDefense();
         }
         private void UpdateStamina()
 		{
@@ -264,8 +266,18 @@ namespace DoomBreakers
                 _staminaTimer.StartTimer(0.05f);
             }
         }
+		private void UpdateDefense()
+		{
+			if(_playerStats.Defence <= 0 && _playerStats.IsArmored())
+			{
+                SetState(new PlayerBrokenEquipment(this, _velocity));
+                _playerStats.IsArmored(false);
+                _playerEquipment.RemoveArmor();
+                _playerAnimator.SetAnimatorController(ref _playerEquipment);
+			}
+		}
 
-        private void OnDrawGizmosSelected()
+		private void OnDrawGizmosSelected()
         {
             for (int i = 0; i < _attackPoints.Length; i++)
             {

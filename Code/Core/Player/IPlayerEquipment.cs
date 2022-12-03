@@ -5,6 +5,7 @@ namespace DoomBreakers
     public interface IPlayerEquipment
 	{
 		//void ApplyEquipment(PlayerEquipType playerEquip, PlayerItem equip);
+		void RemoveArmor();
 		bool NewEquipmentGained();
 		void NewEquipmentGained(bool flag);
 		bool ApplySword(ItemBase playerEquip);
