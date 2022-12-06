@@ -11,6 +11,7 @@ namespace DoomBreakers
 
         protected float ProcessPowerAttackFromPlayer(ref BaseState playerAttackState, int banditId)
         {
+            if (IsDying()) return 0f;
             if (playerAttackState.GetType() == typeof(PlayerReleaseAttack))
             {
                 float playerAttackedButtonTime = BattleColliderManager.GetPlayerHeldAttackButtonTime();
@@ -19,37 +20,67 @@ namespace DoomBreakers
             }
             return 0f;
         }
-        protected void ProcessUpwardAttackFromPlayer(ref BaseState playerAttackState, int banditId)
+        protected bool ProcessUpwardAttackFromPlayer(ref BaseState playerAttackState, int banditId)
 		{
-            if (playerAttackState.GetType() == typeof(PlayerUpwardAttack)) SetState(new BanditHitByUpwardAttack(this, _velocity, banditId));
+            if (IsDying()) return false;
+            if (playerAttackState.GetType() == typeof(PlayerUpwardAttack))
+			{
+                SetState(new BanditHitByUpwardAttack(this, _velocity, banditId));
+                return true;
+            }
+            return false;
         }
-        protected void ProcessKnockAttackFromPlayer(ref BaseState playerAttackState, int playerId, int playerFaceDir,  int banditId, int banditFaceDir)
+        protected bool ProcessKnockAttackFromPlayer(ref BaseState playerAttackState, int playerId, int playerFaceDir,  int banditId, int banditFaceDir)
         {
+            if (IsDying()) return false;
             if (playerAttackState.GetType() == typeof(PlayerKnockAttack))
             {
-                if (NotDefending()) SetState(new BanditHitByKnockAttack(this, _velocity, banditId));
+                if (NotDefending())
+				{
+                    SetState(new BanditHitByKnockAttack(this, _velocity, banditId)); 
+                    return true;
+                }
                 else
                 {
                     if (IsDefendingCorrectDirection(playerFaceDir, banditFaceDir))
+                    {
                         SetState(new BanditHitDefending(this, _velocity, banditId));
+                        return false;
+                    }
                     else
+                    {
                         SetState(new BanditHitByKnockAttack(this, _velocity, banditId));
+                        return true;
+                    }
                 }
             }
+            return false;
         }
-        protected void ProcessQuickAttackFromPlayer(ref BaseState playerAttackState, int playerId, int playerFaceDir, int banditId, int banditFaceDir)
+        protected bool ProcessQuickAttackFromPlayer(ref BaseState playerAttackState, int playerId, int playerFaceDir, int banditId, int banditFaceDir)
 		{
+            if (IsDying()) return false;
             if (playerAttackState.GetType() == typeof(PlayerQuickAttack))
             {
-                if (NotDefending()) SetState(new BanditHitByQuickAttack(this, _velocity, banditId));
+                if (NotDefending())
+				{
+                    SetState(new BanditHitByQuickAttack(this, _velocity, banditId));
+                    return true;
+                }
                 else
                 {
                     if (IsDefendingCorrectDirection(playerFaceDir, banditFaceDir))
+					{
                         SetState(new BanditHitDefending(this, _velocity, banditId));
+                        return false;
+                    }
                     else
+					{
                         SetState(new BanditHitByQuickAttack(this, _velocity, banditId));
+                        return true;
+					}
                 }
             }
+            return false;
         }
         protected bool IsDefendingCorrectDirection(int playerFaceDir, int banditFaceDir)
         {
@@ -69,9 +100,20 @@ namespace DoomBreakers
                 return false;
             if (_state.GetType() == typeof(BanditReleaseAttack))
                 return false;
+            if (_state.GetType() == typeof(BanditDying))
+                return false;
+            if (_state.GetType() == typeof(BanditDead))
+                return false;
 
             return true;
         }
+        protected bool SafeToSetDying()
+		{
+            if (_state.GetType() != typeof(BanditDying))
+                return true;
+
+            return false;
+		}
 
         protected bool NotDefending()
 		{
@@ -83,6 +125,14 @@ namespace DoomBreakers
         protected bool IsDefending()
         {
             if (_state.GetType() == typeof(BanditDefending))
+                return true;
+            return false;
+        }
+        protected bool IsDying()
+        {
+            if (_state.GetType() == typeof(BanditDying))
+                return true;
+            if (_state.GetType() == typeof(BanditDead))
                 return true;
             return false;
         }

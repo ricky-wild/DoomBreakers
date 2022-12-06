@@ -4,11 +4,14 @@ namespace DoomBreakers
 {
 	public class PlayerDodged : BaseState//, IPlayerDodge
 	{
+
+		private float _dodgedXValue;
 		public PlayerDodged(StateMachine s, Vector3 v, bool dodgedLeft) : base(velocity: v)//=> _stateMachine = s; 
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_dodgedLeftFlag = dodgedLeft;
+			_dodgedXValue = 100.0f;
 			//print("\nDodged State.");
 		}
 
@@ -18,9 +21,9 @@ namespace DoomBreakers
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed));
 
 			if (_dodgedLeftFlag)
-				_velocity.x -= 66.0f;
+				_velocity.x -= _dodgedXValue;
 			if (!_dodgedLeftFlag)
-				_velocity.x += 66.0f;
+				_velocity.x += _dodgedXValue;
 
 			_stateMachine.SetState(new PlayerIdle(_stateMachine, _velocity));
 			//base.UpdateBehaviour();

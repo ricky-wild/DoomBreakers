@@ -10,7 +10,7 @@ namespace DoomBreakers
 
         private float _timeStamp;
         private float _waitTime;
-        private bool _timeStamped, _timerCompleted;
+        private bool _timeStamped;
         private float _recordedTimePassed;
 
         public Timer()
@@ -18,7 +18,6 @@ namespace DoomBreakers
             _timeStamp = 0f;
             _waitTime = 0f;
             _timeStamped = false;
-            _timerCompleted = false;
             _recordedTimePassed = 0f;
         }
 
@@ -28,7 +27,6 @@ namespace DoomBreakers
             _timeStamp = 0f;
             _waitTime = 0f;
             _timeStamped = false;
-            _timerCompleted = false;
         }
 
         public void StartTimer(float waitingTime)
@@ -36,31 +34,22 @@ namespace DoomBreakers
             if (_timeStamped) //Guard Clause
                 return;
 
-            _timerCompleted = false;
             _waitTime = waitingTime;
             _timeStamp = Time.time;
             _timeStamped = true;
         }
 
-        void Update()
+        void Update() { }
+
+        public bool HasTimerFinished() => DetectTimePassed();
+        public bool HasTimerFinished(bool safeCheck)
 		{
-            //if (!_timeStamped) //Guard Clause
-            //    return;
-
-            //if (DetectTimePassed())
-            //    _timerCompleted = true;
-
-        }
-
-        public bool HasTimerFinished()
-		{
-            return DetectTimePassed();//_timerCompleted;
+			if (_timeStamped) return false;
+            return DetectTimePassed();
         }
 
         private bool DetectTimePassed()
 		{
-            //if (!_timeStamped)
-            //    return false;
 
             if (Time.time > _timeStamp + _waitTime)
             {
@@ -73,10 +62,7 @@ namespace DoomBreakers
             return false;
 		}
 
-        public float GetTheWaitTime()
-		{
-            return _waitTime;
-		}
+        public float GetTheWaitTime() => _waitTime;
 
 
 

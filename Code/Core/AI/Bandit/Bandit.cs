@@ -15,6 +15,11 @@ namespace DoomBreakers
         [Tooltip("ID ranges from 0 to ?")]  //Max ? enemies.
         public int _banditID;               //Set in editor per enemy?
 
+        [Header("Health Meter")]
+        [Tooltip("The transforms used representing enemy health")]
+        public Transform[] _healthTransform;
+        private BanditStats _banditStats;
+
         [Header("Enemy Attack Points")]
         [Tooltip("Vectors that represent point of attack radius")]
         public Transform[] _attackPoints; //1=quickATK, 2=powerATK, 3=upwardATK
@@ -26,6 +31,7 @@ namespace DoomBreakers
         private IBanditAnimator _banditAnimator;
         private IBanditSprite _banditSprite;
         private float _playerAttackedButtonTime;
+        private ITimer _healthDisplayTimer;
 
         private Action[] _actionListener = new Action[2];
 
@@ -39,6 +45,10 @@ namespace DoomBreakers
             _banditAnimator = new BanditAnimator(this.GetComponent<Animator>());
             _banditSprite = this.gameObject.AddComponent<BanditSprite>();
             _banditSprite.Setup(this.GetComponent<SpriteRenderer>(), _banditID);
+            _banditStats = new BanditStats(ref _healthTransform, 100.0, 100.0, 0.0);
+            _healthDisplayTimer = this.gameObject.AddComponent<Timer>();
+            //_healthDisplayTimer.StartTimer(0.05f);
+
 
             _actionListener[0] = new Action(AttackedByPlayer);//AttackedByPlayer()
             _actionListener[1] = new Action(DetectedAnPlayer);//DetectedAnPlayer()
@@ -69,6 +79,7 @@ namespace DoomBreakers
         {
             UpdateStateBehaviours();
             UpdateCollisions();
+            UpdateStats();
         }
         public void UpdateStateBehaviours()
 		{
@@ -88,6 +99,9 @@ namespace DoomBreakers
             _state.IsHitByUpwardAttack(ref _animator, ref _banditSprite);
             _state.IsHitByKnockAttack(ref _animator, ref _banditSprite);
 
+            _state.IsDying(ref _animator, ref _banditSprite);
+            _state.IsDead(ref _animator, ref _banditSprite);
+
             _state.UpdateBehaviour(ref _controller2D, ref _animator);
         }
 
@@ -95,7 +109,23 @@ namespace DoomBreakers
 		{
             _banditCollider.UpdateCollision(ref _state, _banditSprite);
         }
+        private void UpdateStats()
+		{
+            if (!_banditStats.Process()) return;
 
+            if(_healthDisplayTimer.HasTimerFinished())
+                _banditStats.DisplayFillBar(false);
+
+            if (_banditStats.Health <= 0f)
+            {
+                if(SafeToSetDying())
+				{
+                    SetState(new BanditDying(this, _velocity, _banditID));
+                    _banditStats.DisplayFillBar(false);
+                    _banditStats.Disable();
+                }
+            }
+        }
         private void AttackedByPlayer()
 		{
             //print("\nBandit.cs= AttackedByPlayer() called!");
@@ -105,11 +135,24 @@ namespace DoomBreakers
             int playerFaceDir = BattleColliderManager.GetAssignedPlayerFaceDir(playerId);
             BaseState attackingPlayerState = BattleColliderManager.GetAssignedPlayerState(playerId);
 
-            ProcessQuickAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _banditID, _banditSprite.GetSpriteDirection());
-            _playerAttackedButtonTime = ProcessPowerAttackFromPlayer(ref attackingPlayerState, _banditID);
-            ProcessUpwardAttackFromPlayer(ref attackingPlayerState, _banditID);
-            ProcessKnockAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _banditID, _banditSprite.GetSpriteDirection());
+            double playerQuickAttackDamage = 0.025;
+            double playerPowerAttackDamage = 0.05;
 
+            if(ProcessQuickAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _banditID, _banditSprite.GetSpriteDirection()))
+			{
+                _banditStats.Health -= playerQuickAttackDamage;
+            }
+            _playerAttackedButtonTime = ProcessPowerAttackFromPlayer(ref attackingPlayerState, _banditID);
+            if(_playerAttackedButtonTime != 0f) _banditStats.Health -= playerPowerAttackDamage;
+            if (ProcessUpwardAttackFromPlayer(ref attackingPlayerState, _banditID))
+			{
+                _banditStats.Health -= playerQuickAttackDamage;
+            }
+            if(ProcessKnockAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _banditID, _banditSprite.GetSpriteDirection()))
+			{
+                _banditStats.Health -= playerPowerAttackDamage;
+			}
+            _healthDisplayTimer.StartTimer(1.0f);
         }
         private void DetectedAnPlayer()
 		{
