@@ -68,6 +68,7 @@ namespace DoomBreakers
 		public virtual void IsGainedEquipment(ref Animator animator, ref IPlayerSprite playerSprite, ref IPlayerEquipment playerEquipment) { }
 		public virtual void IsBrokenEquipment(ref Animator animator, ref IPlayerSprite playerSprite, ref IPlayerEquipment playerEquipment) { }
 		public virtual void IsMoving(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider) { }
+		public virtual void IsSprinting(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider) { }
 		public virtual void IsJumping(ref Animator animator, ref Controller2D controller2D, ref Vector2 input) { }
 		public virtual void IsFalling(ref Animator animator, ref Controller2D controller2D, ref Vector2 input) { }
 		public virtual void IsDodging(ref Animator animator, ref Controller2D controller2D, ref Vector2 input, 

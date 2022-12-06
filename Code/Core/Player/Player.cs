@@ -111,7 +111,10 @@ namespace DoomBreakers
                 if (SafeToSetIdle()) SetState(new PlayerIdle(this, _inputVector2));
             }
             if (_rewirdInputPlayer.GetButtonDown("Sprint"))
-               return;
+			{
+                if (SafeToSetSprint())
+                    SetState(new PlayerSprint(this, _inputVector2));
+            }
             if (_rewirdInputPlayer.GetButtonUp("Sprint"))
                 return;
             if (_rewirdInputPlayer.GetButtonDown("Jump"))
@@ -125,7 +128,7 @@ namespace DoomBreakers
                 if (_state.GetType() != typeof(PlayerDodge))
                 {
                     SetState(new PlayerDodge(this, _inputVector2));
-                    _playerStats.Stamina -= 0.05;
+                    _playerStats.Stamina -= 0.125;
                     UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
                 }
             }
@@ -135,7 +138,7 @@ namespace DoomBreakers
                 if (_state.GetType() != typeof(PlayerDodge))
                 {
                     SetState(new PlayerDodge(this, _inputVector2));
-                    _playerStats.Stamina -= 0.05;
+                    _playerStats.Stamina -= 0.125;
                     UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
                 }
             }
@@ -156,7 +159,7 @@ namespace DoomBreakers
 			{
                 SetState(new PlayerKnockAttack(this, _inputVector2));
                 _playerCollider.EnableAttackCollisions();
-                _playerStats.Stamina -= 0.08;
+                _playerStats.Stamina -= 0.1;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
             }
             if (_rewirdInputPlayer.GetButtonDown("Defend"))
@@ -175,7 +178,7 @@ namespace DoomBreakers
 				{
                     _buttonHeldTimer.BeginTimeRecord();
                     SetState(new PlayerHoldAttack(this, _inputVector2));
-                    _playerStats.Stamina -= 0.125;
+                    _playerStats.Stamina -= 0.15;
                     UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
                 }
             }
@@ -196,6 +199,7 @@ namespace DoomBreakers
             _state.IsGainedEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
             _state.IsBrokenEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
             _state.IsMoving(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
+            _state.IsSprinting(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
             _state.IsJumping(ref _animator, ref _controller2D, ref _inputVector2);
             _state.IsFalling(ref _animator, ref _controller2D, ref _inputVector2);
             _state.IsDodging(ref _animator, ref _controller2D, ref _inputVector2, _inputDodgedLeft, ref _playerSprite, ref _playerCollider);

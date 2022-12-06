@@ -34,10 +34,33 @@ namespace DoomBreakers
 
         protected bool SafeToSetMove()
         {
-            if (_state.GetType() != typeof(PlayerMove) && 
+            if (_state.GetType() != typeof(PlayerMove) &&
+                _state.GetType() != typeof(PlayerSprint) &&
                 _state.GetType() != typeof(PlayerFall) && 
                 _state.GetType() != typeof(PlayerJump) && 
                 _state.GetType() != typeof(PlayerDodge) && 
+                _state.GetType() != typeof(PlayerQuickAttack) &&
+                _state.GetType() != typeof(PlayerUpwardAttack) &&
+                _state.GetType() != typeof(PlayerKnockAttack) &&
+                _state.GetType() != typeof(PlayerHoldAttack) &&
+                _state.GetType() != typeof(PlayerReleaseAttack) &&
+                _state.GetType() != typeof(PlayerDefend) &&
+                _state.GetType() != typeof(PlayerGainedEquipment) &&
+                _state.GetType() != typeof(PlayerBrokenEquipment) &&
+                _state.GetType() != typeof(PlayerHitByQuickAttack) &&
+                _state.GetType() != typeof(PlayerHitByPowerAttack) &&
+                _state.GetType() != typeof(PlayerHitDefending))
+                return true;
+            return false;
+        }
+
+        protected bool SafeToSetSprint()
+        {
+            if (
+                _state.GetType() != typeof(PlayerSprint) &&
+                _state.GetType() != typeof(PlayerFall) &&
+                _state.GetType() != typeof(PlayerJump) &&
+                _state.GetType() != typeof(PlayerDodge) &&
                 _state.GetType() != typeof(PlayerQuickAttack) &&
                 _state.GetType() != typeof(PlayerUpwardAttack) &&
                 _state.GetType() != typeof(PlayerKnockAttack) &&

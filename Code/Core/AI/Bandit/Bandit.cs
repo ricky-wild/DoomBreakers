@@ -135,8 +135,8 @@ namespace DoomBreakers
             int playerFaceDir = BattleColliderManager.GetAssignedPlayerFaceDir(playerId);
             BaseState attackingPlayerState = BattleColliderManager.GetAssignedPlayerState(playerId);
 
-            double playerQuickAttackDamage = 0.025;
-            double playerPowerAttackDamage = 0.05;
+            double playerQuickAttackDamage = 0.075;
+            double playerPowerAttackDamage = 0.125;
 
             if(ProcessQuickAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _banditID, _banditSprite.GetSpriteDirection()))
 			{

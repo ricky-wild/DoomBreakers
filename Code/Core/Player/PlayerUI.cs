@@ -148,6 +148,11 @@ namespace DoomBreakers
 				_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
 				_prevPlayerStats.Defence = _playerStats.Defence;
 			}
+			if (_playerStats.Defence <= 0f) _torsoEquipAnim.Play("nothing");
+			//{
+			//_UIAnimFlag = UIAnimationFlag.UITorsoEquip;
+			//PlayUIAnimation("nothing");
+			//}
 
 			UIHealthUpdate((float)_playerStats.Health);
 			UIStaminaUpdate((float)_playerStats.Stamina);
