@@ -14,6 +14,8 @@ namespace DoomBreakers
 		void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite);
 		void UpdateDetectItemTargets(ref IPlayerEquipment playerEquipment);
 		void EnableAttackCollisions();
+		void EnableItemPickupCollision();
+		bool SignalItemPickupCollision();
 		//bool IsAttackCollisionsEnabled();
 		void FlipAttackPoints(int dir);
 	}

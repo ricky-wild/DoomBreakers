@@ -53,7 +53,7 @@ namespace DoomBreakers
 		{
 
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
-			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>());
+			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>(), this.GetComponent<BoxCollider2D>());
             _itemAnimator = new ItemAnimator(animator, animController, animationState);
             //_itemSprite = this.gameObject.AddComponent<Sprite>();
             //_itemSprite.Setup(spriteRenderer, "empty", _itemID);
@@ -73,8 +73,11 @@ namespace DoomBreakers
             _itemBehaviour.UpdateMovement();
         }
 
+        
+
         public void Destroy()
 		{
+            _itemBehaviour.DisableCollisions(); //Especially important for player Equip Indicator usage.
             this.gameObject.SetActive(false);
 		}
     }

@@ -17,22 +17,48 @@ namespace DoomBreakers
 		Weapon_equipment_to_pickup = 7
 
 	};
+	public enum IndicatorAnimID //_playerIndicatorAnimator.Play(animName);//Animator state names= ID1, ID1Pickup, ID1Tired, ID1Death
+	{
+		Idle = 0,//_indicatorAnimStr[0]
+		Pickup = 1,//_indicatorAnimStr[1] and so on..
+		Tired = 2,
+		Dead = 3
+	}; //Must corrispond to string[] _indicatorAnimStr assignment order.
 
 	public class PlayerAnimator : IPlayerAnimator //MonoBehaviour, 
 	{
+
+		private int _playerID;
+
 		private Animator _animator;
 		private RuntimeAnimatorController _runtimeAnimatorController;
 		private AnimationState _animationState;
 		private AnimatorController _animatorController;
-		private string _animControllerFilepath; 
+		private string _animControllerFilepath;
 
-		public PlayerAnimator(Animator animator)
+		private Animator _playerIndicatorAnimator;
+		private string[] _indicatorAnimStr = new string[4];
+
+		public PlayerAnimator(Animator animator, ref Animator playerIndicatorAnimator, int playerId)
 		{
 			_animator = animator;
 			_runtimeAnimatorController = _animator.runtimeAnimatorController;
 			_animatorController = AnimatorController.Player_with_nothing_controller;
 			_animControllerFilepath = "HumanAnimControllers/Unarmored/";
+
+			_playerIndicatorAnimator = playerIndicatorAnimator;
+			_playerID = playerId;
+
+			_indicatorAnimStr[0] = "ID" + (_playerID + 1).ToString() + "";
+			_indicatorAnimStr[1] = "ID" + (_playerID + 1).ToString() + "Pickup";
+			_indicatorAnimStr[2] = "ID" + (_playerID + 1).ToString() + "Tired";
+			_indicatorAnimStr[3] = "ID" + (_playerID + 1).ToString() + "Death";
+
+			//_playerIndicatorAnimator.Play(_indicatorAnimStr[0]); 
+			PlayIndicatorAnimation(IndicatorAnimID.Idle);
 		}
+
+		public void PlayIndicatorAnimation(IndicatorAnimID indicatorAnim) => _playerIndicatorAnimator.Play(_indicatorAnimStr[(int)indicatorAnim]);
 
 		public void SetAnimatorController(ref IPlayerEquipment playerEquipment)//AnimatorController animatorController, bool withArmor)
 		{

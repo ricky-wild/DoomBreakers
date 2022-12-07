@@ -83,6 +83,8 @@ namespace DoomBreakers
 		public virtual void IsHitByQuickAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
 		public virtual void IsHitByReleaseAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input) { }
 		public virtual void IsHitWhileDefending(ref Animator animator, ref Vector2 input) { }
+		public virtual void IsDying(ref Animator animator, ref IPlayerSprite playerSprite) { }
+		public virtual void IsDead(ref Animator animator, ref IPlayerSprite playerSprite) { }
 	}
 }
 

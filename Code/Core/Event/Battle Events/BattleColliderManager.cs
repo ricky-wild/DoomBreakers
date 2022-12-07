@@ -17,6 +17,7 @@ namespace DoomBreakers
         private static int _mostRecentCollidedPlayerId;
         private static Dictionary<int, int> _playerFaceDir;
         private static Dictionary<int, BaseState> _playerState;
+        private static Dictionary<int, ItemBase> _playerWeapon;
         private static float _playerAttackButtonHeldTime;
 
         //private static EnemyAI _enemyType;
@@ -52,6 +53,8 @@ namespace DoomBreakers
                 _playerFaceDir = new Dictionary<int, int>();
             if (_playerState == null)
                 _playerState = new Dictionary<int, BaseState>();
+            if (_playerWeapon == null)
+                _playerWeapon = new Dictionary<int, ItemBase>();
 
             if (_banditFaceDir == null)
                 _banditFaceDir = new Dictionary<int, int>();

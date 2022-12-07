@@ -6,13 +6,15 @@ namespace DoomBreakers
 {
     public class ItemBehaviour : MonoBehaviour, IItemBehaviour
     {
+        private BoxCollider2D _boxCollider2D;
         private Controller2D _controller2D;
         private Vector3 _velocity;
         private Transform _transform;
         private float _gravity;
 
-        public void Setup(Transform t, Controller2D controller2D)
+        public void Setup(Transform t, Controller2D controller2D, BoxCollider2D boxCollider2D)
 		{
+            _boxCollider2D = boxCollider2D;
             _controller2D = controller2D;
             _transform = t;
             _velocity = new Vector3();
@@ -35,6 +37,7 @@ namespace DoomBreakers
             UpdateGravity();
             UpdateTransform();
         }
+        public void DisableCollisions() => _boxCollider2D.enabled = false;
         void Start() { }
 
         void Update() { }

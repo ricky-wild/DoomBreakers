@@ -26,7 +26,9 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerBrokenEquipment) &&
                 _state.GetType() != typeof(PlayerHitByQuickAttack) &&
                 _state.GetType() != typeof(PlayerHitByPowerAttack) &&
-                _state.GetType() != typeof(PlayerHitDefending))
+                _state.GetType() != typeof(PlayerHitDefending) &&
+                _state.GetType() != typeof(PlayerDying) &&
+                _state.GetType() != typeof(PlayerDead))
                 return true;
 
             return false;
@@ -49,7 +51,9 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerBrokenEquipment) &&
                 _state.GetType() != typeof(PlayerHitByQuickAttack) &&
                 _state.GetType() != typeof(PlayerHitByPowerAttack) &&
-                _state.GetType() != typeof(PlayerHitDefending))
+                _state.GetType() != typeof(PlayerHitDefending) &&
+                _state.GetType() != typeof(PlayerDying) &&
+                _state.GetType() != typeof(PlayerDead))
                 return true;
             return false;
         }
@@ -71,7 +75,9 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerBrokenEquipment) &&
                 _state.GetType() != typeof(PlayerHitByQuickAttack) &&
                 _state.GetType() != typeof(PlayerHitByPowerAttack) &&
-                _state.GetType() != typeof(PlayerHitDefending))
+                _state.GetType() != typeof(PlayerHitDefending) &&
+                _state.GetType() != typeof(PlayerDying) &&
+                _state.GetType() != typeof(PlayerDead))
                 return true;
             return false;
         }
@@ -182,8 +188,27 @@ namespace DoomBreakers
                 return true;
             if (_state.GetType() == typeof(PlayerBrokenEquipment))
                 return true;
+            if (_state.GetType() == typeof(PlayerDying))
+                return true;
+            if (_state.GetType() == typeof(PlayerDead))
+                return true;
 
 
+            return false;
+        }
+        protected bool SafeToSetDying()
+        {
+            if (_state.GetType() != typeof(PlayerDying))
+                return true;
+
+            return false;
+        }
+        protected bool IsDying()
+        {
+            if (_state.GetType() == typeof(PlayerDying))
+                return true;
+            if (_state.GetType() == typeof(PlayerDead))
+                return true;
             return false;
         }
     }

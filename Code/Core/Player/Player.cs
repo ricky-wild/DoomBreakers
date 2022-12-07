@@ -20,6 +20,10 @@ namespace DoomBreakers
         [Tooltip("Vectors that represent point of attack radius")]
         public Transform[] _attackPoints; //1=quickATK, 2=powerATK, 3=upwardATK
 
+        [Header("Player Indicator Icon")]
+        [Tooltip("The animator that indicates player ID within game")]
+        public Animator _playerIndicatorAnimator;
+
         private Rewired.Player _rewirdInputPlayer;
         private Vector2 _inputVector2;
         private Controller2D _controller2D;
@@ -45,7 +49,7 @@ namespace DoomBreakers
             _playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints, _playerID);
             
             _playerEquipment = new PlayerEquipment(_playerID);
-            _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>());
+            _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>(), ref _playerIndicatorAnimator, _playerID);
             _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
             _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
             _playerStats = new PlayerStats(100.0, 100.0, 0.0);
@@ -93,7 +97,8 @@ namespace DoomBreakers
 		{
             if (_rewirdInputPlayer == null)
                 return;
-
+            if (IsDying())
+                return;
             if (_state.GetType() == typeof(PlayerGainedEquipment))
                 return;
 
@@ -151,9 +156,12 @@ namespace DoomBreakers
                     if (_state.GetType() != typeof(PlayerHoldAttack))
                     {
                         SetState(new PlayerQuickAttack(this, _inputVector2));//, _quickAttackIncrement));
+                        
                     }
                 }
                 _playerCollider.EnableAttackCollisions();
+                if (_playerCollider.SignalItemPickupCollision())
+                    _playerCollider.EnableItemPickupCollision(); //SetState(new PlayerMove(this, _inputVector2));
             }
             if (_rewirdInputPlayer.GetButtonTimedPressUp("KnockBack", 0.01f))
 			{
@@ -196,26 +204,35 @@ namespace DoomBreakers
         public void UpdateStateBehaviours()
 		{
             _state.IsIdle(ref _animator);
+            
             _state.IsGainedEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
             _state.IsBrokenEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
+            
             _state.IsMoving(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
             _state.IsSprinting(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
+            
             _state.IsJumping(ref _animator, ref _controller2D, ref _inputVector2);
             _state.IsFalling(ref _animator, ref _controller2D, ref _inputVector2);
+           
             _state.IsDodging(ref _animator, ref _controller2D, ref _inputVector2, _inputDodgedLeft, ref _playerSprite, ref _playerCollider);
             _state.IsDodged(ref _animator, ref _controller2D, ref _inputVector2);
+            
             _state.IsQuickAttack(ref _animator, ref _playerSprite, ref _inputVector2, ref _quickAttackIncrement);
             _state.IsUpwardAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsKnockAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsHoldAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsReleaseAttack(ref _animator, ref _playerSprite, ref _inputVector2);
+            
             _state.IsDefending(ref _animator, ref _inputVector2);
+            
             _state.IsHitByQuickAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsHitByReleaseAttack(ref _animator, ref _playerSprite, ref _inputVector2);
             _state.IsHitWhileDefending(ref _animator, ref _inputVector2);
+
+            _state.IsDying(ref _animator, ref _playerSprite);
+            _state.IsDead(ref _animator, ref _playerSprite);
             _state.UpdateBehaviour(ref _controller2D, ref _animator);
         }
-
         public void UpdateCollisions()
 		{
             _playerCollider.UpdateCollision(ref _state, _playerID, ref _playerEquipment, ref _playerSprite);
@@ -225,8 +242,9 @@ namespace DoomBreakers
                 _playerAnimator.SetAnimatorController(ref _playerEquipment);
                 _playerEquipment.NewEquipmentGained(false);
 			}
-		}
-
+            if (_playerCollider.SignalItemPickupCollision()) _playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Pickup);
+            if (!_playerCollider.SignalItemPickupCollision()) _playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Idle);
+        }
         private void AttackedByBandit()
 		{
             //print("\nPlayer.cs= AttackedByBandit() called!");
@@ -258,8 +276,21 @@ namespace DoomBreakers
         }
         private void UpdateStats() //Encapsulate all of this into the PlayerStat class.
 		{
+            if (!_playerStats.Process()) return;
+            UpdateHealth();
             UpdateStamina();
             UpdateDefense();
+        }
+        private void UpdateHealth()
+		{
+            if (_playerStats.Health <= 0f)
+            {
+                if (SafeToSetDying())
+                {
+                    SetState(new PlayerDying(this, _velocity));
+                    _playerStats.Disable();
+                }
+            }
         }
         private void UpdateStamina()
 		{
@@ -268,6 +299,10 @@ namespace DoomBreakers
                 _playerStats.Stamina += 0.008; //magic numbers are bad.
                 UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
                 _staminaTimer.StartTimer(0.05f);
+            }
+            if (_playerStats.Stamina <= 0f)
+            {
+                //if (SafeToSetTired()) SetState(new PlayerTired(this, _velocity));
             }
         }
 		private void UpdateDefense()

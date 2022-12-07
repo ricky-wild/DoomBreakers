@@ -35,6 +35,8 @@ namespace DoomBreakers
         //private ITimer _cooldownTimer;
         private bool _attackCollisionEnabled;
         private bool _itemCollisionEnabled;
+        private bool _itemPickupEnabled;
+        private bool _itemPickupPossible;
 
 
         private IPlayerEquipment _playerEquipment;
@@ -53,7 +55,8 @@ namespace DoomBreakers
             _collider2d.enabled = true;
             _attackCollisionEnabled = false;
             _itemCollisionEnabled = false;
-
+            _itemPickupEnabled = false;
+            _itemPickupPossible = false;
         }
         public void SetupLayerMasks()
 		{
@@ -177,6 +180,8 @@ namespace DoomBreakers
             //playerStateMachine.SetPlayerState(state.IsGainedEquipment);
 
             _itemCollisionEnabled = false;
+            SignalItemPickupCollision(false);
+            EnableItemPickupCollision(false);
         }
         private void ProcessCollisionWithSword(Collider2D collision)
 		{
@@ -221,6 +226,10 @@ namespace DoomBreakers
         {
 			if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
 			{
+                if (!_itemPickupPossible) return;
+
+                if (!_itemPickupEnabled) return;
+
 				ProcessCollisionWithSword(collision);
 				ProcessCollisionWithShield(collision);
 				ProcessCollisionWithArmor(collision);
@@ -229,16 +238,25 @@ namespace DoomBreakers
 
 		}
         public void OnTriggerEnter2D(Collider2D collision)
-        {
-            ProcessCollisionFlags(collision);
-        }
-        void OnTriggerStay2D(Collider2D collision) { }
-        void OnTriggerExit2D(Collider2D collision) { }
-
-        public void EnableAttackCollisions()
 		{
-            _attackCollisionEnabled = true; 
-		}
+            if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
+                SignalItemPickupCollision(true);
+        }
+        void OnTriggerStay2D(Collider2D collision) => ProcessCollisionFlags(collision);
+        void OnTriggerExit2D(Collider2D collision)
+		{
+            if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
+                SignalItemPickupCollision(false);
+        }
+
+        public void EnableAttackCollisions() => _attackCollisionEnabled = true;
+        
+        public void EnableItemPickupCollision() => _itemPickupEnabled = true;
+        private void EnableItemPickupCollision(bool b) => _itemPickupEnabled = b;
+        
+        public bool SignalItemPickupCollision() => _itemPickupPossible;
+        private bool SignalItemPickupCollision(bool b) => _itemPickupPossible = b;
+
         public void FlipAttackPoints(int dir)
 		{
             //Circles we draw(in editor) & detect enemies against. These must all be flipped 

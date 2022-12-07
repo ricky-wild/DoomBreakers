@@ -54,7 +54,7 @@ namespace DoomBreakers
 			//base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);
 
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
-			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>());
+			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>(), this.GetComponent<BoxCollider2D>());
 			_itemAnimator = new ItemAnimator(animator, animController, animationState);
 			_breastplateSprite = this.gameObject.AddComponent<BreastplateSprite>();
 			_breastplateSprite.Setup(ref spriteRenderer, _itemID, itemType, equipMaterialType);

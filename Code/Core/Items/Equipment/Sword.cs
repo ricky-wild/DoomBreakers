@@ -22,10 +22,11 @@ namespace DoomBreakers
 
 		private AnimationState _animState; //Apply as appropriate based on _playerEquip.
 		private IEquipmentSprite _swordSprite;
+		private double _damage;
 
-		public EquipmentWeaponType GetSwordType() => _weaponType;
-		
+		public EquipmentWeaponType GetSwordType() => _weaponType;	
 		public EquipmentMaterialType GetMaterialType() => _materialType;
+		public double Damage() => _damage;
 
 		private void SetupSword()
 		{
@@ -38,15 +39,20 @@ namespace DoomBreakers
 				case EquipmentWeaponType.Broadsword:
 					_swordID = PlayerItem.IsBroadsword;
 					_animState = AnimationState.IdleBroadSword;
+					_damage = 0.065;
 					break;
 				case EquipmentWeaponType.Longsword:
 					_swordID = PlayerItem.IsLongsword;
 					_animState = AnimationState.IdleLongsword;
+					_damage = 0.07;
 					break;
 			}
+			if (_materialType == EquipmentMaterialType.Bronze) _damage += 0.01;
+			if (_materialType == EquipmentMaterialType.Iron) _damage += 0.02;
+			if (_materialType == EquipmentMaterialType.Steel) _damage += 0.0275;
+			if (_materialType == EquipmentMaterialType.Ebony) _damage += 0.0325;
 
 
-			
 		}
 
 		public override void Awake()
@@ -61,7 +67,7 @@ namespace DoomBreakers
 			//base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);
 
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
-			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>());
+			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>(), this.GetComponent<BoxCollider2D>());
 			_itemAnimator = new ItemAnimator(animator, animController, _animState);//animationState);
 			_swordSprite = this.gameObject.AddComponent<SwordSprite>();
 			_swordSprite.Setup(ref spriteRenderer, _itemID, itemType, _materialType);
@@ -81,6 +87,7 @@ namespace DoomBreakers
 		{
 			base.Update();
 		}
+
 
     }
 }
