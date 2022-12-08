@@ -19,7 +19,7 @@ namespace DoomBreakers
         private int _playerID;
         private CompareTags _compareTags;
 
-        private Collider2D _collider2d;
+        private Collider2D _collider2d, _itemCollider2d;
         private Collider2D[] _enemyTargetsHit;
 
         private Transform[] _attackPoints;                              //1=quickATK, 2=powerATK, 3=upwardATK
@@ -102,6 +102,7 @@ namespace DoomBreakers
         public void UpdateCollision(ref BaseState playerState, int playerId, ref IPlayerEquipment playerEquipment, ref IPlayerSprite playerSprite)
 		{
             UpdateDetectEnemyTargets(ref playerState, playerId, ref playerSprite);
+            ProcessItemCollision();
             UpdateDetectItemTargets(ref playerEquipment);
         }
         public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite)
@@ -183,6 +184,13 @@ namespace DoomBreakers
             SignalItemPickupCollision(false);
             EnableItemPickupCollision(false);
         }
+        private void ProcessItemCollision()
+		{
+            if (!_itemPickupPossible) return;
+            if (!_itemPickupEnabled) return;
+
+            ProcessCollisionFlags(_itemCollider2d);
+        }
         private void ProcessCollisionWithSword(Collider2D collision)
 		{
             if (collision.GetComponent<Sword>() == null)
@@ -226,9 +234,8 @@ namespace DoomBreakers
         {
 			if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
 			{
-                if (!_itemPickupPossible) return;
-
-                if (!_itemPickupEnabled) return;
+                //if (!_itemPickupPossible) return;
+                //if (!_itemPickupEnabled) return;
 
 				ProcessCollisionWithSword(collision);
 				ProcessCollisionWithShield(collision);
@@ -240,13 +247,19 @@ namespace DoomBreakers
         public void OnTriggerEnter2D(Collider2D collision)
 		{
             if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
+            {
+                _itemCollider2d = collision;
                 SignalItemPickupCollision(true);
+            }
         }
-        void OnTriggerStay2D(Collider2D collision) => ProcessCollisionFlags(collision);
+        //void OnTriggerStay2D(Collider2D collision) => ProcessCollisionFlags(collision); //unreliable. We use ProcessItemCollision() instead.
         void OnTriggerExit2D(Collider2D collision)
 		{
             if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
+            {
+                _itemCollider2d = null;
                 SignalItemPickupCollision(false);
+            }
         }
 
         public void EnableAttackCollisions() => _attackCollisionEnabled = true;

@@ -160,8 +160,7 @@ namespace DoomBreakers
                     }
                 }
                 _playerCollider.EnableAttackCollisions();
-                if (_playerCollider.SignalItemPickupCollision())
-                    _playerCollider.EnableItemPickupCollision(); //SetState(new PlayerMove(this, _inputVector2));
+                if (_playerCollider.SignalItemPickupCollision()) _playerCollider.EnableItemPickupCollision();
             }
             if (_rewirdInputPlayer.GetButtonTimedPressUp("KnockBack", 0.01f))
 			{
