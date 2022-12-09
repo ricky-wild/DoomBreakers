@@ -272,7 +272,7 @@ namespace DoomBreakers
             if (IsIgnoreDamage())
                 return;
 
-            double banditQuickAttackDamage = 0.0025;//0.0025;
+            double banditQuickAttackDamage = 0.025;//0.0025;
             double banditPowerAttackDamage = 0.005;
             bool process = false;
 
@@ -286,6 +286,7 @@ namespace DoomBreakers
                 else
                 {
                     _playerStats.Defence -= banditQuickAttackDamage;
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerArmorHitSFX);
                 }
             }
             if(process = ProcessPowerAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
@@ -296,7 +297,10 @@ namespace DoomBreakers
                     AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
                 }
                 else
+                {
                     _playerStats.Defence -= banditPowerAttackDamage;
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
+                }
             }
             if(process) UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
         }
@@ -313,6 +317,7 @@ namespace DoomBreakers
             {
                 if (SafeToSetDying())
                 {
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerDeathSFX);
                     _playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Dead);
                     SetState(new PlayerDying(this, _velocity));
                     UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
@@ -339,6 +344,7 @@ namespace DoomBreakers
 		{
 			if(_playerStats.Defence <= 0 && _playerStats.IsArmored())
 			{
+                AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerArmorBrokenSFX);
                 SetState(new PlayerBrokenEquipment(this, _velocity));
                 _playerStats.IsArmored(false);
                 _playerEquipment.RemoveArmor();

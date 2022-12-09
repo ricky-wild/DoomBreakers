@@ -123,6 +123,7 @@ namespace DoomBreakers
                 {
                     if (IsDefendingCorrectDirection(banditFaceDir, playerFaceDir))
 					{
+                        AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerDefenseHitSFX);
                         SetState(new PlayerHitDefending(this, _velocity));
                         return false;
                     }
@@ -148,6 +149,7 @@ namespace DoomBreakers
                 {
                     if (IsDefendingCorrectDirection(banditFaceDir, playerFaceDir))
                     {
+                        AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerDefenseHitSFX);
                         SetState(new PlayerHitDefending(this, _velocity));
                         return false;
                     }

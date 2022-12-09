@@ -11,6 +11,7 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_behaviourTimer = new Timer();
+			Time.timeScale = 0.5f;
 		}
 
 		public override void IsDying(ref Animator animator, ref IPlayerSprite playerSprite)
@@ -20,7 +21,11 @@ namespace DoomBreakers
 
 			playerSprite.SetBehaviourTextureFlash(0.25f, Color.red);
 			_behaviourTimer.StartTimer(1.0f);
-			if (_behaviourTimer.HasTimerFinished()) _stateMachine.SetState(new PlayerDead(_stateMachine, _velocity));
+			if (_behaviourTimer.HasTimerFinished())
+			{
+				Time.timeScale = 1.0f;
+				_stateMachine.SetState(new PlayerDead(_stateMachine, _velocity));
+			}
 
 			//base.UpdateBehaviour();
 		}

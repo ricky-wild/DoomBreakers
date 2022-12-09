@@ -17,7 +17,11 @@ namespace DoomBreakers
         PlayerKnockAttackSFX = 9,
         PlayerDodgeSFX = 10,
         PlayerEquippedSFX = 11,
-        PlayerHitSFX = 12
+        PlayerHitSFX = 12,
+        PlayerArmorHitSFX = 13,
+        PlayerArmorBrokenSFX = 14,
+        PlayerDefenseHitSFX = 15,
+        PlayerDeathSFX = 16
     }
     public class AudioEventManager : MonoBehaviour
     {
@@ -47,7 +51,7 @@ namespace DoomBreakers
         }
         private static void Setup()
         {
-            _volumeSFX = 1.0f;
+            _volumeSFX = 0.15f;
 
             if (_playerSFXDict == null)
                 _playerSFXDict = new Dictionary<PlayerSFXID, Audio>();
@@ -94,6 +98,18 @@ namespace DoomBreakers
             sfxId = PlayerSFXID.PlayerHitSFX;
             _playerSFXDict.Add(sfxId, new Audio("hit0", _volumeSFX, false, _transform));
 
+            sfxId = PlayerSFXID.PlayerArmorHitSFX;
+            _playerSFXDict.Add(sfxId, new Audio("playerArmorHit", _volumeSFX, false, _transform));
+
+            sfxId = PlayerSFXID.PlayerArmorBrokenSFX;
+            _playerSFXDict.Add(sfxId, new Audio("armorBreak", _volumeSFX, false, _transform));
+
+            sfxId = PlayerSFXID.PlayerDefenseHitSFX;
+            _playerSFXDict.Add(sfxId, new Audio("playerShieldHit", _volumeSFX, false, _transform));
+
+            sfxId = PlayerSFXID.PlayerDeathSFX;
+            _playerSFXDict.Add(sfxId, new Audio("deathEvent", _volumeSFX, false, _transform));
+            //
         }
         public static void PlayPlayerSFX(PlayerSFXID playerSFXID) => _playerSFXDict[playerSFXID].PlaySound();
         public static void StopPlayerSFX(PlayerSFXID playerSFXID) => _playerSFXDict[playerSFXID].StopSound();
