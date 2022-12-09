@@ -120,6 +120,7 @@ namespace DoomBreakers
             {
                 if(SafeToSetDying())
 				{
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerKillScoreEvent");
                     SetState(new BanditDying(this, _velocity, _banditID));
                     _banditStats.DisplayFillBar(false);
                     _banditStats.Disable();
@@ -135,12 +136,23 @@ namespace DoomBreakers
             int playerFaceDir = BattleColliderManager.GetAssignedPlayerFaceDir(playerId);
             BaseState attackingPlayerState = BattleColliderManager.GetAssignedPlayerState(playerId);
 
-            double playerQuickAttackDamage = 0.075;
-            double playerPowerAttackDamage = 0.125;
+            double playerQuickAttackDamage = 0.005;
+            double playerPowerAttackDamage = 0.025;
 
-            if(ProcessQuickAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _banditID, _banditSprite.GetSpriteDirection()))
+            if(BattleColliderManager.GetAssignedPlayerWeapon(playerId).GetType() == typeof(Sword))
+			{
+                ItemBase itemBase = BattleColliderManager.GetAssignedPlayerWeapon(playerId);
+                Sword weaponDervived = itemBase as Sword;
+
+                playerQuickAttackDamage = weaponDervived.Damage();
+                playerPowerAttackDamage += weaponDervived.Damage();
+            }
+
+
+            if (ProcessQuickAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _banditID, _banditSprite.GetSpriteDirection()))
 			{
                 _banditStats.Health -= playerQuickAttackDamage;
+                AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX);
             }
             _playerAttackedButtonTime = ProcessPowerAttackFromPlayer(ref attackingPlayerState, _banditID);
             if(_playerAttackedButtonTime != 0f) _banditStats.Health -= playerPowerAttackDamage;

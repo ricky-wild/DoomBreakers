@@ -16,7 +16,7 @@ namespace DoomBreakers
 
 		public override void IsQuickAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input, ref int quickAttackIncrement) 
 		{
-
+			
 			switch (quickAttackIncrement)
 			{
 				case 0:
@@ -43,6 +43,7 @@ namespace DoomBreakers
 					quickAttackIncrement++;
 				else
 					quickAttackIncrement = 0;
+				AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerQuickAttackSFX);
 				_stateMachine.SetState(new PlayerIdle(_stateMachine, _velocity));
 			}
 			//base.UpdateBehaviour();

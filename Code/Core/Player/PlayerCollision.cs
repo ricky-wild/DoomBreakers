@@ -131,7 +131,8 @@ namespace DoomBreakers
                             return;
 
                         int banditID = enemy.GetComponent<Bandit>()._banditID;
-                        BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBandit" + banditID.ToString(), ref playerState, playerId, playerSprite);
+                        BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBandit" + banditID.ToString(), 
+                                                ref playerState, playerId, playerSprite, _playerEquipment.GetWeapon());
                     }
                 }
 

@@ -117,6 +117,7 @@ namespace DoomBreakers
             }
             if (_rewirdInputPlayer.GetButtonDown("Sprint"))
 			{
+                _playerStats.Stamina -= 0.1; //magic numbers are bad.
                 if (SafeToSetSprint())
                     SetState(new PlayerSprint(this, _inputVector2));
             }
@@ -125,7 +126,10 @@ namespace DoomBreakers
             if (_rewirdInputPlayer.GetButtonDown("Jump"))
             {
                 if (SafeToSetJump())
+				{
                     SetState(new PlayerJump(this, _inputVector2));
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerJumpSFX);
+                }
             }
             if (_rewirdInputPlayer.GetButtonDown("DodgeL"))
             {
@@ -135,6 +139,7 @@ namespace DoomBreakers
                     SetState(new PlayerDodge(this, _inputVector2));
                     _playerStats.Stamina -= 0.125;
                     UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerDodgeSFX);
                 }
             }
             if (_rewirdInputPlayer.GetButtonDown("DodgeR"))
@@ -145,6 +150,7 @@ namespace DoomBreakers
                     SetState(new PlayerDodge(this, _inputVector2));
                     _playerStats.Stamina -= 0.125;
                     UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerDodgeSFX);
                 }
             }
             if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.01f))
@@ -156,9 +162,9 @@ namespace DoomBreakers
                     if (_state.GetType() != typeof(PlayerHoldAttack))
                     {
                         SetState(new PlayerQuickAttack(this, _inputVector2));//, _quickAttackIncrement));
-                        
                     }
                 }
+                
                 _playerCollider.EnableAttackCollisions();
                 if (_playerCollider.SignalItemPickupCollision()) _playerCollider.EnableItemPickupCollision();
             }
@@ -168,6 +174,7 @@ namespace DoomBreakers
                 _playerCollider.EnableAttackCollisions();
                 _playerStats.Stamina -= 0.1;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
+                
             }
             if (_rewirdInputPlayer.GetButtonDown("Defend"))
 			{
@@ -187,6 +194,7 @@ namespace DoomBreakers
                     SetState(new PlayerHoldAttack(this, _inputVector2));
                     _playerStats.Stamina -= 0.15;
                     UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerChargeAttackSFX);
                 }
             }
             if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.25f))
@@ -197,6 +205,8 @@ namespace DoomBreakers
                     BattleColliderManager.SetPlayerHeldAttackButtonTime(_buttonHeldTimer.GetTimeRecord());
                     SetState(new PlayerReleaseAttack(this, _inputVector2));
                     _playerCollider.EnableAttackCollisions();
+                    AudioEventManager.StopPlayerSFX(PlayerSFXID.PlayerChargeAttackSFX);
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
                 }
             }
         }
@@ -206,6 +216,7 @@ namespace DoomBreakers
             
             _state.IsGainedEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
             _state.IsBrokenEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
+            _state.IsExhausted(ref _animator, ref _playerSprite);
             
             _state.IsMoving(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
             _state.IsSprinting(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
@@ -234,9 +245,15 @@ namespace DoomBreakers
         }
         public void UpdateCollisions()
 		{
+            if (IsDying())
+                return;
+            if (_state.GetType() == typeof(PlayerExhausted))
+                return;
+
             _playerCollider.UpdateCollision(ref _state, _playerID, ref _playerEquipment, ref _playerSprite);
             if(_playerEquipment.NewEquipmentGained())
 			{
+                AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerEquippedSFX);
                 SetState(new PlayerGainedEquipment(this, _velocity));
                 _playerAnimator.SetAnimatorController(ref _playerEquipment);
                 _playerEquipment.NewEquipmentGained(false);
@@ -255,19 +272,29 @@ namespace DoomBreakers
             if (IsIgnoreDamage())
                 return;
 
-            double banditQuickAttackDamage = 0.0025;
+            double banditQuickAttackDamage = 0.0025;//0.0025;
             double banditPowerAttackDamage = 0.005;
             bool process = false;
 
             if(process = ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
 			{
-                if(!_playerStats.IsArmored()) _playerStats.Health -= banditQuickAttackDamage;
+                if (!_playerStats.IsArmored())
+                {
+                    _playerStats.Health -= banditQuickAttackDamage;
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX);
+                }
                 else
+                {
                     _playerStats.Defence -= banditQuickAttackDamage;
+                }
             }
             if(process = ProcessPowerAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
 			{
-                if (!_playerStats.IsArmored()) _playerStats.Health -= banditPowerAttackDamage;
+                if (!_playerStats.IsArmored())
+                {
+                    _playerStats.Health -= banditPowerAttackDamage;
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
+                }
                 else
                     _playerStats.Defence -= banditPowerAttackDamage;
             }
@@ -286,7 +313,9 @@ namespace DoomBreakers
             {
                 if (SafeToSetDying())
                 {
+                    _playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Dead);
                     SetState(new PlayerDying(this, _velocity));
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
                     _playerStats.Disable();
                 }
             }
@@ -301,7 +330,9 @@ namespace DoomBreakers
             }
             if (_playerStats.Stamina <= 0f)
             {
-                //if (SafeToSetTired()) SetState(new PlayerTired(this, _velocity));
+                //if (SafeToSetTired())
+                _playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Tired);
+                SetState(new PlayerExhausted(this, _velocity));
             }
         }
 		private void UpdateDefense()
@@ -315,7 +346,9 @@ namespace DoomBreakers
 			}
 		}
 
-		private void OnDrawGizmosSelected()
+        private void AudioEventMethod() { }
+
+        private void OnDrawGizmosSelected()
         {
             for (int i = 0; i < _attackPoints.Length; i++)
             {

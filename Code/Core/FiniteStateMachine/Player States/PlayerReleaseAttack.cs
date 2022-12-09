@@ -23,6 +23,7 @@ namespace DoomBreakers
 			_behaviourTimer.StartTimer(0.5f);
 			if (_behaviourTimer.HasTimerFinished())
 			{
+				//AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
 				_stateMachine.SetState(new PlayerIdle(_stateMachine, _velocity));
 			}
 

@@ -9,6 +9,7 @@ namespace DoomBreakers
         //<summary>
         //The battle collider manager' purpose is too communicate collisions between enemy AI & player, vice versa.
         //We will need to communicate some details about each object involved with the collision.
+        //
         //</summary>
         private Dictionary<string, Action> _battleEventDictionary;
         private static BattleColliderManager _battleEventManager;
@@ -69,11 +70,13 @@ namespace DoomBreakers
         //<summary>
         //Bundle all appropriate collision assignment calls into one method call.
         //This is so far, AssignPlayerState(), AssignPlayerFaceDir() and TriggerEvent("ReportCollisionWithSomething").
+        //
         //</summary>
-        public static void AssignCollisionDetails(string eventName, ref BaseState playerState, int forPlayerId, IPlayerSprite playerSprite)
+        public static void AssignCollisionDetails(string eventName, ref BaseState playerState, int forPlayerId, IPlayerSprite playerSprite, ItemBase weapon)
 		{
             AssignPlayerFaceDir(forPlayerId, playerSprite);
             AssignPlayerState(ref playerState, forPlayerId);
+            AssignPlayerWeapon(forPlayerId, weapon);
             BaseTriggerEvent(eventName);
         }
         
@@ -81,6 +84,7 @@ namespace DoomBreakers
         //AssignPlayerState() is used to communicate player state during an attack. 
         //We will need this for enemy AI regarding the Bandit.cs->AttackedByPlayer() so
         //we can determine the enemy' next state, as appropriate.
+        //
         //</summary>
         public static void AssignPlayerState(ref BaseState playerState, int playerId)
 		{
@@ -100,6 +104,7 @@ namespace DoomBreakers
         //<summary>
         //AssignPlayerFaceDir() is used to communicate player face direction during an attack. 
         //We will need this for enemy AI regarding the HitByPowerAttack obj state. 
+        //
         //</summary>
         public static void AssignPlayerFaceDir(int forPlayerId, IPlayerSprite playerSprite)
 		{
@@ -123,6 +128,35 @@ namespace DoomBreakers
             else
                 return 1;
         }
+
+        //<summary>
+        //AssignPlayerWeapon() is used to communicate player damage output during an attack. 
+        //We will need this for enemy AI regarding the Bandit.cs->AttackedByPlayer() Method.
+        //But will use this Method at PlayerCollision.cs->UpdateDetectEnemyTargets()
+        //</summary>
+        public static void AssignPlayerWeapon(int forPlayerId, ItemBase weapon)
+		{
+            if (weapon == null) return;
+
+            if(!_playerWeapon.ContainsKey(forPlayerId))
+                _playerWeapon.Add(forPlayerId, weapon);
+            else
+			{
+               if (_playerWeapon[forPlayerId] != weapon)
+				{
+                    _playerWeapon.Remove(forPlayerId);
+                    _playerWeapon.Add(forPlayerId, weapon);
+				}
+			}
+		}
+        public static ItemBase GetAssignedPlayerWeapon(int forPlayerId)
+		{
+            if (_playerWeapon.ContainsKey(forPlayerId))
+                return _playerWeapon[forPlayerId];
+            else
+                return null;
+		}
+
         public static int GetRecentCollidedPlayerId() => _mostRecentCollidedPlayerId;
         public static void SetPlayerHeldAttackButtonTime(float time) => _playerAttackButtonHeldTime = time;
         public static float GetPlayerHeldAttackButtonTime() => _playerAttackButtonHeldTime;

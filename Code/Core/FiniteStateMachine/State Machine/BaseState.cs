@@ -62,9 +62,18 @@ namespace DoomBreakers
 			}
 
 			if (controller2D.collisions.below)
-				_velocity.y = 0f;
+			{
+				if(Mathf.Abs(_velocity.y) != 0)
+				{
+					_velocity.y = 0f;
+					
+				}
+
+			}
 		}
 		public virtual void IsIdle(ref Animator animator) { }
+
+		public virtual void IsExhausted(ref Animator animator, ref IPlayerSprite playerSprite) { }
 		public virtual void IsGainedEquipment(ref Animator animator, ref IPlayerSprite playerSprite, ref IPlayerEquipment playerEquipment) { }
 		public virtual void IsBrokenEquipment(ref Animator animator, ref IPlayerSprite playerSprite, ref IPlayerEquipment playerEquipment) { }
 		public virtual void IsMoving(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider) { }

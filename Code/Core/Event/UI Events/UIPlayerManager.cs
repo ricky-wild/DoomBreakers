@@ -83,6 +83,9 @@ namespace DoomBreakers
             }
         }
 
+        //<summary>
+        //Used for communicating player statistics.
+        //</summary>
         public static void TriggerEvent(string eventName, ref PlayerStats playerStats, int playerId)
         {
             Action thisEvent = null;
@@ -101,10 +104,15 @@ namespace DoomBreakers
                 //thisEvent.Invoke();
             }
         }
-
         public static PlayerStats GetPlayerStats(int playerId) => _playerStatsEventDictionary[playerId];
         public static void SetPlayerStats(ref PlayerStats playerStats, int playerId) => _playerStatsEventDictionary[playerId] = playerStats;
 
+
+
+
+        //<summary>
+        //Used for communicating player equipment.
+        //</summary>
         public static void TriggerEvent(string eventName, UIAnimationFlag equipmentGainedFlag, int playerId)
         {
             Action thisEvent = null;
@@ -121,6 +129,20 @@ namespace DoomBreakers
             UIAnimationFlag temp = _equipmentGainedEvent[playerId];
             _equipmentGainedEvent[playerId] = UIAnimationFlag.None;
             return temp;
+        }
+
+
+        //<summary>
+        //Used for communicating player kill count. Bandit.cs->UpdateStats()
+        //</summary>
+        public static void TriggerEvent(string eventName)
+        {
+            Action thisEvent = null;
+            if (_instance._UIEventDictionary.TryGetValue(eventName, out thisEvent))
+            {
+                //thisEvent.Invoke();
+                _instance._UIEventDictionary[eventName]();
+            }
         }
     }
 }

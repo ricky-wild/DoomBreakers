@@ -23,6 +23,7 @@ namespace DoomBreakers
 			_behaviourTimer.StartTimer(_gainedEquipWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
 			{
+				//AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerEquippedSFX);
 				playerSprite.SetNewEquipmemtTextureColorFlag(true, playerEquipment);
 				if (Mathf.Abs(_velocity.y) >= 3.0f)
 					_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));

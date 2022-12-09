@@ -249,7 +249,16 @@ namespace DoomBreakers
         {
             return _rightHandEquip;
         }
-        
+        public ItemBase GetWeapon()
+		{
+            if (_leftHandEquip.GetType() == typeof(Sword))
+                return _leftHandEquip;
+            if (_rightHandEquip.GetType() == typeof(Sword))
+                return _rightHandEquip;
+
+            return null;// new EmptyHand(EquipmentWeaponType.None, EquipmentMaterialType.None);
+        }
+
         public EquipmentMaterialType GetArmorMaterialType()
 		{
             if (_torsoEquipment.GetType() == typeof(Breastplate))

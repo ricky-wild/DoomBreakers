@@ -16,6 +16,7 @@ namespace DoomBreakers
 
 		public override void IsKnockAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input)
 		{
+			AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerKnockAttackSFX);
 			animator.Play("Knock Attack");//, 0, 0.0f);
 									//_velocity.x = 0f;
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed)) / 2;

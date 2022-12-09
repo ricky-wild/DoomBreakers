@@ -19,6 +19,7 @@ namespace DoomBreakers
 			{			
 				_velocity.x = 0f;
 				_velocity.y = 0f;
+				AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerLandImpactSFX);
 				_stateMachine.SetState(new PlayerIdle(_stateMachine, _velocity));
 			}
 			//base.UpdateBehaviour();

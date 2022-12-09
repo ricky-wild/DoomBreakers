@@ -28,6 +28,7 @@ namespace DoomBreakers
 			_behaviourTimer.StartTimer(0.5f);
 			if (_behaviourTimer.HasTimerFinished())
 			{
+				AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerChargeAttackSFX);
 				playerSprite.SetBehaviourTextureFlash(0.25f, Color.white);
 				_behaviourTimer.StartTimer(0.5f);
 			}

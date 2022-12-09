@@ -27,6 +27,7 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerHitByQuickAttack) &&
                 _state.GetType() != typeof(PlayerHitByPowerAttack) &&
                 _state.GetType() != typeof(PlayerHitDefending) &&
+                _state.GetType() != typeof(PlayerExhausted) &&
                 _state.GetType() != typeof(PlayerDying) &&
                 _state.GetType() != typeof(PlayerDead))
                 return true;
@@ -52,6 +53,7 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerHitByQuickAttack) &&
                 _state.GetType() != typeof(PlayerHitByPowerAttack) &&
                 _state.GetType() != typeof(PlayerHitDefending) &&
+                _state.GetType() != typeof(PlayerExhausted) &&
                 _state.GetType() != typeof(PlayerDying) &&
                 _state.GetType() != typeof(PlayerDead))
                 return true;
@@ -76,6 +78,7 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerHitByQuickAttack) &&
                 _state.GetType() != typeof(PlayerHitByPowerAttack) &&
                 _state.GetType() != typeof(PlayerHitDefending) &&
+                _state.GetType() != typeof(PlayerExhausted) &&
                 _state.GetType() != typeof(PlayerDying) &&
                 _state.GetType() != typeof(PlayerDead))
                 return true;
@@ -85,7 +88,8 @@ namespace DoomBreakers
         protected bool SafeToSetJump()
         {
             if (_state.GetType() != typeof(PlayerJump) &&
-                _state.GetType() != typeof(PlayerGainedEquipment))
+                _state.GetType() != typeof(PlayerGainedEquipment) &&
+                _state.GetType() != typeof(PlayerExhausted))
                 return true;
 
             return false;
@@ -98,7 +102,8 @@ namespace DoomBreakers
                 _state.GetType() != typeof(PlayerReleaseAttack) &&
                 _state.GetType() != typeof(PlayerGainedEquipment) &&
                 _state.GetType() != typeof(PlayerBrokenEquipment) &&
-                _state.GetType() != typeof(PlayerFall))
+                _state.GetType() != typeof(PlayerFall) &&
+                _state.GetType() != typeof(PlayerExhausted))
                 return true;
 
             return false;
@@ -187,6 +192,8 @@ namespace DoomBreakers
             if (_state.GetType() == typeof(PlayerGainedEquipment))
                 return true;
             if (_state.GetType() == typeof(PlayerBrokenEquipment))
+                return true;
+            if (_state.GetType() == typeof(PlayerExhausted))
                 return true;
             if (_state.GetType() == typeof(PlayerDying))
                 return true;
