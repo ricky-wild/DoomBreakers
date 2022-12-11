@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using wildlogicgames;
 
 namespace DoomBreakers
 {
@@ -20,7 +21,7 @@ namespace DoomBreakers
 		[Tooltip("Set Item to any type of material.")]
 		public EquipmentMaterialType _materialType;
 
-		private AnimationState _animState; //Apply as appropriate based on _playerEquip.
+		private ItemAnimationState _animState; //Apply as appropriate based on _playerEquip.
 		private IEquipmentSprite _swordSprite;
 		private double _damage;
 
@@ -38,12 +39,12 @@ namespace DoomBreakers
 			{
 				case EquipmentWeaponType.Broadsword:
 					_swordID = PlayerItem.IsBroadsword;
-					_animState = AnimationState.IdleBroadSword;
+					_animState = ItemAnimationState.IdleBroadSword;
 					_damage = 0.065;
 					break;
 				case EquipmentWeaponType.Longsword:
 					_swordID = PlayerItem.IsLongsword;
-					_animState = AnimationState.IdleLongsword;
+					_animState = ItemAnimationState.IdleLongsword;
 					_damage = 0.07;
 					break;
 			}
@@ -58,17 +59,17 @@ namespace DoomBreakers
 		public override void Awake()
 		{		
 			Initialize(this.GetComponent<SpriteRenderer>(), this.GetComponent<Animator>(), 
-				AnimatorController.Weapon_equipment_to_pickup, AnimationState.IdleBroadSword, _swordID, _materialType);
+				PlayerAnimatorController.Weapon_equipment_to_pickup, ItemAnimationState.IdleBroadSword, _swordID, _materialType);
 		}
-		public override void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
-									   AnimationState animationState, PlayerItem itemType, EquipmentMaterialType equipMaterialType)
+		public override void Initialize(SpriteRenderer spriteRenderer, Animator animator, PlayerAnimatorController animController,
+									   ItemAnimationState animationState, PlayerItem itemType, EquipmentMaterialType equipMaterialType)
 		{
 			SetupSword();
 			//base.Initialize(spriteRenderer, animator, animController, _animState, itemType, playerEquipType);
 
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
-			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>(), this.GetComponent<BoxCollider2D>());
-			_itemAnimator = new ItemAnimator(animator, animController, _animState);//animationState);
+			_itemBehaviour.Setup(this.transform, this.GetComponent<CharacterController2D>(), this.GetComponent<BoxCollider2D>());
+			_itemAnimator = new ItemAnimator(animator, "ItemAnimControllers", "Equipment", "Weapon", animController, _animState);//animationState);
 			_swordSprite = this.gameObject.AddComponent<SwordSprite>();
 			_swordSprite.Setup(ref spriteRenderer, _itemID, itemType, _materialType);
 		}

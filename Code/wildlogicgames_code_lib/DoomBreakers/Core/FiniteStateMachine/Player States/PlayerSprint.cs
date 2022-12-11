@@ -20,9 +20,9 @@ namespace DoomBreakers
 
 			
 
-			_behaviourTimer.StartTimer(0.5f);
+			_behaviourTimer.StartTimer(0.25f);
 			if (_behaviourTimer.HasTimerFinished())
-				playerSprite.SetBehaviourTextureFlash(0.25f, Color.white);
+				playerSprite.SetBehaviourTextureFlash(0.2f, Color.white);
 
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
 				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));

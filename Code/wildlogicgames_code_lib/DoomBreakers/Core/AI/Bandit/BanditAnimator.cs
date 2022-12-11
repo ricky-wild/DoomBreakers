@@ -14,7 +14,7 @@ namespace DoomBreakers
 		Bandit_with_broadsword_with_broadsword_controller = 4
 	};
 
-	public class BanditAnimator : IBanditAnimator
+	public class BanditAnimator //: IBanditAnimator
 	{
 		private Animator _animator;
 		private RuntimeAnimatorController _runtimeAnimatorController;

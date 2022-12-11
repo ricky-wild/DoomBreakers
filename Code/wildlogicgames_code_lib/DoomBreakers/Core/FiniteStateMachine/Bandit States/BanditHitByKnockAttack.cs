@@ -13,6 +13,7 @@ namespace DoomBreakers
 			_velocity = v; //We want to carry this on between states.
 			_maxPowerStruckVelocityX = 10.0f;
 			_maxPowerStruckVelocityY = 10.0f;
+			_detectPlatformEdge = false;
 		}
 
 		public override void IsHitByKnockAttack(ref Animator animator, ref IBanditSprite banditSprite)

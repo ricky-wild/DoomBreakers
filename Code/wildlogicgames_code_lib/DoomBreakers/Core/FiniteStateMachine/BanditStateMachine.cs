@@ -92,11 +92,17 @@ namespace DoomBreakers
 
             return false;
         }
-        protected bool SafeToSetPersue() 
+        protected bool SafeToSetPersue() //_detectPlatformEdge = true in constructor() BanditPersue()
         {
             if (_state.GetType() == typeof(BanditJump))
                 return false;
-            if (_state.GetType() == typeof(BanditDefending))
+			if (_state.GetType() == typeof(BanditFall))
+				return false;
+			if (_state.GetType() == typeof(BanditHitByPowerAttack))//_detectPlatformEdge = false in constructor()
+                return false;
+			if (_state.GetType() == typeof(BanditHitByKnockAttack))//_detectPlatformEdge = false in constructor()
+                return false;
+			if (_state.GetType() == typeof(BanditDefending))
                 return false;
             if (_state.GetType() == typeof(BanditHitDefending))
                 return false;

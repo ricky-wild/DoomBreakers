@@ -13,6 +13,8 @@ namespace DoomBreakers
 			_transform = transform;
 			_velocity = v; //We want to carry this on between states.
 
+			_detectPlatformEdge = true;
+
 			_randSpeedModifier = wildlogicgames.Utilities.GetRandomNumberInt(1, 3);
 			if (_randSpeedModifier == 1) _attackDist = 1.6f;
 			if (_randSpeedModifier == 2) _attackDist = 1.8f;
@@ -45,24 +47,38 @@ namespace DoomBreakers
 				if (_transform.position.x > _cachedVector3.x + _attackDist)
 					_targetVelocityX = -(_randSpeedModifier * (_moveSpeed * _sprintSpeed));
 				else
-					_stateMachine.SetState(new BanditQuickAttack(_stateMachine, _velocity, _banditID));
+					CheckSetForJumpOrAttackState();
 			}
 			if (trackingDir == 1)
 			{
 				if (_transform.position.x < _cachedVector3.x - _attackDist)
 					_targetVelocityX = _randSpeedModifier * (_moveSpeed * _sprintSpeed);
 				else
-					_stateMachine.SetState(new BanditQuickAttack(_stateMachine, _velocity, _banditID));
+					CheckSetForJumpOrAttackState();
 			}
 
 			_velocity.x = _targetVelocityX;
 
-			if (Mathf.Abs(_velocity.y) >= 3.0f)
-				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID, false));
+			CheckSetForFallState();
 
 			//base.UpdateBehaviour();
 		}
-
+		private void CheckSetForJumpOrAttackState()
+		{
+			CheckSetForFallState();
+			if (_transform.position.y < _cachedVector3.y - _attackDist)
+				_stateMachine.SetState(new BanditJump(_stateMachine, _velocity, _transform, _banditID));
+			else
+				_stateMachine.SetState(new BanditQuickAttack(_stateMachine, _velocity, _banditID));
+		}
+		private void CheckSetForFallState()
+		{
+			if (Mathf.Abs(_velocity.y) >= 3.0f)
+			{
+				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID, false));
+				return;
+			}
+		}
 
 		private void DetectFaceDirection(ref IBanditSprite banditSprite, ref IBanditCollision banditCollider)
 		{

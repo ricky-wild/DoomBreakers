@@ -12,6 +12,7 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_idleWaitTime = 1.0f; //1.520f dying anim length
+			_detectPlatformEdge = false;
 			_behaviourTimer = new Timer();
 			//print("\nIdle State.");
 		}

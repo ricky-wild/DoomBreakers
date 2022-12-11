@@ -23,6 +23,7 @@ namespace DoomBreakers
 		protected float _targetVelocityX, _moveSpeed, _sprintSpeed, _jumpSpeed, _gravity,
 			_targetVelocityY, _maxPowerStruckVelocityY, _maxPowerStruckVelocityX, _attackDist, _randSpeedModifier;
 		protected bool _dodgedLeftFlag;
+		protected bool _detectPlatformEdge;
 		protected int _quickAttackIncrement; //2+ variations of this animation.
 		protected int _attackCooldownCounter;
 		protected int _attackCooldownLimit;
@@ -42,6 +43,7 @@ namespace DoomBreakers
 			_randSpeedModifier = (_randSpeedModifier / 4f); //1/4=0.25f    7/4=1.75f
 			_gravity = wildlogicgames.DoomBreakers.GetGravity();
 			_dodgedLeftFlag = false;
+			_detectPlatformEdge = true;
 			_quickAtkWaitTime = 0.133f;
 			_attackDist = 1.5f;
 
@@ -52,17 +54,20 @@ namespace DoomBreakers
 
 		public virtual void UpdateBehaviour(ref CharacterController2D controller2D, ref Animator animator, ref Transform transform)
 		{
+			//if (this.GetType() == typeof(BanditHitByKnockAttack)) //Want player to purposely knock down pit. (make a 60/40 success rate check maybe)
+			//	_detectPlatformEdge = false;
 
-			if(controller2D._collisionDetail._platformEdge) _stateMachine.SetState(new BanditJump(_stateMachine, _velocity, transform, _banditID));
-
+			if (controller2D._collisionDetail._platformEdge) 
+				_stateMachine.SetState(new BanditJump(_stateMachine, _velocity, transform, _banditID));
+			
 			UpdateGravity(ref controller2D, ref animator);
 			UpdateTransform(ref controller2D);
 		}
 
 		private void UpdateTransform(ref CharacterController2D controller2D)
 		{
-			//if(_controller2D == null) return;
-			controller2D.UpdateMovement(_velocity * Time.deltaTime, Vector2.zero, true);
+
+			controller2D.UpdateMovement(_velocity * Time.deltaTime, Vector2.zero, _detectPlatformEdge);
 		}
 		private void UpdateGravity(ref CharacterController2D controller2D, ref Animator animator)
 		{

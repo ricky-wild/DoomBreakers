@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using wildlogicgames;
 
 namespace DoomBreakers
 {
 
-	public enum AnimationState
+	public enum ItemAnimationState
 	{
 		Empty = -1,
 		IdleBroadSword = 0,
@@ -13,21 +14,20 @@ namespace DoomBreakers
 		IdleShield = 2,
 		IdleBreastplate = 3
 	}
-    public class ItemAnimator : IItemAnimator
-    {
-		private Animator _animator;
-		private RuntimeAnimatorController _runtimeAnimatorController;
-		private AnimationState _animationState;
-		private AnimatorController _animatorController;
+    public class ItemAnimator : Character2DBaseAnimator
+	{
+
+		private ItemAnimationState _animationState;
+		private PlayerAnimatorController _animatorController;
 		private string _animControllerFilepath;
 
-		public ItemAnimator(Animator animator, AnimatorController animController, AnimationState animState)
+		public ItemAnimator(Animator animator, string str1, string str2, string str3, PlayerAnimatorController animController, ItemAnimationState animState) 
+			: base(animator: ref animator, baseAnimationControllerFilepath: str1, specificAnimControllerFilePath: str2, theAnimationControllerName: str3)
 		{
-			_animator = animator;
-			_runtimeAnimatorController = _animator.runtimeAnimatorController;
+
 			_animationState = animState;// AnimationState.IdleSword;
 			_animatorController = animController;// AnimatorController.Weapon_equipment_to_pickup;
-			_animControllerFilepath = "ItemAnimControllers/"; //Equipment/Weapon.controller
+			//ItemAnimControllers/Equipment/Weapon.controller
 
 			SetAnimatorController(animController);
 		}
@@ -36,32 +36,29 @@ namespace DoomBreakers
 		{
 			switch (_animationState)
 			{
-				case AnimationState.IdleBroadSword:
+				case ItemAnimationState.IdleBroadSword:
 					_animator.Play("Sword");//, 0, 0.0f);
 					break;
-				case AnimationState.IdleLongsword:
+				case ItemAnimationState.IdleLongsword:
 					_animator.Play("Longsword");//, 0, 0.0f);
 					break;
-				case AnimationState.IdleShield:
+				case ItemAnimationState.IdleShield:
 					_animator.Play("Shield");//, 0, 0.0f);
 					break;
-				case AnimationState.IdleBreastplate:
+				case ItemAnimationState.IdleBreastplate:
 					_animator.Play("Armor");//, 0, 0.0f);
 					break;
 			}
 		}
-		public void SetAnimationState(AnimationState animationState)
-		{
-			_animationState = animationState;
-		}
-		public void SetAnimatorController(AnimatorController animatorController)
+		public void SetAnimationState(ItemAnimationState animationState) => _animationState = animationState;
+		public void SetAnimatorController(PlayerAnimatorController animatorController)
 		{
 			_animatorController = animatorController;
 			
 
 			switch (_animatorController)
 			{
-				case AnimatorController.Weapon_equipment_to_pickup:
+				case PlayerAnimatorController.Weapon_equipment_to_pickup:
 					_animControllerFilepath = "ItemAnimControllers/Equipment/";
 					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Weapon") as RuntimeAnimatorController;
 					break;

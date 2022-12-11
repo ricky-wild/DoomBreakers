@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using wildlogicgames;
 
 namespace DoomBreakers
 {
@@ -36,27 +37,27 @@ namespace DoomBreakers
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(Controller2D))]
-    public class ItemBase : MonoBehaviour, IItem
+    [RequireComponent(typeof(CharacterController2D))]
+    public class ItemBase : MonoBehaviour//, IItem
     {
         [Header("Item ID")]
         [Tooltip("ID ranges from 0 to ?")]   //Max ? items.
         public int _itemID;                  //Set in editor per item or else where.
 
         protected IItemBehaviour _itemBehaviour;
-        protected IItemAnimator _itemAnimator;
-        //protected ISprite _itemSprite;
+        protected ItemAnimator _itemAnimator;
 
         public ItemBase(){}
-		public virtual void Initialize(SpriteRenderer spriteRenderer, Animator animator, AnimatorController animController,
-                                       AnimationState animationState, PlayerItem itemType, EquipmentMaterialType equipMaterialType)
+		public virtual void Initialize(SpriteRenderer spriteRenderer, Animator animator, PlayerAnimatorController animController,
+                                       ItemAnimationState animationState, PlayerItem itemType, EquipmentMaterialType equipMaterialType)
 		{
 
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
-			_itemBehaviour.Setup(this.transform, this.GetComponent<Controller2D>(), this.GetComponent<BoxCollider2D>());
-            _itemAnimator = new ItemAnimator(animator, animController, animationState);
-            //_itemSprite = this.gameObject.AddComponent<Sprite>();
-            //_itemSprite.Setup(spriteRenderer, "empty", _itemID);
+			_itemBehaviour.Setup(this.transform, this.GetComponent<CharacterController2D>(), this.GetComponent<BoxCollider2D>());
+
+            //ItemAnimControllers/Equipment/Weapon.controller
+            _itemAnimator = new ItemAnimator(animator, "ItemAnimControllers", "Equipment", "Weapon", animController, animationState);
+
 
         }
         public virtual void Awake()

@@ -29,7 +29,7 @@ namespace DoomBreakers
         private Animator _animator;
 
         private IBanditCollision _banditCollider;
-        private IBanditAnimator _banditAnimator;
+        private BanditAnimator _banditAnimator;
         private IBanditSprite _banditSprite;
         private float _playerAttackedButtonTime;
         private ITimer _healthDisplayTimer;

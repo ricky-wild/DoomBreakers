@@ -48,7 +48,7 @@ namespace wildlogicgames
 		private float _raycastLength;
 
 		//Use a value that detects a pit drop deep enough that it doesn't interfere with jumping and being hit into sky for enemy AI.
-		private const float _pitDropDetectionMax = 100.0f; 
+		private const float _pitDropDetectionMax = 400.0f; 
 		private const float _maxClimbAngle = 60f;
 		private const float _maxDecendAngle = 60f;
 		private float _currentSlopeAngle, _distanceToSlopeFrom, _previousSlopeAngle;

@@ -1,18 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using wildlogicgames;
 
 namespace DoomBreakers
 {
     public class ItemBehaviour : MonoBehaviour, IItemBehaviour
     {
         private BoxCollider2D _boxCollider2D;
-        private Controller2D _controller2D;
+        private CharacterController2D _controller2D;
         private Vector3 _velocity;
         private Transform _transform;
         private float _gravity;
 
-        public void Setup(Transform t, Controller2D controller2D, BoxCollider2D boxCollider2D)
+        public void Setup(Transform t, CharacterController2D controller2D, BoxCollider2D boxCollider2D)
 		{
             _boxCollider2D = boxCollider2D;
             _controller2D = controller2D;
@@ -22,13 +23,15 @@ namespace DoomBreakers
         }
         public void UpdateTransform()
 		{
-            _controller2D.Move(_velocity * Time.deltaTime, _velocity);
+            _controller2D.UpdateMovement(_velocity * Time.deltaTime, Vector2.zero, false);
         }
         public void UpdateGravity()
 		{
-            if (!_controller2D.collisions.below)
+            bool collisionBelow = _controller2D._collisionDetail._collidedDirection[0];
+
+            if (!collisionBelow)
                 _velocity.y += _gravity * Time.deltaTime;
-            if (_controller2D.collisions.below)
+            if (collisionBelow)
                 _velocity.y = 0f;
         }
         public void UpdateMovement()

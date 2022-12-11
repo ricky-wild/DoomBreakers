@@ -11,7 +11,8 @@ namespace DoomBreakers
 			_banditID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			_idleWaitTime = 2.0f; 
+			_idleWaitTime = 2.0f;
+			_detectPlatformEdge = false;
 			_behaviourTimer = new Timer();
 			_behaviourTimer.StartTimer(_idleWaitTime);
 			//print("\nIdle State.");

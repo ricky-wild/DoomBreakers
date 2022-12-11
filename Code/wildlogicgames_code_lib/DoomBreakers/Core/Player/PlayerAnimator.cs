@@ -1,10 +1,11 @@
 ﻿
 using UnityEngine;
+using wildlogicgames;
 
 namespace DoomBreakers
 {
 
-	public enum AnimatorController
+	public enum PlayerAnimatorController
 	{
 		Player_with_nothing_controller = 0,
 		Player_with_broadsword_controller = 1,
@@ -25,26 +26,23 @@ namespace DoomBreakers
 		Dead = 3
 	}; //Must corrispond to string[] _indicatorAnimStr assignment order.
 
-	public class PlayerAnimator : IPlayerAnimator //MonoBehaviour, 
+	public class PlayerAnimator : Character2DBaseAnimator
 	{
 
 		private int _playerID;
 
-		private Animator _animator;
-		private RuntimeAnimatorController _runtimeAnimatorController;
 		private AnimationState _animationState;
-		private AnimatorController _animatorController;
-		private string _animControllerFilepath;
+		private PlayerAnimatorController _animatorController;
 
 		private Animator _playerIndicatorAnimator;
 		private string[] _indicatorAnimStr = new string[4];
 
-		public PlayerAnimator(Animator animator, ref Animator playerIndicatorAnimator, int playerId)
+		public PlayerAnimator(ref Animator animator, string str1, string str2, string str3, ref Animator playerIndicatorAnimator, int playerId)
+			: base (animator: ref animator, baseAnimationControllerFilepath: str1, specificAnimControllerFilePath: str2, theAnimationControllerName: str3)
 		{
-			_animator = animator;
-			_runtimeAnimatorController = _animator.runtimeAnimatorController;
-			_animatorController = AnimatorController.Player_with_nothing_controller;
-			_animControllerFilepath = "HumanAnimControllers/Unarmored/";
+
+			_animatorController = PlayerAnimatorController.Player_with_nothing_controller;
+			//_animControllerFilepath = "HumanAnimControllers/Unarmored/";
 
 			_playerIndicatorAnimator = playerIndicatorAnimator;
 			_playerID = playerId;
@@ -54,7 +52,6 @@ namespace DoomBreakers
 			_indicatorAnimStr[2] = "ID" + (_playerID + 1).ToString() + "Tired";
 			_indicatorAnimStr[3] = "ID" + (_playerID + 1).ToString() + "Death";
 
-			//_playerIndicatorAnimator.Play(_indicatorAnimStr[0]); 
 			PlayIndicatorAnimation(IndicatorAnimID.Idle);
 		}
 
@@ -64,43 +61,43 @@ namespace DoomBreakers
 		{
 			SetupAnimControllerBasedOnEquip(playerEquipment);
 
-			switch (_animatorController)
+			switch (_animatorController)//"HumanAnimControllers/Armored/";
 			{
-				case AnimatorController.Player_with_nothing_controller:
-					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_nothing_controller") as RuntimeAnimatorController;
+				case PlayerAnimatorController.Player_with_nothing_controller:
+					_animator.runtimeAnimatorController = Resources.Load(GetBaseAnimFilePath() + "/" + GetSpecificAnimFilePath() + "/Player_with_nothing_controller") as RuntimeAnimatorController;
 					break;
-				case AnimatorController.Player_with_broadsword_controller:
-					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_sword_controller") as RuntimeAnimatorController;
+				case PlayerAnimatorController.Player_with_broadsword_controller:
+					_animator.runtimeAnimatorController = Resources.Load(GetBaseAnimFilePath() + "/" + GetSpecificAnimFilePath() + "/Player_with_sword_controller") as RuntimeAnimatorController;
 					break;
-				case AnimatorController.Player_with_shield_controller:
-					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_shield_controller") as RuntimeAnimatorController;
+				case PlayerAnimatorController.Player_with_shield_controller:
+					_animator.runtimeAnimatorController = Resources.Load(GetBaseAnimFilePath() + "/" + GetSpecificAnimFilePath() + "/Player_with_shield_controller") as RuntimeAnimatorController;
 					break;
-				case AnimatorController.Player_with_broadsword_with_shield_controller:
-					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_sword&shield_controller") as RuntimeAnimatorController;
+				case PlayerAnimatorController.Player_with_broadsword_with_shield_controller:
+					_animator.runtimeAnimatorController = Resources.Load(GetBaseAnimFilePath() + "/" + GetSpecificAnimFilePath() + "/Player_with_sword&shield_controller") as RuntimeAnimatorController;
 					break;
-				case AnimatorController.Player_with_broadsword_with_broadsword_controller:
-					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_sword&sword_controller") as RuntimeAnimatorController;
+				case PlayerAnimatorController.Player_with_broadsword_with_broadsword_controller:
+					_animator.runtimeAnimatorController = Resources.Load(GetBaseAnimFilePath() + "/" + GetSpecificAnimFilePath() + "/Player_with_sword&sword_controller") as RuntimeAnimatorController;
 					break;
-				case AnimatorController.Player_with_longsword_controller:
-					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_longsword_controller") as RuntimeAnimatorController;
+				case PlayerAnimatorController.Player_with_longsword_controller:
+					_animator.runtimeAnimatorController = Resources.Load(GetBaseAnimFilePath() + "/" + GetSpecificAnimFilePath() + "/Player_with_longsword_controller") as RuntimeAnimatorController;
 					break;
-				case AnimatorController.Player_with_longsword_with_shield_controller:
-					_animator.runtimeAnimatorController = Resources.Load(_animControllerFilepath + "Player_with_longsword&shield_controller") as RuntimeAnimatorController;
+				case PlayerAnimatorController.Player_with_longsword_with_shield_controller:
+					_animator.runtimeAnimatorController = Resources.Load(GetBaseAnimFilePath() + "/" + GetSpecificAnimFilePath() + "/Player_with_longsword&shield_controller") as RuntimeAnimatorController;
 					break;
 			}
 		}
 
 		private void SetupAnimControllerBasedOnEquip(IPlayerEquipment playerEquipment)
 		{
-			if (playerEquipment.IsArmor())
-				_animControllerFilepath = "HumanAnimControllers/Armored/";
-			else
-				_animControllerFilepath = "HumanAnimControllers/Unarmored/";
+			SetBaseAnimFilePath("HumanAnimControllers");
+			if (playerEquipment.IsArmor()) SetSpecificAnimFilePath("Armored");
+			else 
+				SetSpecificAnimFilePath("Unarmored");
 
 			if (playerEquipment.IsEmptyHanded(EquipHand.Left_Hand) && 
 				playerEquipment.IsEmptyHanded(EquipHand.Right_Hand))								//EMPTY HANDED BOTH LEFT & RIGHT
 			{
-				_animatorController = AnimatorController.Player_with_nothing_controller;
+				_animatorController = PlayerAnimatorController.Player_with_nothing_controller;
 				return;
 			}
 			if (playerEquipment.IsBroadsword(EquipHand.Left_Hand) &&								//BROADSWORD ONLY IN LEFT OR RIGHT HAND
@@ -108,7 +105,7 @@ namespace DoomBreakers
 				playerEquipment.IsEmptyHanded(EquipHand.Left_Hand) && 
 				playerEquipment.IsBroadsword(EquipHand.Right_Hand))
 			{
-				_animatorController = AnimatorController.Player_with_broadsword_controller;
+				_animatorController = PlayerAnimatorController.Player_with_broadsword_controller;
 				return;
 			}
 
@@ -117,7 +114,7 @@ namespace DoomBreakers
 				playerEquipment.IsEmptyHanded(EquipHand.Left_Hand) &&
 				playerEquipment.IsLongsword(EquipHand.Right_Hand))
 			{
-				_animatorController = AnimatorController.Player_with_longsword_controller;
+				_animatorController = PlayerAnimatorController.Player_with_longsword_controller;
 				return;
 			}
 
@@ -126,7 +123,7 @@ namespace DoomBreakers
 				playerEquipment.IsEmptyHanded(EquipHand.Left_Hand) &&
 				playerEquipment.IsShield(EquipHand.Right_Hand))
 			{
-				_animatorController = AnimatorController.Player_with_shield_controller;
+				_animatorController = PlayerAnimatorController.Player_with_shield_controller;
 				return;
 			}
 
@@ -135,7 +132,7 @@ namespace DoomBreakers
 				playerEquipment.IsBroadsword(EquipHand.Left_Hand) &&
 				playerEquipment.IsShield(EquipHand.Right_Hand))
 			{
-				_animatorController = AnimatorController.Player_with_broadsword_with_shield_controller;
+				_animatorController = PlayerAnimatorController.Player_with_broadsword_with_shield_controller;
 				return;
 			}
 
@@ -144,7 +141,7 @@ namespace DoomBreakers
 				playerEquipment.IsLongsword(EquipHand.Left_Hand) &&
 				playerEquipment.IsShield(EquipHand.Right_Hand))
 			{
-				_animatorController = AnimatorController.Player_with_longsword_with_shield_controller;
+				_animatorController = PlayerAnimatorController.Player_with_longsword_with_shield_controller;
 				return;
 			}
 		}

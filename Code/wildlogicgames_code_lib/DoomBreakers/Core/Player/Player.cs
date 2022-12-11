@@ -32,7 +32,7 @@ namespace DoomBreakers
 
         private IPlayerCollision _playerCollider;
         private IPlayerEquipment _playerEquipment;
-        private IPlayerAnimator _playerAnimator;
+        private PlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
         private PlayerStats _playerStats;
         private ITimer _buttonHeldTimer, _staminaTimer;
@@ -50,7 +50,8 @@ namespace DoomBreakers
             _playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints, _playerID);
             
             _playerEquipment = new PlayerEquipment(_playerID);
-            _playerAnimator = new PlayerAnimator(this.GetComponent<Animator>(), ref _playerIndicatorAnimator, _playerID);
+            _playerAnimator = new PlayerAnimator(ref _animator, "HumanAnimControllers", "Unarmored", "Player_with_nothing_controller", ref _playerIndicatorAnimator, _playerID);
+
             _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
             _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
             _playerStats = new PlayerStats(100.0, 100.0, 0.0);

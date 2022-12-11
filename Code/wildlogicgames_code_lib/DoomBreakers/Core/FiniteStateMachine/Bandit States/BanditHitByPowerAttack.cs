@@ -15,6 +15,7 @@ namespace DoomBreakers
 			_maxPowerStruckVelocityX = 0.75f;
 			_behaviourTimer = new Timer();
 			_cooldownTimer = new Timer();
+			_detectPlatformEdge = false;
 			//print("\nHitByPowerAttack State.");
 		}
 

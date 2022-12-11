@@ -47,6 +47,9 @@ namespace DoomBreakers
 			}
 			if(_fromJumpState)
 			{
+				//_cachedVector3 = AITargetTrackingManager.GetAssignedTargetTransform(_banditID, EnemyAI.Bandit).position;
+
+				//if( _cachedVector3.y < _transform.position.y){}
 
 			}
 
