@@ -22,7 +22,7 @@ namespace DoomBreakers
         PlayerArmorBrokenSFX = 14,
         PlayerDefenseHitSFX = 15,
         PlayerDeathSFX = 16
-    }
+    };
     public enum EnemySFXID
     {
         EnemyJumpSFX = 1,
@@ -40,7 +40,12 @@ namespace DoomBreakers
         EnemyArmorBrokenSFX = 13,
         EnemyDefenseHitSFX = 14,
         EnemyDeathSFX = 15
-    }
+    };
+    public enum PropSFXID
+	{
+        PropHitSFX = 1,
+        PropDestroySFX = 2
+	};
     public class AudioEventManager : MonoBehaviour
     {
         public static AudioEventManager _instance = null;
@@ -51,6 +56,7 @@ namespace DoomBreakers
 
         private static Dictionary<PlayerSFXID, Audio> _playerSFXDict;
         private static Dictionary<EnemySFXID, Audio> _enemySFXDict;
+        private static Dictionary<PropSFXID, Audio> _propSFXDict;
 
         void Awake()
         {
@@ -74,8 +80,14 @@ namespace DoomBreakers
 
             if (_playerSFXDict == null)
                 _playerSFXDict = new Dictionary<PlayerSFXID, Audio>();
+            if (_enemySFXDict == null)
+                _enemySFXDict = new Dictionary<EnemySFXID, Audio>();
+            if (_propSFXDict == null)
+                _propSFXDict = new Dictionary<PropSFXID, Audio>();
 
             InitializePlayersSFX();
+            InitializeEnemySFX();
+            InitializePropSFX();
         }
 
         private static void InitializePlayersSFX()
@@ -147,6 +159,18 @@ namespace DoomBreakers
         }
         public static void PlayEnemySFX(EnemySFXID enemySFXID) => _enemySFXDict[enemySFXID].PlaySound();
         public static void StopEnemySFX(EnemySFXID enemySFXID) => _enemySFXDict[enemySFXID].StopSound();
+
+        private static void InitializePropSFX()
+        {
+            PropSFXID sfxId = PropSFXID.PropHitSFX;
+            _propSFXDict.Add(sfxId, new Audio("playerLand2", _volumeSFX, false, _transform));
+
+            sfxId = PropSFXID.PropDestroySFX;
+            _propSFXDict.Add(sfxId, new Audio("armorBreak", _volumeSFX, false, _transform));
+
+        }
+        public static void PlayPropSFX(PropSFXID propSFXID) => _propSFXDict[propSFXID].PlaySound();
+        public static void StopPropSFX(PropSFXID propSFXID) => _propSFXDict[propSFXID].StopSound();
 
     }
 }

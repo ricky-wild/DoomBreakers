@@ -19,6 +19,9 @@ namespace DoomBreakers
 			
 			switch (quickAttackIncrement)
 			{
+				default:
+					animator.Play("SmallAttack3");
+					break;
 				case 0:
 					animator.Play("SmallAttack");//, -1, 0.0f); //SmallAttack2 - SmallAttack5
 					break;

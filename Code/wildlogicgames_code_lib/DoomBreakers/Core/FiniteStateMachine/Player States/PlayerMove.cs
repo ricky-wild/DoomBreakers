@@ -11,7 +11,7 @@ namespace DoomBreakers
 			//print("\nMove State.");
 		}
 
-		public override void IsMoving(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider)
+		public override void IsMoving(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref PlayerCollision playerCollider)
 		{
 			animator.Play("Run");
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed));
@@ -22,7 +22,7 @@ namespace DoomBreakers
 			//base.UpdateBehaviour();
 		}
 
-		private void DetectFaceDirection(ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider)
+		private void DetectFaceDirection(ref IPlayerSprite playerSprite, ref PlayerCollision playerCollider)
 		{
 			if (_velocity.x < 0f)
 			{

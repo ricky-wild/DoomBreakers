@@ -30,7 +30,7 @@ namespace DoomBreakers
         private CharacterController2D _controller2D;//private Controller2D _controller2D;
         private Animator _animator;
 
-        private IPlayerCollision _playerCollider;
+        private PlayerCollision _playerCollider;
         private IPlayerEquipment _playerEquipment;
         private PlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
@@ -208,7 +208,7 @@ namespace DoomBreakers
                     SetState(new PlayerReleaseAttack(this, _inputVector2));
                     _playerCollider.EnableAttackCollisions();
                     AudioEventManager.StopPlayerSFX(PlayerSFXID.PlayerChargeAttackSFX);
-                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
+                    //AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
                 }
             }
         }

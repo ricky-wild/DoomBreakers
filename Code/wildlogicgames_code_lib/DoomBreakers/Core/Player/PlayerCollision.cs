@@ -15,7 +15,7 @@ namespace DoomBreakers
         Container = 6,
     };
 
-    public class PlayerCollision : MonoBehaviour, IPlayerCollision
+    public class PlayerCollision : MonoBehaviour//, IPlayerCollision
     {
         private int _playerID;
         private CompareTags _compareTags;
@@ -30,6 +30,7 @@ namespace DoomBreakers
         private LayerMask[] _enemyLayerMasks;// = new LayerMask[2];
         private const string _playerLayerMaskStr = "Player";
         private const string _enemyLayerMaskStr = "Enemy";
+        //private const string _propsLayerMaskStr = "Items";
 
         private string[] _compareTagStrings;// = new string[10];
 
@@ -38,7 +39,7 @@ namespace DoomBreakers
         private bool _itemCollisionEnabled;
         private bool _itemPickupEnabled;
         private bool _itemPickupPossible;
-        private bool _containerCollisionEnabled;
+
 
 
         private IPlayerEquipment _playerEquipment;
@@ -59,14 +60,15 @@ namespace DoomBreakers
             _itemCollisionEnabled = false;
             _itemPickupEnabled = false;
             _itemPickupPossible = false;
-            _containerCollisionEnabled = false;
+
         }
         public void SetupLayerMasks()
 		{
-            _enemyLayerMasks = new LayerMask[2];
+            _enemyLayerMasks = new LayerMask[3];
 
             _enemyLayerMasks[0] = LayerMask.NameToLayer(_playerLayerMaskStr);
             _enemyLayerMasks[1] = LayerMask.NameToLayer(_enemyLayerMaskStr);
+            //_enemyLayerMasks[2] = LayerMask.NameToLayer(_propsLayerMaskStr);
             //_enemyLayerMasks[0] = LayerMask.GetMask(_playerLayerMaskStr);
             //_enemyLayerMasks[1] = LayerMask.GetMask(_enemyLayerMaskStr);
         }
@@ -104,7 +106,7 @@ namespace DoomBreakers
             UpdateDetectEnemyTargets(ref playerState, playerId, ref playerSprite);
             ProcessItemCollision();
             UpdateDetectItemTargets(ref playerEquipment);
-            ProcessContainerCollision();
+
         }
         public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite)
         {
@@ -134,6 +136,10 @@ namespace DoomBreakers
                         int banditID = enemy.GetComponent<Bandit>()._banditID;
                         BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBandit" + banditID.ToString(), 
                                                 ref playerState, playerId, playerSprite, _playerEquipment.GetWeapon());
+                    }
+                    if (enemy.CompareTag(GetCompareTag(CompareTags.Container)))
+					{
+                        ProcessCollisionWithBarrel(enemy);
                     }
                 }
 
@@ -177,7 +183,6 @@ namespace DoomBreakers
             playerEquipment.NewEquipmentGained(true);
 
             _itemCollisionEnabled = false;
-            _containerCollisionEnabled = false;
             SignalItemPickupCollision(false);
             EnableItemPickupCollision(false);
         }
@@ -186,7 +191,7 @@ namespace DoomBreakers
             if (!_itemPickupPossible) return;
             if (!_itemPickupEnabled) return;
 
-            ProcessCollisionFlags(_itemCollider2d);
+            ProcessItemCollisionFlags(_itemCollider2d);
         }
         private void ProcessCollisionWithSword(Collider2D collision)
 		{
@@ -228,23 +233,18 @@ namespace DoomBreakers
             return;
         }
 
-        private void ProcessContainerCollision()
-        {
-            if (!_containerCollisionEnabled) return;
 
-            ProcessCollisionFlags(_itemCollider2d);
-        }
         private void ProcessCollisionWithBarrel(Collider2D collision)
         {
             if (collision.GetComponent<Barrel>() == null)
                 return; //Then NOT a Barrel. Get outta here!
 
             collision.GetComponent<Barrel>().IsHit();
-            _containerCollisionEnabled = false;
+
 
             return;
         }
-        public void ProcessCollisionFlags(Collider2D collision)
+        public void ProcessItemCollisionFlags(Collider2D collision)
         {
 			if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
 			{
@@ -252,10 +252,7 @@ namespace DoomBreakers
 				ProcessCollisionWithShield(collision);
 				ProcessCollisionWithArmor(collision);
 			}
-            if (collision.CompareTag(GetCompareTag(CompareTags.Container)))
-            {
-                ProcessCollisionWithBarrel(collision);
-            }
+
             //if (collision.CompareTag("")) { }
 
          }
@@ -266,6 +263,7 @@ namespace DoomBreakers
                 _itemCollider2d = collision;
                 SignalItemPickupCollision(true);
             }
+
         }
         //void OnTriggerStay2D(Collider2D collision) => ProcessCollisionFlags(collision); //unreliable. We use ProcessItemCollision() instead.
         void OnTriggerExit2D(Collider2D collision)
@@ -275,13 +273,11 @@ namespace DoomBreakers
                 _itemCollider2d = null;
                 SignalItemPickupCollision(false);
             }
+
         }
 
-        public void EnableAttackCollisions() //=> _attackCollisionEnabled = true;//_containerCollisionEnabled = _attackCollisionEnabled = true;
-		{
-            _attackCollisionEnabled = true;
-            //_containerCollisionEnabled = true;
-        }
+        public void EnableAttackCollisions() =>  _attackCollisionEnabled = true;
+
 
         public void EnableItemPickupCollision() => _itemPickupEnabled = true;
         private void EnableItemPickupCollision(bool b) => _itemPickupEnabled = b;

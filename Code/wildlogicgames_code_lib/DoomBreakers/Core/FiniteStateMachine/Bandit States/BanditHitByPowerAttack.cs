@@ -16,6 +16,7 @@ namespace DoomBreakers
 			_behaviourTimer = new Timer();
 			_cooldownTimer = new Timer();
 			_detectPlatformEdge = false;
+			AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
 			//print("\nHitByPowerAttack State.");
 		}
 

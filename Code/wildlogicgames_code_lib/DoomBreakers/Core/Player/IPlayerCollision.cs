@@ -10,7 +10,7 @@ namespace DoomBreakers
 		void SetupCompareTags();
 		string GetCompareTag(CompareTags compareTagId);
 		void UpdateCollision(ref BaseState playerState, int playerId, ref IPlayerEquipment playerEquipment, ref IPlayerSprite playerSprite);
-		void ProcessCollisionFlags(Collider2D collision);
+		void ProcessItemCollisionFlags(Collider2D collision);
 		void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite);
 		void UpdateDetectItemTargets(ref IPlayerEquipment playerEquipment);
 		void EnableAttackCollisions();

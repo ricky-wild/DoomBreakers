@@ -62,7 +62,13 @@ namespace DoomBreakers
             return false;
 		}
 
-        public float GetTheWaitTime() => _waitTime;
+		public void Reset()
+		{
+            _timeStamp = 0f;
+            _timeStamped = false;
+        }
+
+		public float GetTheWaitTime() => _waitTime;
 
 
 

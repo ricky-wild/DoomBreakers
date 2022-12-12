@@ -16,7 +16,7 @@ namespace DoomBreakers
 		}
 
 		public override void IsDodging(ref Animator animator, ref CharacterController2D controller2D, ref Vector2 input,
-										 bool dodgeLeft, ref IPlayerSprite playerSprite, ref IPlayerCollision playerCollider)
+										 bool dodgeLeft, ref IPlayerSprite playerSprite, ref PlayerCollision playerCollider)
 		{
 			animator.Play("Dodge");
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed));
