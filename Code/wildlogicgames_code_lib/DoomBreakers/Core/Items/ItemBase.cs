@@ -44,7 +44,7 @@ namespace DoomBreakers
         [Tooltip("ID ranges from 0 to ?")]   //Max ? items.
         public int _itemID;                  //Set in editor per item or else where.
 
-        protected IItemBehaviour _itemBehaviour;
+        protected ItemBehaviour _itemBehaviour;
         protected ItemAnimator _itemAnimator;
 
         public ItemBase(){}
@@ -55,7 +55,7 @@ namespace DoomBreakers
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
 			_itemBehaviour.Setup(this.transform, this.GetComponent<CharacterController2D>(), this.GetComponent<BoxCollider2D>());
 
-            //ItemAnimControllers/Equipment/Weapon.controller
+            //Resources/ItemAnimControllers/Equipment/Weapon.controller
             _itemAnimator = new ItemAnimator(animator, "ItemAnimControllers", "Equipment", "Weapon", animController, animationState);
 
 

@@ -5,7 +5,7 @@ using wildlogicgames;
 
 namespace DoomBreakers
 {
-    public class ItemBehaviour : MonoBehaviour, IItemBehaviour
+    public class ItemBehaviour : MonoBehaviour//, IItemBehaviour
     {
         private BoxCollider2D _boxCollider2D;
         private CharacterController2D _controller2D;

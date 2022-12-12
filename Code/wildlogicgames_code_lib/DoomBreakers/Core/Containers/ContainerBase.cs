@@ -24,20 +24,39 @@ namespace DoomBreakers
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(Controller2D))]
+    [RequireComponent(typeof(CharacterController2D))]
     public class ContainerBase : MonoBehaviour//, Character2DBaseAnimator
     {
-        private ContainerAnimator _containerAnimator;
+        protected ItemBehaviour _itemBehaviour;
+        protected ContainerAnimator _containerAnimator;
         public ContainerBase() { }
 
-        public virtual void Initialize(SpriteRenderer spriteRenderer, Animator animator, ContainerAnimatorController animController, AnimationState animationState)
+        public virtual void Initialize(SpriteRenderer spriteRenderer, Animator animator, ContainerAnimatorController animController)
         {
 
-            //_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
-            //_itemBehaviour.Setup(this.transform, this.GetComponent<CharacterController2D>(), this.GetComponent<BoxCollider2D>());
+            _itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
+            _itemBehaviour.Setup(this.transform, this.GetComponent<CharacterController2D>(), this.GetComponent<BoxCollider2D>());
 
-            _containerAnimator = new ContainerAnimator(animator, "", "", "");
+            //Resources/ContainerAnimControllers/Barrel/Barrel.controller
+            _containerAnimator = new ContainerAnimator(animator, "ContainerAnimControllers", "Barrel", "Barrel");
 
+        }
+        public virtual void Awake()
+        {
+            //Initialize();
+        }
+        public virtual void Start()
+        {
+        }
+
+        public virtual void Update() => _itemBehaviour.UpdateMovement();
+
+
+
+        public void Destroy()
+        {
+            _itemBehaviour.DisableCollisions(); //Especially important for player Equip Indicator usage.
+            this.gameObject.SetActive(false);
         }
     }
 }

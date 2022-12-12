@@ -11,8 +11,9 @@ namespace DoomBreakers
         Player4 = 3,
 
         Enemy = 4,
-        Item = 5
-    }
+        Item = 5,
+        Container = 6,
+    };
 
     public class PlayerCollision : MonoBehaviour, IPlayerCollision
     {
@@ -37,6 +38,7 @@ namespace DoomBreakers
         private bool _itemCollisionEnabled;
         private bool _itemPickupEnabled;
         private bool _itemPickupPossible;
+        private bool _containerCollisionEnabled;
 
 
         private IPlayerEquipment _playerEquipment;
@@ -57,6 +59,7 @@ namespace DoomBreakers
             _itemCollisionEnabled = false;
             _itemPickupEnabled = false;
             _itemPickupPossible = false;
+            _containerCollisionEnabled = false;
         }
         public void SetupLayerMasks()
 		{
@@ -87,13 +90,10 @@ namespace DoomBreakers
             _compareTagStrings[4] = "Enemy";
 
             _compareTagStrings[5] = "Item";
+            _compareTagStrings[6] = "Container";
         }
 
-        public string GetCompareTag(CompareTags compareTagId)
-		{
-            return _compareTagStrings[(int)compareTagId];
-
-        }
+        public string GetCompareTag(CompareTags compareTagId) => _compareTagStrings[(int)compareTagId];
 
         void Start() { }
 
@@ -104,6 +104,7 @@ namespace DoomBreakers
             UpdateDetectEnemyTargets(ref playerState, playerId, ref playerSprite);
             ProcessItemCollision();
             UpdateDetectItemTargets(ref playerEquipment);
+            ProcessContainerCollision();
         }
         public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite)
         {
@@ -168,20 +169,15 @@ namespace DoomBreakers
 
         public void UpdateDetectItemTargets(ref IPlayerEquipment playerEquipment)
         {
-            if (_playerEquipment == null)
-                _playerEquipment = playerEquipment; //For ProcessCollisionFlags() Item use.
+            if (_playerEquipment == null) _playerEquipment = playerEquipment; //For ProcessCollisionFlags() Item use.
 
-            if (!_itemCollisionEnabled)
-                return;
+            if (!_itemCollisionEnabled) return;
 
             playerEquipment = _playerEquipment; //Any changes made apply to original parent class, Player.cs.
             playerEquipment.NewEquipmentGained(true);
-            //playerState = new PlayerGainedEquipment(null, Vector3.zero);
-            //playerState = new BaseState(new Vector3());
-            //playerStateMachine.SetState(new PlayerGainedEquipment(playerStateMachine, velocity));
-            //playerStateMachine.SetPlayerState(state.IsGainedEquipment);
 
             _itemCollisionEnabled = false;
+            _containerCollisionEnabled = false;
             SignalItemPickupCollision(false);
             EnableItemPickupCollision(false);
         }
@@ -231,20 +227,38 @@ namespace DoomBreakers
             }
             return;
         }
+
+        private void ProcessContainerCollision()
+        {
+            if (!_containerCollisionEnabled) return;
+
+            ProcessCollisionFlags(_itemCollider2d);
+        }
+        private void ProcessCollisionWithBarrel(Collider2D collision)
+        {
+            if (collision.GetComponent<Barrel>() == null)
+                return; //Then NOT a Barrel. Get outta here!
+
+            collision.GetComponent<Barrel>().IsHit();
+            _containerCollisionEnabled = false;
+
+            return;
+        }
         public void ProcessCollisionFlags(Collider2D collision)
         {
 			if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
 			{
-                //if (!_itemPickupPossible) return;
-                //if (!_itemPickupEnabled) return;
-
 				ProcessCollisionWithSword(collision);
 				ProcessCollisionWithShield(collision);
 				ProcessCollisionWithArmor(collision);
 			}
-			//if (collision.CompareTag("")) { }
+            if (collision.CompareTag(GetCompareTag(CompareTags.Container)))
+            {
+                ProcessCollisionWithBarrel(collision);
+            }
+            //if (collision.CompareTag("")) { }
 
-		}
+         }
         public void OnTriggerEnter2D(Collider2D collision)
 		{
             if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
@@ -263,8 +277,12 @@ namespace DoomBreakers
             }
         }
 
-        public void EnableAttackCollisions() => _attackCollisionEnabled = true;
-        
+        public void EnableAttackCollisions() //=> _attackCollisionEnabled = true;//_containerCollisionEnabled = _attackCollisionEnabled = true;
+		{
+            _attackCollisionEnabled = true;
+            //_containerCollisionEnabled = true;
+        }
+
         public void EnableItemPickupCollision() => _itemPickupEnabled = true;
         private void EnableItemPickupCollision(bool b) => _itemPickupEnabled = b;
         
