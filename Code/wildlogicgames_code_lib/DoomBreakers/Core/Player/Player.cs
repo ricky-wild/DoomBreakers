@@ -252,7 +252,7 @@ namespace DoomBreakers
             if (_state.GetType() == typeof(PlayerExhausted))
                 return;
 
-            _playerCollider.UpdateCollision(ref _state, _playerID, ref _playerEquipment, ref _playerSprite);
+            _playerCollider.UpdateCollision(ref _state, _playerID, ref _playerEquipment, ref _playerSprite, ref _playerStats);
             if(_playerEquipment.NewEquipmentGained())
 			{
                 AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerEquippedSFX);

@@ -31,6 +31,13 @@ namespace DoomBreakers
         Breastplate = 0,
         Shield = 1
 	}
+    public enum HealingItemType
+	{
+        None = -1,
+        Apple = 0,
+        Chicken = 1,
+        Fish = 2
+	};
 
 
     [RequireComponent(typeof(Animator))]
@@ -48,17 +55,30 @@ namespace DoomBreakers
         protected ItemAnimator _itemAnimator;
 
         public ItemBase(){}
+
+        //<summary>
+        //Initialize for items that are Equipment, such as weapons, armor.
+        //</summary>
 		public virtual void Initialize(SpriteRenderer spriteRenderer, Animator animator, PlayerAnimatorController animController,
                                        ItemAnimationState animationState, PlayerItem itemType, EquipmentMaterialType equipMaterialType)
 		{
-
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
 			_itemBehaviour.Setup(this.transform, this.GetComponent<CharacterController2D>(), this.GetComponent<BoxCollider2D>());
 
             //Resources/ItemAnimControllers/Equipment/Weapon.controller
-            _itemAnimator = new ItemAnimator(animator, "ItemAnimControllers", "Equipment", "Weapon", animController, animationState);
+            _itemAnimator = new ItemAnimator(animator, "ItemAnimControllers", "Equipment", "Weapon", animationState);
+        }
 
+        //<summary>
+        //Initialize for items that are Health, such as apples, fish.
+        //</summary>
+        public virtual void Initialize(SpriteRenderer spriteRenderer, Animator animator, HealingItemType healingItemType)
+        {
+            _itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
+            _itemBehaviour.Setup(this.transform, this.GetComponent<CharacterController2D>(), this.GetComponent<BoxCollider2D>());
 
+            //Resources/ItemAnimControllers/Equipment/Weapon.controller
+            _itemAnimator = new ItemAnimator(animator, "ItemAnimControllers", "HealthItems", "Health", healingItemType);
         }
         public virtual void Awake()
 		{

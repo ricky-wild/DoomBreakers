@@ -40,7 +40,7 @@ namespace DoomBreakers
 
 			_itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
 			_itemBehaviour.Setup(this.transform, this.GetComponent<CharacterController2D>(), this.GetComponent<BoxCollider2D>());
-			_itemAnimator = new ItemAnimator(animator, "ItemAnimControllers", "Equipment", "Weapon", animController, animationState);
+			_itemAnimator = new ItemAnimator(animator, "ItemAnimControllers", "Equipment", "Weapon", animationState);
 
 		}
 		public EmptyHand(EquipmentWeaponType weaponType, EquipmentMaterialType materialType) //Constructor for equipment setup within code, not scene.

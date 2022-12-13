@@ -32,6 +32,7 @@ namespace wildlogicgames
 		public void SetSpecificAnimFilePath(string filePathStr) => _specificAnimControllerFilepath = filePathStr;
 		public string GetBaseAnimFilePath() => _baseAnimControllerFilepath;
 		public string GetSpecificAnimFilePath() => _specificAnimControllerFilepath;
+		public string GetAnimControllerName() => _theAnimationControllerName;
 		public Animator GetAnimator() => _animator;
 
 		public void AddAnimation(int idKey, string animationName)
