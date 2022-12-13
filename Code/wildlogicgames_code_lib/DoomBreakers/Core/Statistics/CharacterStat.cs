@@ -19,12 +19,16 @@ namespace DoomBreakers
 
 		protected bool _armored;
 
+
+		protected int _currency;
+
 		public CharacterStat(double health, double stamina, double defence)
 		{
 			_health = health;
 			_stamina = stamina;
 			_defence = defence;
 			_armored = false;
+			_currency = 0;
 		}
 		public virtual double Health
 		{
@@ -78,6 +82,11 @@ namespace DoomBreakers
 			{
 				return _defence;
 			}
+		}
+		public virtual int Currency
+		{
+			set => _currency = value;
+			get => _currency;
 		}
 
 		public virtual bool IsArmored() => _armored;

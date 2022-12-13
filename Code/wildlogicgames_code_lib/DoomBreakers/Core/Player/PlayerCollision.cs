@@ -13,15 +13,24 @@ namespace DoomBreakers
         Enemy = 4,
         Item = 5,
         Container = 6,
-        Health = 7
+        Health = 7,
+        Currency = 8
     };
+
+    public enum C2D
+	{
+        PlayerCollider2D = 0,
+        EquipmentCollider2D = 1,
+        HealthCollider2D = 2,
+        CurrencyCollider2D = 3
+	};//_colliderIdentities2D[]; //_collider2d, _equipCollider2d, _healthCollider2d;
 
     public class PlayerCollision : MonoBehaviour//, IPlayerCollision
     {
         private int _playerID;
         private CompareTags _compareTags;
 
-        private Collider2D _collider2d, _equipCollider2d, _itemCollider2d;
+        private Collider2D[] _colliderIdentities2D = new Collider2D[4];
         private Collider2D[] _enemyTargetsHit;
 
         private Transform[] _attackPoints;                              //1=quickATK, 2=powerATK, 3=upwardATK
@@ -40,7 +49,8 @@ namespace DoomBreakers
         private bool _equipCollisionEnabled;
         private bool _equipPickupEnabled;
         private bool _equipPickupPossible;
-        private bool _itemPickupEnabled;
+        private bool _healthPickupEnabled;
+        private bool _currencyPickupEnabled;
 
 
         private IPlayerEquipment _playerEquipment;
@@ -49,22 +59,30 @@ namespace DoomBreakers
         public void Setup(Collider2D collider2D, ref Transform[] arrayAtkPoints, int playerId)
 		{
             _playerID = playerId;
-            _collider2d = collider2D;
+            SetupCollider2D(collider2D);
             _attackPoints = arrayAtkPoints;
 
             SetupLayerMasks();
             SetupAttackRadius();
             SetupCompareTags();
 
-            _collider2d.enabled = true;
+            //_collider2d.enabled = true;
             _attackCollisionEnabled = false;
             
             _equipCollisionEnabled = false;
             _equipPickupEnabled = false;
             _equipPickupPossible = false;
 
-            _itemPickupEnabled = false;
+            _healthPickupEnabled = false;
+            _currencyPickupEnabled = false;
 
+        }
+        private void SetupCollider2D(Collider2D collider2D)
+		{
+            SetCollider2DIdentity(collider2D, C2D.PlayerCollider2D); //_collider2d = collider2D;
+            _colliderIdentities2D[1] = null; //C2D.EquipmentCollider2D
+            _colliderIdentities2D[2] = null; //C2D.HealthCollider2D
+            _colliderIdentities2D[3] = null; //C2D.CurrencyCollider2D
         }
         public void SetupLayerMasks()
 		{
@@ -98,9 +116,12 @@ namespace DoomBreakers
             _compareTagStrings[5] = "Item";
             _compareTagStrings[6] = "Container";
             _compareTagStrings[7] = "Health";
+            _compareTagStrings[8] = "Currency";//oops
         }
 
         public string GetCompareTag(CompareTags compareTagId) => _compareTagStrings[(int)compareTagId];
+        private Collider2D GetCollider2DIdentity(C2D colliderIdentity) => _colliderIdentities2D[(int)colliderIdentity];
+        private void SetCollider2DIdentity(Collider2D collider2D, C2D colliderIdentity) => _colliderIdentities2D[(int)colliderIdentity] = collider2D;
 
         void Start() { }
 
@@ -109,9 +130,10 @@ namespace DoomBreakers
         public void UpdateCollision(ref BaseState playerState, int playerId, ref IPlayerEquipment playerEquipment, ref IPlayerSprite playerSprite, ref PlayerStats playerStat)
 		{
             UpdateDetectEnemyTargets(ref playerState, playerId, ref playerSprite);
-            ProcessEquipmentCollision();
+            ProcessEquipmentCollisions();
             UpdateEquipmentTargets(ref playerEquipment);
-            ProcessItemsCollision(ref playerStat);
+            ProcessHealthCollisions(ref playerStat);
+            ProcessCurrencyCollisions(ref playerStat);
         }
         public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite)
         {
@@ -191,12 +213,12 @@ namespace DoomBreakers
             SignalItemPickupCollision(false);
             EnableItemPickupCollision(false);
         }
-        private void ProcessEquipmentCollision()
+        private void ProcessEquipmentCollisions()
 		{
             if (!_equipPickupPossible) return;
             if (!_equipPickupEnabled) return;
 
-            ProcessItemCollisionFlags(_equipCollider2d);
+            ProcessItemCollisionFlags(GetCollider2DIdentity(C2D.EquipmentCollider2D));//_equipCollider2d
         }
         public void ProcessItemCollisionFlags(Collider2D collision)
         {
@@ -247,16 +269,59 @@ namespace DoomBreakers
             return;
         }
 
-        private void ProcessItemsCollision(ref PlayerStats playerStat)
+        private void ProcessHealthCollisions(ref PlayerStats playerStat)
         {
-            if (!_itemPickupEnabled) return;
-            if (_itemCollider2d == null) return;
-            if (_itemCollider2d.CompareTag(GetCompareTag(CompareTags.Health)))
+            if (!_healthPickupEnabled) return;
+            if (GetCollider2DIdentity(C2D.HealthCollider2D) == null) return;//_healthCollider2d
+            if (GetCollider2DIdentity(C2D.HealthCollider2D).CompareTag(GetCompareTag(CompareTags.Health)))
             {
-                ProcessCollisionWithApple(_itemCollider2d, ref playerStat);
+                ProcessCollisionWithApple(GetCollider2DIdentity(C2D.HealthCollider2D), ref playerStat);
+            }
+		}
+        private void ProcessCollisionWithApple(Collider2D collision,ref PlayerStats playerStat)
+        {
+            if (collision.GetComponent<Apple>() == null) //Exists on Items Layer, Tag=Health
+                return; //Then NOT a Apple. Get outta here!
 
+            if (playerStat.Health != playerStat.GetMaxHealthLimit())
+			{
+                double healPoints = collision.GetComponent<Apple>().Health();
+                playerStat.Health += healPoints;
+                UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref playerStat, _playerID);
+                collision.GetComponent<Apple>().Destroy();
+            }
+
+            _healthPickupEnabled = false;
+            SetCollider2DIdentity(null, C2D.HealthCollider2D);//_healthCollider2d = null;
+            return;
+        }
+
+        private void ProcessCurrencyCollisions(ref PlayerStats playerStat)
+        {
+            if (!_currencyPickupEnabled) return;
+
+            if (GetCollider2DIdentity(C2D.CurrencyCollider2D).CompareTag(GetCompareTag(CompareTags.Currency)))
+            {
+                ProcessCollisionWithGoldCoin(GetCollider2DIdentity(C2D.CurrencyCollider2D), ref playerStat);
             }
         }
+        private void ProcessCollisionWithGoldCoin(Collider2D collision, ref PlayerStats playerStat)
+        {
+            if (collision.GetComponent<GoldCoin>() == null) //Exists on Items Layer, Tag=Currency
+                return; //Then NOT a GoldCoin. Get outta here!
+
+            int currencyValue = collision.GetComponent<GoldCoin>().Amount();
+            playerStat.Currency += currencyValue;
+            UIPlayerManager.TriggerEvent("ReportUIPlayerGoldscoreEvent", ref playerStat, _playerID);
+            collision.GetComponent<GoldCoin>().Destroy();
+            AudioEventManager.PlayPropSFX(PropSFXID.PropCoinPickSFX);
+            _currencyPickupEnabled = false;
+            SetCollider2DIdentity(null, C2D.HealthCollider2D);//_healthCollider2d = null;
+            return;
+        }
+
+
+
         private void ProcessCollisionWithBarrel(Collider2D collision)
         {
             if (collision.GetComponent<Barrel>() == null) //Exists on Enemy Layer, Tag=Container
@@ -267,45 +332,34 @@ namespace DoomBreakers
 
             return;
         }
-        private void ProcessCollisionWithApple(Collider2D collision,ref PlayerStats playerStat)
-        {
-            if (collision.GetComponent<Apple>() == null) //Exists on Items Layer, Tag=Health
-                return; //Then NOT a Apple. Get outta here!
-
-
-            double healPoints = collision.GetComponent<Apple>().Health();
-            playerStat.Health += healPoints;
-            UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref playerStat, _playerID);
-
-            collision.GetComponent<Apple>().Destroy();
-            _itemPickupEnabled = false;
-            _itemCollider2d = null;
-            return;
-        }
-
-
         public void OnTriggerEnter2D(Collider2D collision)
 		{
             if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
             {
-                _equipCollider2d = collision;
+                SetCollider2DIdentity(collision, C2D.EquipmentCollider2D);//_equipCollider2d = collision;
                 SignalItemPickupCollision(true);
             }
             if (collision.CompareTag(GetCompareTag(CompareTags.Health)))
             {
-                _itemCollider2d = collision;
-                _itemPickupEnabled = true;
+                SetCollider2DIdentity(collision, C2D.HealthCollider2D);//_healthCollider2d = collision;
+                _healthPickupEnabled = true;
             }
-        }
+			if (collision.CompareTag(GetCompareTag(CompareTags.Currency)))
+			{
+                SetCollider2DIdentity(collision, C2D.CurrencyCollider2D);
+                _currencyPickupEnabled = true;
+			}
+		}
         //void OnTriggerStay2D(Collider2D collision) => ProcessCollisionFlags(collision); //unreliable. We use ProcessItemCollision() instead.
         void OnTriggerExit2D(Collider2D collision)
 		{
             if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
             {
-                _equipCollider2d = null;
+                SetCollider2DIdentity(null, C2D.EquipmentCollider2D);//_equipCollider2d = null;
                 SignalItemPickupCollision(false);
             }
-            if (collision.CompareTag(GetCompareTag(CompareTags.Health))) _itemCollider2d = null;
+            if (collision.CompareTag(GetCompareTag(CompareTags.Health))) SetCollider2DIdentity(null, C2D.HealthCollider2D); //_healthCollider2d = null;
+            if (collision.CompareTag(GetCompareTag(CompareTags.Currency))) SetCollider2DIdentity(null, C2D.CurrencyCollider2D);
         }
 
         public void EnableAttackCollisions() =>  _attackCollisionEnabled = true;

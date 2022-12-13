@@ -8,9 +8,9 @@ namespace DoomBreakers
 {
     public class ContainerBehaviour : ItemBehaviour
     {
-        private bool _ignoreGravity;
+
         private float _targetVelocityX, _targetVelocityY;
-        private ITimer _timer;
+
         public override void Setup(Transform t, CharacterController2D controller2D, BoxCollider2D boxCollider2D) 
             //: base (Transform: t, CharacterController2D: controller2D, BoxCollider2D: boxCollider2D)
         {
@@ -18,21 +18,19 @@ namespace DoomBreakers
             _controller2D = controller2D;
             _transform = t;
             _velocity = new Vector3();
-            _timer = this.gameObject.AddComponent<Timer>();
-            _timer.Setup("Container Hit Behaviour Timer");
-            _ignoreGravity = false;
             _targetVelocityX = 0f;
             _targetVelocityY = 0f;
             _gravity = wildlogicgames.DoomBreakers.GetGravity();
         }
         public void IsHit()
 		{
-            _targetVelocityX = 4f;// 10f;
-            _targetVelocityY = 4f;//10f;
-            //_ignoreGravity = true;
-            //_timer.StartTimer(1.5f);
-            _velocity.y -= (_gravity * Time.deltaTime) * _targetVelocityY;
-            _velocity.x = Time.deltaTime *_targetVelocityY;
+            _bounceCount = 2;
+            _bounceMax = 3;
+            _targetVelocityX = _bounceMax + _bounceCount;
+            _targetVelocityY = _bounceMax + _bounceCount;
+
+            _velocity.y -= ((_gravity / 2) * Time.deltaTime) * _targetVelocityY;
+            _velocity.x = ((_gravity / 4) * Time.deltaTime) * _targetVelocityY;
         }
         public void UpdateContainerMovement()
         {

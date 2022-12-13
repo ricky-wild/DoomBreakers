@@ -151,6 +151,8 @@ namespace DoomBreakers
 		}
         public static ItemBase GetAssignedPlayerWeapon(int forPlayerId)
 		{
+            if (_playerWeapon == null) return null;
+
             if (_playerWeapon.ContainsKey(forPlayerId))
                 return _playerWeapon[forPlayerId];
             else

@@ -12,7 +12,9 @@ namespace DoomBreakers
         protected Vector3 _velocity;
         protected Transform _transform;
         protected float _gravity;
-
+        private float _targetVelocityY;
+        protected int _bounceMax = 5;
+        protected int _bounceCount;
         public virtual void Setup(Transform t, CharacterController2D controller2D, BoxCollider2D boxCollider2D)
 		{
             _boxCollider2D = boxCollider2D;
@@ -20,6 +22,15 @@ namespace DoomBreakers
             _transform = t;
             _velocity = new Vector3();
             _gravity = wildlogicgames.DoomBreakers.GetGravity();
+            _bounceCount = 3;
+        }
+        private void IsBounceOffGround()
+        {
+            if (_bounceCount <= 0) return;
+
+            _targetVelocityY = _bounceMax + _bounceCount;
+            _velocity.y -= ((_gravity/2) * Time.deltaTime) * _targetVelocityY;
+            _bounceCount--;
         }
         public virtual void UpdateTransform()
 		{
@@ -35,6 +46,7 @@ namespace DoomBreakers
 			{
                 _velocity.y = 0f;
                 _velocity.x = 0f;
+                IsBounceOffGround();
             }
         }
         public virtual void UpdateMovement()

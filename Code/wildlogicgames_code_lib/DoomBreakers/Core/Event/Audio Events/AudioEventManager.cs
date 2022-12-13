@@ -44,7 +44,8 @@ namespace DoomBreakers
     public enum PropSFXID
 	{
         PropHitSFX = 1,
-        PropDestroySFX = 2
+        PropDestroySFX = 2,
+        PropCoinPickSFX = 3,
 	};
     public class AudioEventManager : MonoBehaviour
     {
@@ -167,6 +168,9 @@ namespace DoomBreakers
 
             sfxId = PropSFXID.PropDestroySFX;
             _propSFXDict.Add(sfxId, new Audio("armorBreak", _volumeSFX, false, _transform));
+
+            sfxId = PropSFXID.PropCoinPickSFX;
+            _propSFXDict.Add(sfxId, new Audio("currencyPickup", _volumeSFX, false, _transform));
 
         }
         public static void PlayPropSFX(PropSFXID propSFXID) => _propSFXDict[propSFXID].PlaySound();

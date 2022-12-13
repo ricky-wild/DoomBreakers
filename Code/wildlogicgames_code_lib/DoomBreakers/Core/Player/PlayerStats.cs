@@ -25,6 +25,8 @@ namespace DoomBreakers
 		public int GetKillCount() => _killCount;
 		public void IncrementKillCount(int value) => _killCount += value;
 
+		public double GetMaxHealthLimit() => _maxHealth;
+
 	}
 }
 

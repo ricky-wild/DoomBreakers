@@ -77,7 +77,7 @@ namespace DoomBreakers
 
 		private bool _hitFrameAnimFlag;
 
-		private Action[] _actionListener = new Action[3];
+		private Action[] _actionListener = new Action[4];
 
 		private void InitializeUI()
 		{
@@ -117,11 +117,19 @@ namespace DoomBreakers
 			_actionListener[0] = new Action(UIPlayerStatsEvent);//UIPlayerStatsEvent()
 			_actionListener[1] = new Action(UIPlayerEquipEvent);//UIPlayerEquipEvent()
 			_actionListener[2] = new Action(UIPlayerKillScoreEvent);//UIPlayerKillScoreEvent()
+			_actionListener[3] = new Action(UIPlayerGoldScoreEvent);//UIPlayerGoldScoreEvent()
 		}
 		private string GetFrameAnim(UIFrameAnimID id) => _UIframeAnimStr[(int)id];
 
 		private void Awake() => InitializeUI();
 
+		private void UIPlayerGoldScoreEvent()
+		{
+			//Used for communicating player currency count.PlayerCollision.cs->ProcessCollisionWithGoldCoin() ect.
+			_playerStats = UIPlayerManager.GetPlayerStats(_playerID); //because we store kill count here.
+
+			_currencyText.text = "" + _playerStats.Currency.ToString();
+		}
 		private void UIPlayerKillScoreEvent()
 		{
 			//Used for communicating player kill count.Bandit.cs->UpdateStats()
@@ -160,7 +168,7 @@ namespace DoomBreakers
 		}
 		private void ProcessHealth()
 		{
-			//Then this indicates health has lowered.
+			//Then this indicates health has decreased.
 			if (_prevPlayerStats.Health > UIPlayerManager.GetPlayerStats(_playerID).Health)
 			{
 				if (!_playerStats.IsArmored())
@@ -173,6 +181,20 @@ namespace DoomBreakers
 					_hitFrameAnimFlag = true;
 				}
 			}
+			//Then this indicates health has increased.
+			if (_prevPlayerStats.Health < UIPlayerManager.GetPlayerStats(_playerID).Health)
+			{
+				if (!_playerStats.IsArmored())
+				{
+					_UIAnimFlag = UIAnimationFlag.UIFrame;
+					PlayUIAnimation(GetFrameAnim(UIFrameAnimID.Heal));//("P" + (_playerID + 1).ToString() + "_Hit"); //anim length 1.017 sec
+					_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
+					_prevPlayerStats.Health = _playerStats.Health;
+					_timer.StartTimer(1.0f); //We don't loop P1_Hit anim.
+					_hitFrameAnimFlag = true;
+				}
+			}
+			//Then this indicates health has hit zero and death is upon thee.
 			if (UIPlayerManager.GetPlayerStats(_playerID).Health <= 0)//(_playerStats.Health <= 0f)
 			{
 				SetUIColour(UIFrameAnimID.Dead);
@@ -209,12 +231,14 @@ namespace DoomBreakers
 			UIPlayerManager.Subscribe("ReportUIPlayerStatEvent", _actionListener[0]);
 			UIPlayerManager.Subscribe("ReportUIPlayerEquipEvent", _actionListener[1]);
 			UIPlayerManager.Subscribe("ReportUIPlayerKillScoreEvent", _actionListener[2]);
+			UIPlayerManager.Subscribe("ReportUIPlayerGoldscoreEvent", _actionListener[3]);
 		}
 		private void OnDisable()
 		{
 			UIPlayerManager.Unsubscribe("ReportUIPlayerStatEvent", _actionListener[0]);
 			UIPlayerManager.Unsubscribe("ReportUIPlayerEquipEvent", _actionListener[1]);
 			UIPlayerManager.Unsubscribe("ReportUIPlayerKillScoreEvent", _actionListener[2]);
+			UIPlayerManager.Unsubscribe("ReportUIPlayerGoldscoreEvent", _actionListener[3]);
 		}
 
 		void Start() { }

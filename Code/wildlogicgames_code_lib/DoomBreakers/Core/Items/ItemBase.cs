@@ -38,6 +38,15 @@ namespace DoomBreakers
         Chicken = 1,
         Fish = 2
 	};
+    public enum CurrencyItemType
+    {
+        None = -1,
+        Goldcoin = 0,
+        Ruby = 1,
+        Emerald = 2,
+        Saphhire = 3,
+        Diamond = 4
+    };
 
 
     [RequireComponent(typeof(Animator))]
@@ -79,6 +88,18 @@ namespace DoomBreakers
 
             //Resources/ItemAnimControllers/Equipment/Weapon.controller
             _itemAnimator = new ItemAnimator(animator, "ItemAnimControllers", "HealthItems", "Health", healingItemType);
+        }
+
+        //<summary>
+        //Initialize for items that are Currency, such as goldcoins, ruby.
+        //</summary>
+        public virtual void Initialize(SpriteRenderer spriteRenderer, Animator animator, CurrencyItemType currencyItemType)
+        {
+            _itemBehaviour = this.gameObject.AddComponent<ItemBehaviour>();
+            _itemBehaviour.Setup(this.transform, this.GetComponent<CharacterController2D>(), this.GetComponent<BoxCollider2D>());
+
+            //Resources/ItemAnimControllers/Equipment/Weapon.controller
+            _itemAnimator = new ItemAnimator(animator, "ItemAnimControllers", "Currency", "Currency", currencyItemType);
         }
         public virtual void Awake()
 		{

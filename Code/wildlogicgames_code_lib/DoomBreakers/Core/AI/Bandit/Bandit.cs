@@ -141,14 +141,19 @@ namespace DoomBreakers
             double playerQuickAttackDamage = 0.005;
             double playerPowerAttackDamage = 0.025;
 
-            if(BattleColliderManager.GetAssignedPlayerWeapon(playerId).GetType() == typeof(Sword))
-			{
-                ItemBase itemBase = BattleColliderManager.GetAssignedPlayerWeapon(playerId);
+            ItemBase itemBase = BattleColliderManager.GetAssignedPlayerWeapon(playerId);
+            if (itemBase == null) return;
+
+            if (itemBase.GetType() == typeof(Sword))
+            {
+                //ItemBase itemBase = BattleColliderManager.GetAssignedPlayerWeapon(playerId);
                 Sword weaponDervived = itemBase as Sword;
 
                 playerQuickAttackDamage = weaponDervived.Damage();
                 playerPowerAttackDamage += weaponDervived.Damage();
             }
+            else
+                return;
 
 
             if (ProcessQuickAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _banditID, _banditSprite.GetSpriteDirection()))

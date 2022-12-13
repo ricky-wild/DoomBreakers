@@ -274,8 +274,8 @@ namespace DoomBreakers
             if (IsIgnoreDamage())
                 return;
 
-            double banditQuickAttackDamage = 0.0025;//0.0025;
-            double banditPowerAttackDamage = 0.005;
+            double banditQuickAttackDamage = 0.01;//0.0025;
+            double banditPowerAttackDamage = 0.0175;
             bool process = false;
 
             if(process = ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
