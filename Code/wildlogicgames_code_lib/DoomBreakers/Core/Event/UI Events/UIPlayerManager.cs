@@ -19,6 +19,7 @@ namespace DoomBreakers
         private Dictionary<string, Action> _UIEventDictionary;
 
         private static Dictionary<int, PlayerStats> _playerStatsEventDictionary;
+        private static Dictionary<int, IPlayerEquipment> _playerEquipmentEventDictionary;
         private static UIAnimationFlag[] _equipmentGainedEvent;// = new EquipmentGainedFlag[4]; //Max 4 players
         public static UIPlayerManager _instance
         {
@@ -42,6 +43,7 @@ namespace DoomBreakers
         {
             if (_UIEventDictionary == null) _UIEventDictionary = new Dictionary<string, Action>();
             if (_playerStatsEventDictionary == null) _playerStatsEventDictionary = new Dictionary<int, PlayerStats>();
+            if (_playerEquipmentEventDictionary == null) _playerEquipmentEventDictionary = new Dictionary<int, IPlayerEquipment>();
             _equipmentGainedEvent = new UIAnimationFlag[4]; //Max 4 players
         }
 
@@ -107,6 +109,9 @@ namespace DoomBreakers
         public static PlayerStats GetPlayerStats(int playerId) => _playerStatsEventDictionary[playerId];
         public static void SetPlayerStats(ref PlayerStats playerStats, int playerId) => _playerStatsEventDictionary[playerId] = playerStats;
 
+
+        public static IPlayerEquipment GetPlayerEquipment(int playerId) => _playerEquipmentEventDictionary[playerId];
+        public static void SetPlayerEquipment(ref IPlayerEquipment playerEquipment, int playerId) => _playerEquipmentEventDictionary[playerId] = playerEquipment;
 
 
 

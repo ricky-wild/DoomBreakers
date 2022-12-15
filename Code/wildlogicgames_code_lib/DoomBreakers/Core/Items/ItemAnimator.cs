@@ -55,7 +55,7 @@ namespace DoomBreakers
 			if (currencyItemType == CurrencyItemType.Goldcoin) _animationState = ItemAnimationState.IdleGoldcoin;
 			if (currencyItemType == CurrencyItemType.Ruby) _animationState = ItemAnimationState.IdleRuby;
 			if (currencyItemType == CurrencyItemType.Emerald) _animationState = ItemAnimationState.IdleEmerald;
-			if (currencyItemType == CurrencyItemType.Saphhire) _animationState = ItemAnimationState.IdleSapphire;
+			if (currencyItemType == CurrencyItemType.Sapphire) _animationState = ItemAnimationState.IdleSapphire;
 			if (currencyItemType == CurrencyItemType.Diamond) _animationState = ItemAnimationState.IdleDiamond;
 
 			SetAnimatorController();

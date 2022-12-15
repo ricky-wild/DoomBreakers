@@ -35,13 +35,37 @@ namespace DoomBreakers
 			Dead = 3
 		}; //Must corrispond to string[] _UIframeAnimStr assignment order.
 
+		public struct UITextToSceenSpace
+		{
+			public Vector2 _positionOnScreen, _finalPosition, _originalScale;
+			public float _scaleFactor;
+			public RectTransform _rectForText;
+			public bool _displayFlag, _getPosition, _getStringForTextFlag, _forHealthFlag;
+		}
+		private UITextToSceenSpace _UIItemTextToScreenSpace, _UIBattleTextToScreenSpace;
+
 		[Header("Player ID")]
 		public int _playerID;
+
+		[Header("UI Canvas")]
+		public Canvas _parentCanvas;
+
+		[Header("Player Transform")]
+		public Transform _playerTransform;
+
 		[Header("Username Text")]
 		public TMPro.TextMeshProUGUI _usernameText;
+
+		[Header("Item Collided Text")]
+		public TextMeshProUGUI _itemText;
+
+		[Header("Battle Text")]
+		public TextMeshProUGUI _battleText;
+
 		[Header("Currency Text")]
 		public TextMeshProUGUI _currencyText;
 		public Image _currencyImage;
+
 		[Header("Deathcount Text")]
 		public TextMeshProUGUI _killCountText;
 		public Image _killCountImage;
@@ -53,9 +77,11 @@ namespace DoomBreakers
 		[Header("LeftHand Equipment Animator")]
 		public Animator _leftHandEquipAnim;
 		public Image _leftHandEquipImage;
+
 		[Header("RightHand Equipment Animator")]
 		public Animator _rightHandEquipAnim;
 		public Image _rightHandEquipImage;
+
 		[Header("Torso Equipment Animator")]
 		public Animator _torsoEquipAnim;
 		public Image _torsoEquipImage;
@@ -73,7 +99,7 @@ namespace DoomBreakers
 		private string[] _UIframeAnimStr = new string[4];
 
 		private PlayerStats _playerStats, _prevPlayerStats;
-		private ITimer _timer;
+		private ITimer _timer, _textItemDisplayTimer, _textBattleDisplayTimer;
 
 		private bool _hitFrameAnimFlag;
 
@@ -111,6 +137,8 @@ namespace DoomBreakers
 			_UIcolours[2] = _healthUIImage.color;
 			_UIcolours[3] = new Color32(51, 51, 51, 175);//Dead colour.
 
+			SetupTextToScreenSpace();
+
 			_timer = new Timer();
 			_hitFrameAnimFlag = false;
 
@@ -118,6 +146,23 @@ namespace DoomBreakers
 			_actionListener[1] = new Action(UIPlayerEquipEvent);//UIPlayerEquipEvent()
 			_actionListener[2] = new Action(UIPlayerKillScoreEvent);//UIPlayerKillScoreEvent()
 			_actionListener[3] = new Action(UIPlayerGoldScoreEvent);//UIPlayerGoldScoreEvent()
+		}
+		private void SetupTextToScreenSpace()
+		{
+			_UIItemTextToScreenSpace._displayFlag = false;
+			_UIItemTextToScreenSpace._getPosition = false;
+			_UIItemTextToScreenSpace._forHealthFlag = false;
+			_UIItemTextToScreenSpace._rectForText = _itemText.gameObject.GetComponent<RectTransform>();
+			_UIItemTextToScreenSpace._originalScale = _UIItemTextToScreenSpace._rectForText.localScale;
+			_itemText.text = "";
+			_textItemDisplayTimer = new Timer();
+
+			_UIBattleTextToScreenSpace._displayFlag = false;
+			_UIBattleTextToScreenSpace._getPosition = false;
+			_UIBattleTextToScreenSpace._rectForText = _battleText.gameObject.GetComponent<RectTransform>();
+			_UIBattleTextToScreenSpace._originalScale = _UIBattleTextToScreenSpace._rectForText.localScale;
+			_battleText.text = "";
+			_textBattleDisplayTimer = new Timer();
 		}
 		private string GetFrameAnim(UIFrameAnimID id) => _UIframeAnimStr[(int)id];
 
@@ -154,6 +199,7 @@ namespace DoomBreakers
 				_playerStats.IsArmored(true);
 				UIPlayerManager.SetPlayerStats(ref _playerStats, _playerID);
 			}
+			QueueItemToTextProcess(false);
 		}
 		private void UIPlayerStatsEvent() 
 		{
@@ -192,6 +238,8 @@ namespace DoomBreakers
 					_prevPlayerStats.Health = _playerStats.Health;
 					_timer.StartTimer(1.0f); //We don't loop P1_Hit anim.
 					_hitFrameAnimFlag = true;
+
+					QueueItemToTextProcess(true);
 				}
 			}
 			//Then this indicates health has hit zero and death is upon thee.
@@ -244,6 +292,12 @@ namespace DoomBreakers
 		void Start() { }
 		private void Update()
 		{
+			UpdatePlayerUI();
+			UpdateUIItemTextToScreenSpace();
+			UpdateUIBattleTextToScreenSpace();
+		}
+		private void UpdatePlayerUI()
+		{
 			if (!_hitFrameAnimFlag) return;
 
 			if (_timer.HasTimerFinished())
@@ -251,7 +305,6 @@ namespace DoomBreakers
 				_hitFrameAnimFlag = false;
 				PlayUIAnimation(GetFrameAnim(UIFrameAnimID.Idle));
 			}
-
 		}
 
 		private void PlayUIAnimation(string animName)
@@ -300,5 +353,143 @@ namespace DoomBreakers
 			_killCountText.color = _UIcolours[(int)uIFrameAnimID];
 		}
 
+		private void QueueItemToTextProcess(bool forHealth)
+		{
+			_UIItemTextToScreenSpace._forHealthFlag = forHealth;
+			_UIItemTextToScreenSpace._displayFlag = true;
+
+			if (!forHealth) _textItemDisplayTimer.StartTimer(1.0f);
+			if (forHealth) _textItemDisplayTimer.StartTimer(0.5f);
+		}
+		private void UpdateUIItemTextToScreenSpace()
+		{
+			if (!_UIItemTextToScreenSpace._displayFlag) return;
+
+			if(_textItemDisplayTimer.HasTimerFinished())
+			{
+				_itemText.text = "";
+				_UIItemTextToScreenSpace._displayFlag = false;
+				_UIItemTextToScreenSpace._getPosition = false;
+				_UIItemTextToScreenSpace._getStringForTextFlag = false;
+				return;
+			}
+
+			if(!_UIItemTextToScreenSpace._forHealthFlag)
+			{
+				if (!_UIItemTextToScreenSpace._getStringForTextFlag)
+				{
+					IPlayerEquipment playerEquipment = UIPlayerManager.GetPlayerEquipment(_playerID);
+					ItemBase itemBase = playerEquipment.GetMostRecentEquipment();
+
+					if (itemBase.GetType() == typeof(Sword))
+					{
+						Sword weaponDervived = itemBase as Sword;
+						string weaponType = "";
+						string weaponMaterial = "";
+
+						if (weaponDervived.GetSwordType() == EquipmentWeaponType.Broadsword) weaponType = "BROADSWORD";
+						if (weaponDervived.GetSwordType() == EquipmentWeaponType.Longsword) weaponType = "LONGSWORD";
+
+						if (weaponDervived.GetMaterialType() == EquipmentMaterialType.Bronze) weaponMaterial = "BRONZE ";
+						if (weaponDervived.GetMaterialType() == EquipmentMaterialType.Iron) weaponMaterial = "IRON ";
+						if (weaponDervived.GetMaterialType() == EquipmentMaterialType.Steel) weaponMaterial = "STEEL ";
+						if (weaponDervived.GetMaterialType() == EquipmentMaterialType.Ebony) weaponMaterial = "EBONY ";
+
+						_itemText.text = weaponMaterial + weaponType;
+					}
+					if (itemBase.GetType() == typeof(Shield))
+					{
+						Shield shieldDervived = itemBase as Shield;
+						string shieldType = "";
+						string shieldMaterial = "";
+
+						shieldType = "SHIELD";
+
+						if (shieldDervived.GetMaterialType() == EquipmentMaterialType.Bronze) shieldMaterial = "BRONZE ";
+						if (shieldDervived.GetMaterialType() == EquipmentMaterialType.Iron) shieldMaterial = "IRON ";
+						if (shieldDervived.GetMaterialType() == EquipmentMaterialType.Steel) shieldMaterial = "STEEL ";
+						if (shieldDervived.GetMaterialType() == EquipmentMaterialType.Ebony) shieldMaterial = "EBONY ";
+
+						_itemText.text = shieldMaterial + shieldType;
+					}
+					if (itemBase.GetType() == typeof(Breastplate))
+					{
+						Breastplate armorDervived = itemBase as Breastplate;
+						string armorType = "";
+						string armorMaterial = "";
+
+						armorType = "BREASTPLATE";
+
+						if (armorDervived.GetMaterialType() == EquipmentMaterialType.Bronze) armorMaterial = "BRONZE ";
+						if (armorDervived.GetMaterialType() == EquipmentMaterialType.Iron) armorMaterial = "IRON ";
+						if (armorDervived.GetMaterialType() == EquipmentMaterialType.Steel) armorMaterial = "STEEL ";
+						if (armorDervived.GetMaterialType() == EquipmentMaterialType.Ebony) armorMaterial = "EBONY ";
+
+						_itemText.text = armorMaterial + armorType;
+					}
+
+					_UIItemTextToScreenSpace._getStringForTextFlag = true;
+				}
+			}
+			if (_UIItemTextToScreenSpace._forHealthFlag)
+			{
+				if (_playerStats.GetRecentHealItemType() == HealingItemType.None) _itemText.text = "";
+				if (_playerStats.GetRecentHealItemType() == HealingItemType.Apple) _itemText.text = "JUICY APPLE";
+				if (_playerStats.GetRecentHealItemType() == HealingItemType.Chicken) _itemText.text = "TASTY CHICKEN";
+				if (_playerStats.GetRecentHealItemType() == HealingItemType.Fish) _itemText.text = "DELICIOUS FISH";
+			}
+
+			if (!_UIItemTextToScreenSpace._getPosition)
+			{
+				if (Camera.main != null)
+					_UIItemTextToScreenSpace._positionOnScreen = Camera.main.WorldToScreenPoint(_playerTransform.position);
+
+				_UIItemTextToScreenSpace._scaleFactor = _parentCanvas.scaleFactor;
+				_UIItemTextToScreenSpace._finalPosition.x = _UIItemTextToScreenSpace._positionOnScreen.x;
+				_UIItemTextToScreenSpace._finalPosition.y = _UIItemTextToScreenSpace._positionOnScreen.y;
+				_UIItemTextToScreenSpace._rectForText.position = _UIItemTextToScreenSpace._finalPosition;
+				_UIItemTextToScreenSpace._getPosition = true;
+			}
+
+		}
+
+		private void QueueBattleToTextProcess()
+		{
+			_UIBattleTextToScreenSpace._displayFlag = true;
+			_textBattleDisplayTimer.StartTimer(0.5f);
+		}
+		private void UpdateUIBattleTextToScreenSpace()
+		{
+			if (!_UIBattleTextToScreenSpace._displayFlag) return;
+
+			if (_textBattleDisplayTimer.HasTimerFinished())
+			{
+				_battleText.text = "";
+				_UIBattleTextToScreenSpace._displayFlag = false;
+				_UIBattleTextToScreenSpace._getPosition = false;
+				_UIBattleTextToScreenSpace._getStringForTextFlag = false;
+				return;
+			}
+
+			if (!_UIBattleTextToScreenSpace._getStringForTextFlag)
+			{
+
+
+				_UIBattleTextToScreenSpace._getStringForTextFlag = true;
+			}
+
+			if (!_UIBattleTextToScreenSpace._getPosition)
+			{
+				if (Camera.main != null)
+					_UIBattleTextToScreenSpace._positionOnScreen = Camera.main.WorldToScreenPoint(_playerTransform.position);
+
+				_UIBattleTextToScreenSpace._scaleFactor = _parentCanvas.scaleFactor;
+				_UIBattleTextToScreenSpace._finalPosition.x = _UIBattleTextToScreenSpace._positionOnScreen.x;
+				_UIBattleTextToScreenSpace._finalPosition.y = _UIBattleTextToScreenSpace._positionOnScreen.y;
+				_UIBattleTextToScreenSpace._rectForText.position = _UIBattleTextToScreenSpace._finalPosition;
+				_UIBattleTextToScreenSpace._getPosition = true;
+			}
+
+		}
 	}
 }

@@ -46,6 +46,7 @@ namespace DoomBreakers
         PropHitSFX = 1,
         PropDestroySFX = 2,
         PropCoinPickSFX = 3,
+        PropHealUpSFX = 4
 	};
     public class AudioEventManager : MonoBehaviour
     {
@@ -95,52 +96,52 @@ namespace DoomBreakers
         {
             PlayerSFXID sfxId = PlayerSFXID.PlayerJumpSFX;
             //_playerSFX[0] = new Audio("playerJump0", _volumeSFX, false, _transform);
-            _playerSFXDict.Add(sfxId, new Audio("playerJump0", _volumeSFX, false, _transform));
+            _playerSFXDict.Add(sfxId, new Audio("playerJump0", _volumeSFX, false, 1.0f,_transform));
 
 			sfxId = PlayerSFXID.PlayerDoubleJumpSFX;
-			_playerSFXDict.Add(sfxId, new Audio("playerDblJump0", _volumeSFX, false, _transform));
+			_playerSFXDict.Add(sfxId, new Audio("playerDblJump0", _volumeSFX, false, 1.0f,_transform));
 
 			sfxId = PlayerSFXID.PlayerLandImpactSFX;
-			_playerSFXDict.Add(sfxId, new Audio("playerLand0", _volumeSFX, false, _transform));
+			_playerSFXDict.Add(sfxId, new Audio("playerLand0", _volumeSFX, false, 1.0f, _transform));
 
 			sfxId = PlayerSFXID.PlayerQuickAttackSFX;
-			_playerSFXDict.Add(sfxId, new Audio("playerQuickAtkSFX", _volumeSFX, false, _transform));
+			_playerSFXDict.Add(sfxId, new Audio("playerQuickAtkSFX", _volumeSFX, false, 1.0f, _transform));
 
 			sfxId = PlayerSFXID.PlayerChargeAttackSFX;
-			_playerSFXDict.Add(sfxId, new Audio("weaponCharge0", _volumeSFX, false, _transform));
+			_playerSFXDict.Add(sfxId, new Audio("weaponCharge0", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PlayerSFXID.PlayerPowerAttackSFX;
-            _playerSFXDict.Add(sfxId, new Audio("powerAttack0", _volumeSFX, false, _transform));
+            _playerSFXDict.Add(sfxId, new Audio("powerAttack0", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PlayerSFXID.PlayerWaterImpactSFX;
-			_playerSFXDict.Add(sfxId, new Audio("waterImpactSFX", _volumeSFX, false, _transform));
+			_playerSFXDict.Add(sfxId, new Audio("waterImpactSFX", _volumeSFX, false, 1.0f, _transform));
 
 			sfxId = PlayerSFXID.PlayerWaterMoveSFX;
-			_playerSFXDict.Add(sfxId, new Audio("waterMovementSFX", _volumeSFX, false, _transform));
+			_playerSFXDict.Add(sfxId, new Audio("waterMovementSFX", _volumeSFX, false, 1.0f, _transform));
 
 			sfxId = PlayerSFXID.PlayerKnockAttackSFX;
-			_playerSFXDict.Add(sfxId, new Audio("knockBackAtkSFX0", _volumeSFX, false, _transform));
+			_playerSFXDict.Add(sfxId, new Audio("knockBackAtkSFX0", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PlayerSFXID.PlayerDodgeSFX;
-            _playerSFXDict.Add(sfxId, new Audio("playerDodgeSFX", _volumeSFX, false, _transform));
+            _playerSFXDict.Add(sfxId, new Audio("playerDodgeSFX", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PlayerSFXID.PlayerEquippedSFX;
-            _playerSFXDict.Add(sfxId, new Audio("armorUp", _volumeSFX, false, _transform));
+            _playerSFXDict.Add(sfxId, new Audio("armorUp", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PlayerSFXID.PlayerHitSFX;
-            _playerSFXDict.Add(sfxId, new Audio("hit0", _volumeSFX, false, _transform));
+            _playerSFXDict.Add(sfxId, new Audio("hit0", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PlayerSFXID.PlayerArmorHitSFX;
-            _playerSFXDict.Add(sfxId, new Audio("playerArmorHit", _volumeSFX, false, _transform));
+            _playerSFXDict.Add(sfxId, new Audio("playerArmorHit", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PlayerSFXID.PlayerArmorBrokenSFX;
-            _playerSFXDict.Add(sfxId, new Audio("armorBreak", _volumeSFX, false, _transform));
+            _playerSFXDict.Add(sfxId, new Audio("armorBreak", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PlayerSFXID.PlayerDefenseHitSFX;
-            _playerSFXDict.Add(sfxId, new Audio("playerShieldHit", _volumeSFX, false, _transform));
+            _playerSFXDict.Add(sfxId, new Audio("playerShieldHit", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PlayerSFXID.PlayerDeathSFX;
-            _playerSFXDict.Add(sfxId, new Audio("deathEvent", _volumeSFX, false, _transform));
+            _playerSFXDict.Add(sfxId, new Audio("deathEvent", _volumeSFX, false, 1.0f, _transform));
             //
         }
         public static void PlayPlayerSFX(PlayerSFXID playerSFXID) => _playerSFXDict[playerSFXID].PlaySound();
@@ -150,13 +151,13 @@ namespace DoomBreakers
         private static void InitializeEnemySFX()
 		{
             EnemySFXID sfxId = EnemySFXID.EnemyHitSFX;
-            _enemySFXDict.Add(sfxId, new Audio("hit2", _volumeSFX, false, _transform));
+            _enemySFXDict.Add(sfxId, new Audio("hit2", _volumeSFX, false, 1.5f, _transform));
 
             sfxId = EnemySFXID.EnemyDoubleJumpSFX;
-            _enemySFXDict.Add(sfxId, new Audio("playerDblJump0", _volumeSFX, false, _transform));
+            _enemySFXDict.Add(sfxId, new Audio("playerDblJump0", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = EnemySFXID.EnemyLandImpactSFX;
-            _enemySFXDict.Add(sfxId, new Audio("playerLand0", _volumeSFX, false, _transform));
+            _enemySFXDict.Add(sfxId, new Audio("playerLand0", _volumeSFX, false, 1.0f, _transform));
         }
         public static void PlayEnemySFX(EnemySFXID enemySFXID) => _enemySFXDict[enemySFXID].PlaySound();
         public static void StopEnemySFX(EnemySFXID enemySFXID) => _enemySFXDict[enemySFXID].StopSound();
@@ -164,13 +165,16 @@ namespace DoomBreakers
         private static void InitializePropSFX()
         {
             PropSFXID sfxId = PropSFXID.PropHitSFX;
-            _propSFXDict.Add(sfxId, new Audio("playerLand2", _volumeSFX, false, _transform));
+            _propSFXDict.Add(sfxId, new Audio("playerLand2", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PropSFXID.PropDestroySFX;
-            _propSFXDict.Add(sfxId, new Audio("armorBreak", _volumeSFX, false, _transform));
+            _propSFXDict.Add(sfxId, new Audio("armorBreak", _volumeSFX, false, 1.0f, _transform));
 
             sfxId = PropSFXID.PropCoinPickSFX;
-            _propSFXDict.Add(sfxId, new Audio("currencyPickup", _volumeSFX, false, _transform));
+            _propSFXDict.Add(sfxId, new Audio("currencyPickup", _volumeSFX, false, 1.0f, _transform));
+
+            sfxId = PropSFXID.PropHealUpSFX;
+            _propSFXDict.Add(sfxId, new Audio("healUpSFX", _volumeSFX, false, 1.0f, _transform));
 
         }
         public static void PlayPropSFX(PropSFXID propSFXID) => _propSFXDict[propSFXID].PlaySound();

@@ -132,7 +132,7 @@ namespace DoomBreakers
             UpdateDetectEnemyTargets(ref playerState, playerId, ref playerSprite);
             ProcessEquipmentCollisions();
             UpdateEquipmentTargets(ref playerEquipment);
-            ProcessHealthCollisions(ref playerStat);
+            ProcessHealthCollisions(ref playerStat, ref playerSprite);
             ProcessCurrencyCollisions(ref playerStat);
         }
         public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite)
@@ -208,6 +208,7 @@ namespace DoomBreakers
 
             playerEquipment = _playerEquipment; //Any changes made apply to original parent class, Player.cs.
             playerEquipment.NewEquipmentGained(true);
+            UIPlayerManager.SetPlayerEquipment(ref playerEquipment, _playerID);
 
             _equipCollisionEnabled = false;
             SignalItemPickupCollision(false);
@@ -269,17 +270,21 @@ namespace DoomBreakers
             return;
         }
 
-        private void ProcessHealthCollisions(ref PlayerStats playerStat)
+        private void ProcessHealthCollisions(ref PlayerStats playerStat, ref IPlayerSprite playerSprite)
         {
             if (!_healthPickupEnabled) return;
             if (GetCollider2DIdentity(C2D.HealthCollider2D) == null) return;//_healthCollider2d
             if (GetCollider2DIdentity(C2D.HealthCollider2D).CompareTag(GetCompareTag(CompareTags.Health)))
             {
-                ProcessCollisionWithApple(GetCollider2DIdentity(C2D.HealthCollider2D), ref playerStat);
+                ProcessCollisionWithApple(GetCollider2DIdentity(C2D.HealthCollider2D), ref playerStat, ref playerSprite);
+                ProcessCollisionWithChicken(GetCollider2DIdentity(C2D.HealthCollider2D), ref playerStat, ref playerSprite);
+                ProcessCollisionWithFish(GetCollider2DIdentity(C2D.HealthCollider2D), ref playerStat, ref playerSprite);
+                SetCollider2DIdentity(null, C2D.HealthCollider2D);//_healthCollider2d = null;
             }
 		}
-        private void ProcessCollisionWithApple(Collider2D collision,ref PlayerStats playerStat)
+        private void ProcessCollisionWithApple(Collider2D collision,ref PlayerStats playerStat, ref IPlayerSprite playerSprite)
         {
+            if (collision == null) return;
             if (collision.GetComponent<Apple>() == null) //Exists on Items Layer, Tag=Health
                 return; //Then NOT a Apple. Get outta here!
 
@@ -287,12 +292,57 @@ namespace DoomBreakers
 			{
                 double healPoints = collision.GetComponent<Apple>().Health();
                 playerStat.Health += healPoints;
+                playerStat.SetRecentHealItemType(HealingItemType.Apple);
+                playerSprite.SetBehaviourTextureFlash(0.5f, Color.green);
                 UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref playerStat, _playerID);
                 collision.GetComponent<Apple>().Destroy();
+                AudioEventManager.PlayPropSFX(PropSFXID.PropHealUpSFX);
             }
 
             _healthPickupEnabled = false;
-            SetCollider2DIdentity(null, C2D.HealthCollider2D);//_healthCollider2d = null;
+            
+            return;
+        }
+        private void ProcessCollisionWithChicken(Collider2D collision, ref PlayerStats playerStat, ref IPlayerSprite playerSprite)
+        {
+            if (collision == null) return;
+            if (collision.GetComponent<Chicken>() == null) //Exists on Items Layer, Tag=Health
+                return; //Then NOT a Chicken. Get outta here!
+
+            if (playerStat.Health != playerStat.GetMaxHealthLimit())
+            {
+                double healPoints = collision.GetComponent<Chicken>().Health();
+                playerStat.Health += healPoints;
+                playerStat.SetRecentHealItemType(HealingItemType.Chicken);
+                playerSprite.SetBehaviourTextureFlash(0.5f, Color.green);
+                UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref playerStat, _playerID);
+                collision.GetComponent<Chicken>().Destroy();
+                AudioEventManager.PlayPropSFX(PropSFXID.PropHealUpSFX);
+            }
+
+            _healthPickupEnabled = false;
+
+            return;
+        }
+        private void ProcessCollisionWithFish(Collider2D collision, ref PlayerStats playerStat, ref IPlayerSprite playerSprite)
+        {
+            if (collision == null) return;
+            if (collision.GetComponent<Fish>() == null) //Exists on Items Layer, Tag=Health
+                return; //Then NOT a Fish. Get outta here!
+
+            if (playerStat.Health != playerStat.GetMaxHealthLimit())
+            {
+                double healPoints = collision.GetComponent<Fish>().Health();
+                playerStat.Health += healPoints;
+                playerStat.SetRecentHealItemType(HealingItemType.Fish);
+                playerSprite.SetBehaviourTextureFlash(0.5f, Color.green);
+                UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref playerStat, _playerID);
+                collision.GetComponent<Fish>().Destroy();
+                AudioEventManager.PlayPropSFX(PropSFXID.PropHealUpSFX);
+            }
+
+            _healthPickupEnabled = false;
+
             return;
         }
 
@@ -303,10 +353,16 @@ namespace DoomBreakers
             if (GetCollider2DIdentity(C2D.CurrencyCollider2D).CompareTag(GetCompareTag(CompareTags.Currency)))
             {
                 ProcessCollisionWithGoldCoin(GetCollider2DIdentity(C2D.CurrencyCollider2D), ref playerStat);
+                ProcessCollisionWithRuby(GetCollider2DIdentity(C2D.CurrencyCollider2D), ref playerStat);
+                ProcessCollisionWithSapphire(GetCollider2DIdentity(C2D.CurrencyCollider2D), ref playerStat);
+                ProcessCollisionWithEmerald(GetCollider2DIdentity(C2D.CurrencyCollider2D), ref playerStat);
+                ProcessCollisionWithDiamond(GetCollider2DIdentity(C2D.CurrencyCollider2D), ref playerStat);
+                SetCollider2DIdentity(null, C2D.CurrencyCollider2D);
             }
         }
         private void ProcessCollisionWithGoldCoin(Collider2D collision, ref PlayerStats playerStat)
         {
+            if (collision == null) return;
             if (collision.GetComponent<GoldCoin>() == null) //Exists on Items Layer, Tag=Currency
                 return; //Then NOT a GoldCoin. Get outta here!
 
@@ -316,10 +372,65 @@ namespace DoomBreakers
             collision.GetComponent<GoldCoin>().Destroy();
             AudioEventManager.PlayPropSFX(PropSFXID.PropCoinPickSFX);
             _currencyPickupEnabled = false;
-            SetCollider2DIdentity(null, C2D.HealthCollider2D);//_healthCollider2d = null;
+            
             return;
         }
+        private void ProcessCollisionWithRuby(Collider2D collision, ref PlayerStats playerStat)
+        {
+            if (collision == null) return;
+            if (collision.GetComponent<Ruby>() == null) //Exists on Items Layer, Tag=Currency
+                return; //Then NOT a Ruby. Get outta here!
 
+            int currencyValue = collision.GetComponent<Ruby>().Amount();
+            playerStat.Currency += currencyValue;
+            UIPlayerManager.TriggerEvent("ReportUIPlayerGoldscoreEvent", ref playerStat, _playerID);
+            collision.GetComponent<Ruby>().Destroy();
+            AudioEventManager.PlayPropSFX(PropSFXID.PropCoinPickSFX);
+            _currencyPickupEnabled = false;
+            return;
+        }
+        private void ProcessCollisionWithSapphire(Collider2D collision, ref PlayerStats playerStat)
+        {
+            if (collision == null) return;
+            if (collision.GetComponent<Sapphire>() == null) //Exists on Items Layer, Tag=Currency
+                return; //Then NOT a Sapphire. Get outta here!
+
+            int currencyValue = collision.GetComponent<Sapphire>().Amount();
+            playerStat.Currency += currencyValue;
+            UIPlayerManager.TriggerEvent("ReportUIPlayerGoldscoreEvent", ref playerStat, _playerID);
+            collision.GetComponent<Sapphire>().Destroy();
+            AudioEventManager.PlayPropSFX(PropSFXID.PropCoinPickSFX);
+            _currencyPickupEnabled = false;
+            return;
+        }
+        private void ProcessCollisionWithEmerald(Collider2D collision, ref PlayerStats playerStat)
+        {
+            if (collision == null) return;
+            if (collision.GetComponent<Emerald>() == null) //Exists on Items Layer, Tag=Currency
+                return; //Then NOT a Emerald. Get outta here!
+
+            int currencyValue = collision.GetComponent<Emerald>().Amount();
+            playerStat.Currency += currencyValue;
+            UIPlayerManager.TriggerEvent("ReportUIPlayerGoldscoreEvent", ref playerStat, _playerID);
+            collision.GetComponent<Emerald>().Destroy();
+            AudioEventManager.PlayPropSFX(PropSFXID.PropCoinPickSFX);
+            _currencyPickupEnabled = false;
+            return;
+        }
+        private void ProcessCollisionWithDiamond(Collider2D collision, ref PlayerStats playerStat)
+        {
+            if (collision == null) return;
+            if (collision.GetComponent<Diamond>() == null) //Exists on Items Layer, Tag=Currency
+                return; //Then NOT a Diamond. Get outta here!
+
+            int currencyValue = collision.GetComponent<Diamond>().Amount();
+            playerStat.Currency += currencyValue;
+            UIPlayerManager.TriggerEvent("ReportUIPlayerGoldscoreEvent", ref playerStat, _playerID);
+            collision.GetComponent<Diamond>().Destroy();
+            AudioEventManager.PlayPropSFX(PropSFXID.PropCoinPickSFX);
+            _currencyPickupEnabled = false;
+            return;
+        }
 
 
         private void ProcessCollisionWithBarrel(Collider2D collision)

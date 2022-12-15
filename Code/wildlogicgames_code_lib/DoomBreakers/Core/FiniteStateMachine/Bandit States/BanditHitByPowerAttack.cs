@@ -27,11 +27,11 @@ namespace DoomBreakers
 
 			
 
-			_behaviourTimer.StartTimer(0.3f);
+			_behaviourTimer.StartTimer(0.6f);
 			if (_behaviourTimer.HasTimerFinished())
 			{
-				banditSprite.SetBehaviourTextureFlash(0.15f, Color.red);
-				_behaviourTimer.StartTimer(0.3f);
+				banditSprite.SetBehaviourTextureFlash(0.5f, Color.red);
+				_behaviourTimer.StartTimer(0.6f);
 			}
 
 			WeaponChargeHold weaponChargeHoldFlag = WeaponChargeHold.None;

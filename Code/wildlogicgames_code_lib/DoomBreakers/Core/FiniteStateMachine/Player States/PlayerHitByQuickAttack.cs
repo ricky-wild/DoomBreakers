@@ -17,7 +17,7 @@ namespace DoomBreakers
 			animator.Play("Jabbed");//, -1, 0.0f);
 
 
-			playerSprite.SetBehaviourTextureFlash(0.1f, Color.red);
+			playerSprite.SetBehaviourTextureFlash(0.5f, Color.red);
 
 			_behaviourTimer.StartTimer(_quickAtkWaitTime);
 			if (_behaviourTimer.HasTimerFinished())

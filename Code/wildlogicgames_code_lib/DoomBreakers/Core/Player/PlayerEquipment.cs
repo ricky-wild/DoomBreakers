@@ -24,7 +24,11 @@ namespace DoomBreakers
         private ItemBase _torsoEquipment;
         private ItemBase _leftHandEquip;
         private ItemBase _rightHandEquip;
+        
         private bool _equipmentGainedFlag;
+
+
+        private ItemBase _mostRecentEquipGained;
         private EquipmentRating _equipmentChecker;
 
         public PlayerEquipment(int playerId)
@@ -55,6 +59,9 @@ namespace DoomBreakers
             _equipmentGainedFlag = flag;
 		}
 
+        public ItemBase GetMostRecentEquipment() => _mostRecentEquipGained;
+        
+
         public bool ApplySword(ItemBase playerEquip)
 		{
             //Now determine where we apply this equipment.
@@ -66,7 +73,7 @@ namespace DoomBreakers
             //NO EQUIPMENT APPLY SWORD.
             if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
             {
-                _leftHandEquip = playerEquip;
+                _mostRecentEquipGained = _leftHandEquip = playerEquip;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandSword, _playerID);
                 return true;
             }
@@ -76,7 +83,7 @@ namespace DoomBreakers
 			{
                 if (IsEmptyHanded(EquipHand.Right_Hand))
 				{
-                    _rightHandEquip = playerEquip;
+                    _mostRecentEquipGained = _rightHandEquip = playerEquip;
                     UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandSword, _playerID);
                     return true;
                 }
@@ -87,7 +94,7 @@ namespace DoomBreakers
             {
                 if (IsEmptyHanded(EquipHand.Left_Hand))
 				{
-                    _leftHandEquip = playerEquip;
+                    _mostRecentEquipGained = _leftHandEquip = playerEquip;
                     UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandSword, _playerID);
                     return true;
                 }
@@ -117,7 +124,7 @@ namespace DoomBreakers
             if (IsSword(EquipHand.Left_Hand))
             {
                 //if (IsSwordBetterThanCurrent(playerEquip, EquipHand.Left_Hand))
-                _leftHandEquip = playerEquip;
+                _mostRecentEquipGained = _leftHandEquip = playerEquip;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandSword, _playerID);
                 return true;
             }
@@ -128,7 +135,7 @@ namespace DoomBreakers
             if (IsSword(EquipHand.Right_Hand))
             {
                 //if (IsSwordBetterThanCurrent(playerEquip, EquipHand.Right_Hand))
-                _rightHandEquip = playerEquip;
+                _mostRecentEquipGained = _rightHandEquip = playerEquip;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandSword, _playerID);
                 return true;
             }
@@ -142,20 +149,20 @@ namespace DoomBreakers
 
             if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
             {
-                _leftHandEquip = playerEquip;
+                _mostRecentEquipGained =_leftHandEquip = playerEquip;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandShield, _playerID);
                 return true;
             }
 
             if (IsEmptyHanded(EquipHand.Left_Hand) && !IsShield(EquipHand.Right_Hand))
             {
-                _leftHandEquip = playerEquip;
+                _mostRecentEquipGained = _leftHandEquip = playerEquip;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandShield, _playerID);
                 return true;
             }
             if (IsEmptyHanded(EquipHand.Right_Hand) && !IsShield(EquipHand.Left_Hand))
             {
-                _rightHandEquip = playerEquip;
+                _mostRecentEquipGained = _rightHandEquip = playerEquip;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandShield, _playerID);
                 return true;
             }
@@ -178,7 +185,7 @@ namespace DoomBreakers
             if (IsShield(EquipHand.Left_Hand))
             {
                 //if (IsShieldBetterThanCurrent(playerEquip, EquipHand.Left_Hand))
-                _leftHandEquip = playerEquip;
+                _mostRecentEquipGained = _leftHandEquip = playerEquip;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandShield, _playerID);
                 return true;
             }
@@ -189,7 +196,7 @@ namespace DoomBreakers
             if (IsShield(EquipHand.Right_Hand))
             {
                 //if (IsShieldBetterThanCurrent(playerEquip, EquipHand.Right_Hand))
-                _rightHandEquip = playerEquip;
+                _mostRecentEquipGained = _rightHandEquip = playerEquip;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandShield, _playerID);
                 return true;
             }
@@ -202,14 +209,14 @@ namespace DoomBreakers
 
             if(!IsArmor())
 			{
-                _torsoEquipment = playerEquip;
+                _mostRecentEquipGained = _torsoEquipment = playerEquip;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UITorsoEquip, _playerID);
                 return true;
 			}
             else
 			{
                 //if(IsArmorBetterThanCurrent(playerEquip))
-                _torsoEquipment = playerEquip;
+                _mostRecentEquipGained = _torsoEquipment = playerEquip;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UITorsoEquip, _playerID);
                 return true;
             }

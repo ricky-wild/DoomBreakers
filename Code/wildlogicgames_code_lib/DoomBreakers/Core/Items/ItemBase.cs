@@ -44,7 +44,7 @@ namespace DoomBreakers
         Goldcoin = 0,
         Ruby = 1,
         Emerald = 2,
-        Saphhire = 3,
+        Sapphire = 3,
         Diamond = 4
     };
 

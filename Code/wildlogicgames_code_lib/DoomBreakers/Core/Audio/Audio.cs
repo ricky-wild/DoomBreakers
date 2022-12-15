@@ -9,9 +9,9 @@ namespace DoomBreakers
 		private AudioSource _audioSource;
 		private AudioClip _audioClip;
 		private float _volume, _timeStamp, _waitTime, _length;
-		private bool _timeStamped;
+		
 
-		public Audio(string fileName, float volume, bool loop, Transform parentTransform)
+		public Audio(string fileName, float volume, bool loop, float pitch, Transform parentTransform)
 		{
 			_gameObject = new GameObject();
 			_gameObject.transform.parent = parentTransform;
@@ -24,9 +24,13 @@ namespace DoomBreakers
 			_audioSource.loop = loop;
 			_volume = volume;
 			_audioSource.volume = _volume;
+			_audioSource.pitch = pitch;
 
-			_waitTime = _audioSource.time;//_audioClip.length;
+			_length = _audioSource.time;//_audioClip.length;
+
+
 		}
+
 
 		public void PlaySound()
 		{
@@ -38,6 +42,7 @@ namespace DoomBreakers
 				PlaySound();
 			}
 		}
+
 		public void StopSound() => _audioSource.Stop(); //_audioSource.Pause();
 
 	}

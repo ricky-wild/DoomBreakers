@@ -21,7 +21,7 @@ namespace DoomBreakers
 			animator.Play("Hit");//, -1, 0.0f);
 
 
-			playerSprite.SetBehaviourTextureFlash(0.1f, Color.red);
+			playerSprite.SetBehaviourTextureFlash(0.5f, Color.red);
 
 			float multiplier = 1.2f;// 1.66f;
 

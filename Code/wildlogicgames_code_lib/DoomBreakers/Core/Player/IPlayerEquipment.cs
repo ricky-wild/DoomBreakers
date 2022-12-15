@@ -15,6 +15,7 @@ namespace DoomBreakers
 		ItemBase GetLeftHandEquip();
 		ItemBase GetRightHandEquip();
 		ItemBase GetWeapon();
+		ItemBase GetMostRecentEquipment();
 
 		EquipmentMaterialType GetArmorMaterialType();
 		EquipmentMaterialType GetSwordMaterialType();

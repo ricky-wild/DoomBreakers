@@ -23,7 +23,7 @@ namespace DoomBreakers
 
 			animator.Play("Jabbed");//, 0, 0.0f);
 
-			banditSprite.SetBehaviourTextureFlash(0.1f, Color.red);
+			banditSprite.SetBehaviourTextureFlash(0.5f, Color.red);
 
 			_behaviourTimer.StartTimer(_quickAtkWaitTime);
 			if (_behaviourTimer.HasTimerFinished())

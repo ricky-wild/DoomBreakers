@@ -6,6 +6,7 @@ namespace DoomBreakers
 {
 	public class PlayerStats : CharacterStat, IPlayerStats //
 	{
+		private HealingItemType _mostRecentHealType;
 		private int _killCount;
 
 		private bool _process;
@@ -18,6 +19,7 @@ namespace DoomBreakers
 			_defence = d;
 			_process = true;
 			_killCount = 0;
+			_mostRecentHealType = HealingItemType.None;
 		}
 		public override bool IsArmored() => _armored;
 		public override void IsArmored(bool b) => base.IsArmored(b);
@@ -26,6 +28,9 @@ namespace DoomBreakers
 		public void IncrementKillCount(int value) => _killCount += value;
 
 		public double GetMaxHealthLimit() => _maxHealth;
+
+		public void SetRecentHealItemType(HealingItemType recentHealType) => _mostRecentHealType = recentHealType;
+		public HealingItemType GetRecentHealItemType() => _mostRecentHealType;
 
 	}
 }

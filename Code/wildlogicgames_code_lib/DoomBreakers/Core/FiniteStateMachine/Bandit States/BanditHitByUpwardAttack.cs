@@ -20,7 +20,7 @@ namespace DoomBreakers
 
 			animator.Play("Hit");//, 0, 0.0f);
 
-			banditSprite.SetBehaviourTextureFlash(0.1f, Color.red);
+			banditSprite.SetBehaviourTextureFlash(0.5f, Color.red);
 
 			if (_velocity.y >= _maxPowerStruckVelocityY)//Near peak of jump velocity, set falling state.
 			{
