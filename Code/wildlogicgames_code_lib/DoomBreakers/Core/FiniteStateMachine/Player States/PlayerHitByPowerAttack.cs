@@ -5,12 +5,13 @@ namespace DoomBreakers
 {
 	public class PlayerHitByPowerAttack : BaseState//, IPlayerJump
 	{
-
+		private Transform _transform;
 		private int _banditFaceDir;
-		public PlayerHitByPowerAttack(StateMachine s, Vector3 v) : base(velocity: v)//=> _stateMachine = s; 
+		public PlayerHitByPowerAttack(StateMachine s, Vector3 v, Transform t) : base(velocity: v)//=> _stateMachine = s; 
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
+			_transform = t;
 			_behaviourTimer = new Timer();
 			_banditFaceDir = BattleColliderManager.GetAssignedBanditFaceDir(BattleColliderManager.GetRecentCollidedBanditId());
 			_maxPowerStruckVelocityY = 11.25f;
@@ -28,7 +29,7 @@ namespace DoomBreakers
 			if (_velocity.y >= _maxPowerStruckVelocityY)//Near peak of jump velocity, set falling state.
 			{
 				playerSprite.SetBehaviourTextureFlash(0.25f, Color.red);
-				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
+				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity, _transform, ref playerSprite));
 				return;
 			}
 			else

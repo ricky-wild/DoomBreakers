@@ -5,12 +5,14 @@ namespace DoomBreakers
 {
 	public class PlayerKnockAttack : BaseState
 	{
-
-		public PlayerKnockAttack(StateMachine s, Vector3 v) : base(velocity: v)//=> _stateMachine = s; 
+		private Transform _transform;
+		public PlayerKnockAttack(StateMachine s, Vector3 v, Transform t) : base(velocity: v)//=> _stateMachine = s; 
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
+			_transform = t;
 			_behaviourTimer = new Timer();
+			ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_JumpingDustFX, _transform, 0, 1);
 			//print("\nKnock Attack State.");
 		}
 
@@ -27,12 +29,12 @@ namespace DoomBreakers
 			if (_behaviourTimer.HasTimerFinished())
 			{
 				playerSprite.ResetTexture2DColor();
-
+				ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_JumpingDustFX, _transform, 0, -playerSprite.GetSpriteDirection());
 				_stateMachine.SetState(new PlayerIdle(_stateMachine, _velocity));
 			}
 
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
-				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
+				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity, null, ref playerSprite));
 			//base.UpdateBehaviour();
 		}
 	}

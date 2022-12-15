@@ -4,21 +4,30 @@ namespace DoomBreakers
 {
 	public class PlayerMove : BaseState, IPlayerMove
 	{
-		public PlayerMove(StateMachine s, Vector3 v) : base(velocity: v)//=> _stateMachine = s; 
+		private Transform _transform;
+		public PlayerMove(StateMachine s, Vector3 v, Transform t, ref IPlayerSprite playerSprite) : base(velocity: v)//=> _stateMachine = s; 
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			//print("\nMove State.");
+			_transform = t;
+			_behaviourTimer = new Timer();
+			_behaviourTimer.StartTimer(1.0f);
+			ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_RunningDustFX, _transform, 0, -playerSprite.GetSpriteDirection());
 		}
 
 		public override void IsMoving(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref PlayerCollision playerCollider)
 		{
 			animator.Play("Run");
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed));
+
+			_behaviourTimer.StartTimer(1.0f);
+			if (_behaviourTimer.HasTimerFinished())
+				ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_RunningDustFX, _transform, 0, playerSprite.GetSpriteDirection());
+
 			DetectFaceDirection(ref playerSprite, ref playerCollider);
-			//print("\nplayerSprite.GetSpriteDirection()=" + playerSprite.GetSpriteDirection());
+
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
-				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
+				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity, _transform, ref playerSprite));
 			//base.UpdateBehaviour();
 		}
 

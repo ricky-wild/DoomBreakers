@@ -4,12 +4,15 @@ namespace DoomBreakers
 {
 	public class PlayerSprint : BaseState, IPlayerMove
 	{
-		public PlayerSprint(StateMachine s, Vector3 v) : base(velocity: v)//=> _stateMachine = s; 
+		private Transform _transform;
+		public PlayerSprint(StateMachine s, Vector3 v, Transform t,ref IPlayerSprite playerSprite) : base(velocity: v)//=> _stateMachine = s; 
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
+			_transform = t;
 			_sprintSpeed = 1.75f;
 			_behaviourTimer = new Timer();
+			ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_RunningDustFX, _transform, 0, -playerSprite.GetSpriteDirection());
 		}
 
 		public override void IsSprinting(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref PlayerCollision playerCollider)
@@ -22,10 +25,13 @@ namespace DoomBreakers
 
 			_behaviourTimer.StartTimer(0.25f);
 			if (_behaviourTimer.HasTimerFinished())
+			{
 				playerSprite.SetBehaviourTextureFlash(0.2f, Color.white);
+				ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_RunningDustFX, _transform, 0, playerSprite.GetSpriteDirection());
+			}
 
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
-				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
+				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity, _transform, ref playerSprite));
 			//base.UpdateBehaviour();
 		}
 

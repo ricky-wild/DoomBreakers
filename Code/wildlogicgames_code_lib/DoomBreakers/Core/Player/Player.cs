@@ -29,6 +29,7 @@ namespace DoomBreakers
         private Vector2 _inputVector2;
         private CharacterController2D _controller2D;//private Controller2D _controller2D;
         private Animator _animator;
+        private Transform _transform;
 
         private PlayerCollision _playerCollider;
         private IPlayerEquipment _playerEquipment;
@@ -45,6 +46,7 @@ namespace DoomBreakers
             _rewirdInputPlayer = ReInput.players.GetPlayer(_playerID);
             _inputVector2 = new Vector2();
             _animator = this.GetComponent<Animator>();
+            _transform = this.transform;
 
             _playerCollider = this.gameObject.AddComponent<PlayerCollision>(); //Required for OnTriggerEnter2D()
             _playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints, _playerID);
@@ -111,7 +113,7 @@ namespace DoomBreakers
             if (_inputVector2.x > 0f || _inputVector2.x < 0f)
             {
                 if (SafeToSetMove())
-                    SetState(new PlayerMove(this, _inputVector2));
+                    SetState(new PlayerMove(this, _inputVector2, _transform, ref _playerSprite));
             }
             if (Mathf.Abs(_inputVector2.x) == 0f && Mathf.Abs(_inputVector2.y) == 0f)//else
             {
@@ -121,7 +123,7 @@ namespace DoomBreakers
 			{
                 _playerStats.Stamina -= 0.1; //magic numbers are bad.
                 if (SafeToSetSprint())
-                    SetState(new PlayerSprint(this, _inputVector2));
+                    SetState(new PlayerSprint(this, _inputVector2, _transform, ref _playerSprite));
             }
             if (_rewirdInputPlayer.GetButtonUp("Sprint"))
                 return;
@@ -129,7 +131,7 @@ namespace DoomBreakers
             {
                 if (SafeToSetJump())
 				{
-                    SetState(new PlayerJump(this, _inputVector2));
+                    SetState(new PlayerJump(this, _inputVector2, _transform, ref _playerSprite));
                     AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerJumpSFX);
                 }
             }
@@ -172,7 +174,7 @@ namespace DoomBreakers
             }
             if (_rewirdInputPlayer.GetButtonTimedPressUp("KnockBack", 0.01f))
 			{
-                SetState(new PlayerKnockAttack(this, _inputVector2));
+                SetState(new PlayerKnockAttack(this, _inputVector2, _transform));
                 _playerCollider.EnableAttackCollisions();
                 _playerStats.Stamina -= 0.1;
                 UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
@@ -193,7 +195,7 @@ namespace DoomBreakers
                 if(SafeToSetHoldAttack())
 				{
                     _buttonHeldTimer.BeginTimeRecord();
-                    SetState(new PlayerHoldAttack(this, _inputVector2));
+                    SetState(new PlayerHoldAttack(this, _inputVector2, _transform));
                     _playerStats.Stamina -= 0.15;
                     UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
                     AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerChargeAttackSFX);
@@ -205,7 +207,7 @@ namespace DoomBreakers
                 {
                     _buttonHeldTimer.FinishTimeRecord();
                     BattleColliderManager.SetPlayerHeldAttackButtonTime(_buttonHeldTimer.GetTimeRecord());
-                    SetState(new PlayerReleaseAttack(this, _inputVector2));
+                    SetState(new PlayerReleaseAttack(this, _inputVector2, _transform));
                     _playerCollider.EnableAttackCollisions();
                     AudioEventManager.StopPlayerSFX(PlayerSFXID.PlayerChargeAttackSFX);
                     //AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
@@ -214,7 +216,7 @@ namespace DoomBreakers
         }
         public void UpdateStateBehaviours()
 		{
-            _state.IsIdle(ref _animator);
+            _state.IsIdle(ref _animator, ref _playerSprite);
             
             _state.IsGainedEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
             _state.IsBrokenEquipment(ref _animator, ref _playerSprite, ref _playerEquipment);
@@ -223,7 +225,7 @@ namespace DoomBreakers
             _state.IsMoving(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
             _state.IsSprinting(ref _animator, ref _inputVector2, ref _playerSprite, ref _playerCollider);
             
-            _state.IsJumping(ref _animator, ref _controller2D, ref _inputVector2);
+            _state.IsJumping(ref _animator, ref _controller2D, ref _inputVector2, ref _playerSprite);
             _state.IsFalling(ref _animator, ref _controller2D, ref _inputVector2);
            
             _state.IsDodging(ref _animator, ref _controller2D, ref _inputVector2, _inputDodgedLeft, ref _playerSprite, ref _playerCollider);
@@ -256,7 +258,7 @@ namespace DoomBreakers
             if(_playerEquipment.NewEquipmentGained())
 			{
                 AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerEquippedSFX);
-                SetState(new PlayerGainedEquipment(this, _velocity));
+                SetState(new PlayerGainedEquipment(this, _velocity, _transform));
                 _playerAnimator.SetAnimatorController(ref _playerEquipment);
                 _playerEquipment.NewEquipmentGained(false);
 			}
@@ -339,7 +341,7 @@ namespace DoomBreakers
             {
                 //if (SafeToSetTired())
                 _playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Tired);
-                SetState(new PlayerExhausted(this, _velocity));
+                SetState(new PlayerExhausted(this, _velocity, _transform));
             }
         }
 		private void UpdateDefense()
@@ -347,7 +349,7 @@ namespace DoomBreakers
 			if(_playerStats.Defence <= 0 && _playerStats.IsArmored())
 			{
                 AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerArmorBrokenSFX);
-                SetState(new PlayerBrokenEquipment(this, _velocity));
+                SetState(new PlayerBrokenEquipment(this, _velocity, _transform));
                 _playerStats.IsArmored(false);
                 _playerEquipment.RemoveArmor();
                 _playerAnimator.SetAnimatorController(ref _playerEquipment);

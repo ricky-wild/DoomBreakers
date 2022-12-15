@@ -74,14 +74,14 @@ namespace DoomBreakers
 
 			}
 		}
-		public virtual void IsIdle(ref Animator animator) { }
+		public virtual void IsIdle(ref Animator animator, ref IPlayerSprite playerSprite) { }
 
 		public virtual void IsExhausted(ref Animator animator, ref IPlayerSprite playerSprite) { }
 		public virtual void IsGainedEquipment(ref Animator animator, ref IPlayerSprite playerSprite, ref IPlayerEquipment playerEquipment) { }
 		public virtual void IsBrokenEquipment(ref Animator animator, ref IPlayerSprite playerSprite, ref IPlayerEquipment playerEquipment) { }
 		public virtual void IsMoving(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref PlayerCollision playerCollider) { }
 		public virtual void IsSprinting(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref PlayerCollision playerCollider) { }
-		public virtual void IsJumping(ref Animator animator, ref CharacterController2D controller2D, ref Vector2 input) { }
+		public virtual void IsJumping(ref Animator animator, ref CharacterController2D controller2D, ref Vector2 input, ref IPlayerSprite playerSprite) { }
 		public virtual void IsFalling(ref Animator animator, ref CharacterController2D controller2D, ref Vector2 input) { }
 		public virtual void IsDodging(ref Animator animator, ref CharacterController2D controller2D, ref Vector2 input, 
 										bool dodgeLeft, ref IPlayerSprite playerSprite, ref PlayerCollision playerCollider) { }

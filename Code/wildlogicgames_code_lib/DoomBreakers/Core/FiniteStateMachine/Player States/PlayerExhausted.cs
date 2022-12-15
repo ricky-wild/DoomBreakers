@@ -5,13 +5,15 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
-	public class PlayerExhausted : BaseState, IPlayerIdle
+	public class PlayerExhausted : BaseState//, IPlayerIdle
 	{
+		private Transform _transform;
 		ITimer _waitTimer;
-		public PlayerExhausted(StateMachine s, Vector3 v) : base(velocity: v)//=> _stateMachine = s; 
+		public PlayerExhausted(StateMachine s, Vector3 v, Transform t) : base(velocity: v)//=> _stateMachine = s; 
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
+			_transform = t;
 			_behaviourTimer = new Timer();
 			_waitTimer = new Timer();
 		}
@@ -30,7 +32,7 @@ namespace DoomBreakers
 				_stateMachine.SetState(new PlayerIdle(_stateMachine, _velocity));
 
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
-				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
+				_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity, _transform, ref playerSprite));
 			//base.UpdateBehaviour();
 		}
 	}

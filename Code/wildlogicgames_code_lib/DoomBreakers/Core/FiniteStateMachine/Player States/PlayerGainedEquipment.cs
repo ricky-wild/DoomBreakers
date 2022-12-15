@@ -5,11 +5,12 @@ namespace DoomBreakers
 {
 	public class PlayerGainedEquipment : BaseState
 	{
-
-		public PlayerGainedEquipment(StateMachine s, Vector3 v) : base(velocity: v)//=> _stateMachine = s; 
+		private Transform _transform;
+		public PlayerGainedEquipment(StateMachine s, Vector3 v, Transform t) : base(velocity: v)//=> _stateMachine = s; 
 		{
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
+			_transform = t;
 			_behaviourTimer = new Timer();
 			//print("\nGained Equipment State.");
 		}
@@ -26,7 +27,7 @@ namespace DoomBreakers
 				//AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerEquippedSFX);
 				playerSprite.SetNewEquipmemtTextureColorFlag(true, playerEquipment);
 				if (Mathf.Abs(_velocity.y) >= 3.0f)
-					_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity));
+					_stateMachine.SetState(new PlayerFall(_stateMachine, _velocity, _transform, ref playerSprite));
 				else
 					_stateMachine.SetState(new PlayerIdle(_stateMachine, _velocity));
 			}

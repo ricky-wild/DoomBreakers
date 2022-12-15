@@ -142,7 +142,7 @@ namespace DoomBreakers
             {
                 if (!IsDefendingSelf())
                 {
-                    SetState(new PlayerHitByPowerAttack(this, _velocity));
+                    SetState(new PlayerHitByPowerAttack(this, _velocity, null));
                     return true;
                 }
                 else//if (IsDefendingSelf())
@@ -155,7 +155,7 @@ namespace DoomBreakers
                     }
                     else
                     {
-                        SetState(new PlayerHitByPowerAttack(this, _velocity));
+                        SetState(new PlayerHitByPowerAttack(this, _velocity, null));
                         return true;
                     }
                 }
