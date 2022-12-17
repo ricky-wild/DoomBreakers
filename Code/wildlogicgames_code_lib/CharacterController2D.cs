@@ -20,7 +20,7 @@ namespace wildlogicgames
 		{
 			public bool[] _collidedDirection;
 			public int _faceDirection;
-			public bool _platformEdge;
+			public bool _platformEdge, _ignoreEdgeDetection;
 			public void Setup()
 			{
 				_collidedDirection = new bool[4];
@@ -33,6 +33,7 @@ namespace wildlogicgames
 				for (int i = 0; i < _collidedDirection.Length; i++) _collidedDirection[i] = false;
 				_faceDirection = 1;
 				_platformEdge = false;
+				_ignoreEdgeDetection = false;
 			}
 			public void SetCollidedDir(CollidedDir collidedDir, bool b) => _collidedDirection[(int)collidedDir] = b;
 			public bool GetCollidedDir(CollidedDir collidedDir) => _collidedDirection[(int)collidedDir];
@@ -56,6 +57,7 @@ namespace wildlogicgames
 		private Transform _transform;
 
 		public CollisionDetail GetCollision() => _collisionDetail;
+		public void IgnoreEdgeDetection(bool b) => _collisionDetail._ignoreEdgeDetection = b;
 
 		public override void Start()
 		{
@@ -193,7 +195,7 @@ namespace wildlogicgames
 		}
 		private void DetectPitfall()
 		{
-
+			if (_collisionDetail._ignoreEdgeDetection) return;
 
 			Vector2 tempVector2 = _raycastOriginVector2;
 

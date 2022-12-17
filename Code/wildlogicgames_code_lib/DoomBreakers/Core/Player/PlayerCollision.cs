@@ -27,6 +27,7 @@ namespace DoomBreakers
 
     public class PlayerCollision : MonoBehaviour//, IPlayerCollision
     {
+        private Transform _transform;
         private int _playerID;
         private CompareTags _compareTags;
 
@@ -54,11 +55,14 @@ namespace DoomBreakers
 
 
         private IPlayerEquipment _playerEquipment;
+        private PlayerStats _playerStats;
 
         //public PlayerCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints) { }
-        public void Setup(Collider2D collider2D, ref Transform[] arrayAtkPoints, int playerId)
+        public void Setup(Collider2D collider2D, ref Transform[] arrayAtkPoints, int playerId, ref Transform t,ref PlayerStats playerStat)
 		{
+            _transform = t;
             _playerID = playerId;
+            _playerStats = playerStat;
             SetupCollider2D(collider2D);
             _attackPoints = arrayAtkPoints;
 
@@ -166,7 +170,7 @@ namespace DoomBreakers
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Container)))
 					{
-                        ProcessCollisionWithBarrel(enemy);
+                        ProcessCollisionWithBarrel(enemy, ref playerSprite);
                     }
                 }
 
@@ -293,10 +297,11 @@ namespace DoomBreakers
                 double healPoints = collision.GetComponent<Apple>().Health();
                 playerStat.Health += healPoints;
                 playerStat.SetRecentHealItemType(HealingItemType.Apple);
-                playerSprite.SetBehaviourTextureFlash(0.5f, Color.green);
+                playerSprite.SetBehaviourTextureFlash(0.75f, Color.green);
                 UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref playerStat, _playerID);
                 collision.GetComponent<Apple>().Destroy();
                 AudioEventManager.PlayPropSFX(PropSFXID.PropHealUpSFX);
+                ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_HealingFX, _transform, _playerID, playerSprite.GetSpriteDirection());
             }
 
             _healthPickupEnabled = false;
@@ -314,10 +319,11 @@ namespace DoomBreakers
                 double healPoints = collision.GetComponent<Chicken>().Health();
                 playerStat.Health += healPoints;
                 playerStat.SetRecentHealItemType(HealingItemType.Chicken);
-                playerSprite.SetBehaviourTextureFlash(0.5f, Color.green);
+                playerSprite.SetBehaviourTextureFlash(0.75f, Color.green);
                 UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref playerStat, _playerID);
                 collision.GetComponent<Chicken>().Destroy();
                 AudioEventManager.PlayPropSFX(PropSFXID.PropHealUpSFX);
+                ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_HealingFX, _transform, _playerID, playerSprite.GetSpriteDirection());
             }
 
             _healthPickupEnabled = false;
@@ -335,10 +341,11 @@ namespace DoomBreakers
                 double healPoints = collision.GetComponent<Fish>().Health();
                 playerStat.Health += healPoints;
                 playerStat.SetRecentHealItemType(HealingItemType.Fish);
-                playerSprite.SetBehaviourTextureFlash(0.5f, Color.green);
+                playerSprite.SetBehaviourTextureFlash(0.75f, Color.green);
                 UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref playerStat, _playerID);
                 collision.GetComponent<Fish>().Destroy();
                 AudioEventManager.PlayPropSFX(PropSFXID.PropHealUpSFX);
+                ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_HealingFX, _transform, _playerID, playerSprite.GetSpriteDirection());
             }
 
             _healthPickupEnabled = false;
@@ -433,11 +440,12 @@ namespace DoomBreakers
         }
 
 
-        private void ProcessCollisionWithBarrel(Collider2D collision)
+        private void ProcessCollisionWithBarrel(Collider2D collision, ref IPlayerSprite playerSprite)
         {
             if (collision.GetComponent<Barrel>() == null) //Exists on Enemy Layer, Tag=Container
                 return; //Then NOT a Barrel. Get outta here!
 
+            ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_DustHitFX, _transform, _playerID, playerSprite.GetSpriteDirection());
             collision.GetComponent<Barrel>().IsHit();
 
 
@@ -460,7 +468,8 @@ namespace DoomBreakers
                 SetCollider2DIdentity(collision, C2D.CurrencyCollider2D);
                 _currencyPickupEnabled = true;
 			}
-		}
+            if (collision.CompareTag("FallenFlag")) _playerStats.Health -= _playerStats.Health;
+        }
         //void OnTriggerStay2D(Collider2D collision) => ProcessCollisionFlags(collision); //unreliable. We use ProcessItemCollision() instead.
         void OnTriggerExit2D(Collider2D collision)
 		{

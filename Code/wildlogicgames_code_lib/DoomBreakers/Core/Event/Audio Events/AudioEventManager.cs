@@ -151,13 +151,25 @@ namespace DoomBreakers
         private static void InitializeEnemySFX()
 		{
             EnemySFXID sfxId = EnemySFXID.EnemyHitSFX;
-            _enemySFXDict.Add(sfxId, new Audio("hit2", _volumeSFX, false, 1.5f, _transform));
+            _enemySFXDict.Add(sfxId, new Audio("hit2", _volumeSFX, false, 0.9f, _transform));
 
             sfxId = EnemySFXID.EnemyDoubleJumpSFX;
-            _enemySFXDict.Add(sfxId, new Audio("playerDblJump0", _volumeSFX, false, 1.0f, _transform));
+            _enemySFXDict.Add(sfxId, new Audio("playerDblJump0", _volumeSFX, false, 0.9f, _transform));
 
             sfxId = EnemySFXID.EnemyLandImpactSFX;
             _enemySFXDict.Add(sfxId, new Audio("playerLand0", _volumeSFX, false, 1.0f, _transform));
+
+            sfxId = EnemySFXID.EnemyQuickAttackSFX;
+            _enemySFXDict.Add(sfxId, new Audio("playerQuickAtkSFX", _volumeSFX, false, 0.9f, _transform));
+
+            sfxId = EnemySFXID.EnemyJumpSFX;
+            _enemySFXDict.Add(sfxId, new Audio("playerJump0", _volumeSFX, false, 0.9f, _transform));
+
+            sfxId = EnemySFXID.EnemyDefenseHitSFX;
+            _enemySFXDict.Add(sfxId, new Audio("playerShieldHit", _volumeSFX, false, 1.0f, _transform));
+
+            sfxId = EnemySFXID.EnemyDeathSFX;
+            _enemySFXDict.Add(sfxId, new Audio("enemyDeathEvent", _volumeSFX, false, 1.0f, _transform));
         }
         public static void PlayEnemySFX(EnemySFXID enemySFXID) => _enemySFXDict[enemySFXID].PlaySound();
         public static void StopEnemySFX(EnemySFXID enemySFXID) => _enemySFXDict[enemySFXID].StopSound();

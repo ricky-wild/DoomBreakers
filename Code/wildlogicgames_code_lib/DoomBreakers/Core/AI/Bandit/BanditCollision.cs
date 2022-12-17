@@ -35,12 +35,15 @@ namespace DoomBreakers
 
         private bool _detectTargetCollisionEnabled;
 
+        private BanditStats _banditStats;
 
-        public BanditCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints, int banditId)
+
+        public BanditCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints, ref BanditStats banditStats,int banditId)
         {
             _banditID = banditId;
             _collider2d = collider2D;
             _attackPoints = arrayAtkPoints;
+            _banditStats = banditStats;
 
             SetupLayerMasks();
             SetupAttackRadius();
@@ -86,12 +89,12 @@ namespace DoomBreakers
 
         void Update() { }
 
-        public void UpdateCollision(ref BanditBaseState banditState, IBanditSprite banditSprite)
+        public void UpdateCollision(ref BasicEnemyBaseState banditState, IBanditSprite banditSprite)
         {
             UpdateDetectEnemyTargets(ref banditState, banditSprite);
 
         }
-        public void UpdateDetectEnemyTargets(ref BanditBaseState banditState, IBanditSprite banditSprite)
+        public void UpdateDetectEnemyTargets(ref BasicEnemyBaseState banditState, IBanditSprite banditSprite)
         {
             if (!_detectTargetCollisionEnabled)
                 return;
@@ -116,6 +119,8 @@ namespace DoomBreakers
                     { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player4)))
                     { }
+                    //if (enemy.CompareTag("FallenFlag")) _banditStats.Health -= _banditStats.Health;
+
 
                     //if (enemy.CompareTag(GetCompareTag(CompareTags.Enemy))){}
                 }
@@ -125,7 +130,7 @@ namespace DoomBreakers
             _detectTargetCollisionEnabled = false;
         }
 
-        private void DetermineCollisionPurpose(ref BanditBaseState banditState, int i)
+        private void DetermineCollisionPurpose(ref BasicEnemyBaseState banditState, int i)
         {
 
 
@@ -164,7 +169,8 @@ namespace DoomBreakers
         
         public void ProcessCollisionFlags(Collider2D collision)
         {
-            //if (collision.CompareTag("")) { }
+            if (collision.CompareTag("FallenFlag")) 
+                _banditStats.Health -= _banditStats.Health;
             //if (collision.CompareTag("")) { }
             //if (collision.CompareTag("")) { }
             //if (collision.CompareTag("")) { }
@@ -199,8 +205,6 @@ namespace DoomBreakers
                     _vector.x = Mathf.Abs(_vector.x);
                     _attackPoints[i].localPosition = _vector;
                 }
-
-
                 return;
             }
             if (dir == -1)//Facing Left
@@ -211,8 +215,6 @@ namespace DoomBreakers
                     _vector.x = -Mathf.Abs(_vector.x);
                     _attackPoints[i].localPosition = _vector;
                 }
-
-
                 return;
             }
         }

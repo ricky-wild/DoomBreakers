@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DoomBreakers
 {
-    public class BanditStateMachine : EnemyStateMachine
+    public class BanditStateMachine : BasicEnemyStateMachine
     {
         protected bool _inputDodgedLeft;
         protected int _quickAttackIncrement;
@@ -70,6 +70,7 @@ namespace DoomBreakers
                 {
                     if (IsDefendingCorrectDirection(playerFaceDir, banditFaceDir))
 					{
+                        
                         SetState(new BanditHitDefending(this, _velocity, banditId));
                         return false;
                     }

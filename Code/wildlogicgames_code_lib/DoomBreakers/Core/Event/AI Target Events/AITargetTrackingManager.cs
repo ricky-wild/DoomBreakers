@@ -19,7 +19,7 @@ namespace DoomBreakers
         //individual enemy AI. The targets will be binded by each enemy ID assigned and used
         //as appropriate via their ID' and type (see EnemyAI enum above).
         //Relevant data will be plugged in via BanditCollision.cs trigger and pulled out-used from
-        //BanditPersue : BanditBaseState class.
+        //BanditPersue : BasicEnemyBaseState class.
         //</summary>
 
         private static AITargetTrackingManager _targetTrackingEventManager;

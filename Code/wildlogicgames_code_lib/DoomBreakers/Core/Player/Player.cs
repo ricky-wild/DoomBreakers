@@ -11,7 +11,7 @@ namespace DoomBreakers
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(CharacterController2D))]//[RequireComponent(typeof(Controller2D))]
-    public class Player : MyPlayerStateMachine, IPlayer
+    public class Player : PlayerStateMachine, IPlayer
     {
         [Header("Player ID")]
         [Tooltip("ID ranges from 0 to 3")]  //Max 4 players.
@@ -43,20 +43,21 @@ namespace DoomBreakers
         private void InitializePlayer()
 		{
             _controller2D = this.GetComponent<CharacterController2D>();//this.GetComponent<Controller2D>();
+            _controller2D.IgnoreEdgeDetection(true);
             _rewirdInputPlayer = ReInput.players.GetPlayer(_playerID);
             _inputVector2 = new Vector2();
             _animator = this.GetComponent<Animator>();
             _transform = this.transform;
+            _playerStats = new PlayerStats(100.0, 100.0, 0.0);
 
             _playerCollider = this.gameObject.AddComponent<PlayerCollision>(); //Required for OnTriggerEnter2D()
-            _playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints, _playerID);
+            _playerCollider.Setup(this.GetComponent<Collider2D>(), ref _attackPoints, _playerID, ref _transform, ref _playerStats);
             
             _playerEquipment = new PlayerEquipment(_playerID);
             _playerAnimator = new PlayerAnimator(ref _animator, "HumanAnimControllers", "Unarmored", "Player_with_nothing_controller", ref _playerIndicatorAnimator, _playerID);
 
             _playerSprite = this.gameObject.AddComponent<PlayerSprite>();
             _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
-            _playerStats = new PlayerStats(100.0, 100.0, 0.0);
 
             _buttonHeldTimer = new Timer();
             _staminaTimer = new Timer();
@@ -160,7 +161,7 @@ namespace DoomBreakers
             if (_rewirdInputPlayer.GetButtonTimedPressUp("Attack", 0.01f))
             {
                 if (_inputVector2.y > 0.44f)
-                    SetState(new PlayerUpwardAttack(this, _inputVector2));
+                    SetState(new PlayerUpwardAttack(this, _inputVector2, _transform));
                 else
                 {
                     if (_state.GetType() != typeof(PlayerHoldAttack))
@@ -257,6 +258,7 @@ namespace DoomBreakers
             _playerCollider.UpdateCollision(ref _state, _playerID, ref _playerEquipment, ref _playerSprite, ref _playerStats);
             if(_playerEquipment.NewEquipmentGained())
 			{
+                ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_ArmorObtainedFX, _transform, _playerID, _playerSprite.GetSpriteDirection());
                 AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerEquippedSFX);
                 SetState(new PlayerGainedEquipment(this, _velocity, _transform));
                 _playerAnimator.SetAnimatorController(ref _playerEquipment);
@@ -271,7 +273,7 @@ namespace DoomBreakers
 
             int banditId = BattleColliderManager.GetRecentCollidedBanditId();
             int banditFaceDir = BattleColliderManager.GetAssignedBanditFaceDir(banditId);
-            BanditBaseState attackingBanditState = BattleColliderManager.GetAssignedBanditState(banditId);
+            BasicEnemyBaseState attackingBanditState = BattleColliderManager.GetAssignedBanditState(banditId);
 
             if (IsIgnoreDamage())
                 return;
@@ -280,20 +282,22 @@ namespace DoomBreakers
             double banditPowerAttackDamage = 0.0175;
             bool process = false;
 
-            if(process = ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
+            if(process = ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection(), ref _transform))
 			{
                 if (!_playerStats.IsArmored())
                 {
+                    ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_BloodHitFX, _transform, _playerID, _playerSprite.GetSpriteDirection());
                     _playerStats.Health -= banditQuickAttackDamage;
-                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX);
+                    AudioEventManager.PlayEnemySFX(EnemySFXID.EnemyHitSFX);//AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX);
                 }
                 else
                 {
+                    ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_ArmorHitFX, _transform, _playerID, _playerSprite.GetSpriteDirection());
                     _playerStats.Defence -= banditQuickAttackDamage;
                     AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerArmorHitSFX);
                 }
             }
-            if(process = ProcessPowerAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection()))
+            if(process = ProcessPowerAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection(), ref _transform))
 			{
                 if (!_playerStats.IsArmored())
                 {
@@ -302,6 +306,8 @@ namespace DoomBreakers
                 }
                 else
                 {
+                    ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_ArmorHitFX, _transform, _playerID, _playerSprite.GetSpriteDirection());
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerArmorHitSFX);
                     _playerStats.Defence -= banditPowerAttackDamage;
                     AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
                 }

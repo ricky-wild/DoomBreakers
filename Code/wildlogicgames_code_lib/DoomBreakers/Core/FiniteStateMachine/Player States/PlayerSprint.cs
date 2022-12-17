@@ -23,7 +23,7 @@ namespace DoomBreakers
 
 			
 
-			_behaviourTimer.StartTimer(0.25f);
+			_behaviourTimer.StartTimer(0.65f);
 			if (_behaviourTimer.HasTimerFinished())
 			{
 				playerSprite.SetBehaviourTextureFlash(0.2f, Color.white);

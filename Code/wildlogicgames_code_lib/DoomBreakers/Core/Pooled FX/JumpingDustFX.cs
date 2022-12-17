@@ -18,18 +18,25 @@ namespace DoomBreakers
 			base.Setup(direction);
 			_targetVelocityY = 10.5f;
 			_animator = this.GetComponent<Animator>();
-			_animator.Play("dustCloudJumpFX");
+			_animator.Play("dustCloudJumpFX"); //FXController.controller
 			_alphaFreq = 0.05f;
 		}
-		public override void SetDirection(int dir) => base.SetDirection(dir);
+		public override void SetDirection(int dir) //=> base.SetDirection(dir);
+		{
+			base.SetDirection(dir);
+			this.Setup(dir);
+		}
 		void Awake() { }
 		void Start() { }
 
 
 		public override void Update()
 		{
-			_velocity.y = (_targetVelocityY * Time.deltaTime);
 			base.Update();
+
+			if(_animator != null) _animator.Play("dustCloudJumpFX");
+			_velocity.y = (_targetVelocityY * Time.deltaTime);
+
 		}
 		public override void FlipSprite() => base.FlipSprite();
 		public override void ApplyTransparency() => base.ApplyTransparency();

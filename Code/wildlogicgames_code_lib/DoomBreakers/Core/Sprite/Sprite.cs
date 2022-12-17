@@ -66,8 +66,7 @@ namespace DoomBreakers
 				_colorSwapTexture2D.SetPixel(i, 0, _colorSwapTextureColors[i]);
 			}
 
-			if (_colorSwappedFlag)
-				_colorSwappedFlag = false;
+			if (_colorSwappedFlag) _colorSwappedFlag = false;
 
 			_colorSwapTexture2D.Apply();
 		}
@@ -81,16 +80,15 @@ namespace DoomBreakers
 
 			if (!_colorSwappedFlag) //Ensure we reset internally upon failure to do so externally (ie a state change)
 			{
+				_colorSwappedTimer.Reset();
 				_colorSwappedTimer.StartTimer(time);
 				_colorSwappedFlag = true;
 			}
 
 			_colorSwapTexture2D.Apply();
 		}
-		public virtual void SetBehaviourTextureFlash(float time, Color colour)
-		{
+		public virtual void SetBehaviourTextureFlash(float time, Color colour) => SetTexture2DColor(time, colour);
 
-		}
 		public virtual void SwapTexture2DColor(SpriteColourIndex indexOfColourToSwap, Color replacementColor)
 		{
 			_colorSwapTextureColors[(int)indexOfColourToSwap] = replacementColor;

@@ -24,7 +24,7 @@ namespace DoomBreakers
         //private static EnemyAI _enemyType;
         private static int _mostRecentCollidedBanditId; //Needed for Enemy Hit By Power Attack behaviour state.
         private static Dictionary<int, int> _banditFaceDir;
-        private static Dictionary<int, BanditBaseState> _banditState;
+        private static Dictionary<int, BasicEnemyBaseState> _banditState;
 
 
         public static BattleColliderManager _instance
@@ -60,7 +60,7 @@ namespace DoomBreakers
             if (_banditFaceDir == null)
                 _banditFaceDir = new Dictionary<int, int>();
             if (_banditState == null)
-                _banditState = new Dictionary<int, BanditBaseState>();
+                _banditState = new Dictionary<int, BasicEnemyBaseState>();
 
             _mostRecentCollidedPlayerId = 0;
             _playerAttackButtonHeldTime = 0f;
@@ -171,13 +171,13 @@ namespace DoomBreakers
         //This is so far, AssignBanditState(), AssignBanditFaceDir() and TriggerEvent("ReportCollisionWithSomething").
         //We'll overload this from Player use for Bandit use.
         //</summary>
-        public static void AssignCollisionDetails(string eventName, ref BanditBaseState banditState, int forBanditId, IBanditSprite banditSprite)
+        public static void AssignCollisionDetails(string eventName, ref BasicEnemyBaseState banditState, int forBanditId, IBanditSprite banditSprite)
         {
             AssignBanditFaceDir(forBanditId, banditSprite);
             AssignBanditState(ref banditState, forBanditId);
             BaseTriggerEvent(eventName);
         }
-        public static void AssignBanditState(ref BanditBaseState banditState, int banditId)
+        public static void AssignBanditState(ref BasicEnemyBaseState banditState, int banditId)
         {
             if (!_banditState.ContainsKey(banditId))
                 _banditState.Add(banditId, banditState);
@@ -190,7 +190,7 @@ namespace DoomBreakers
                 }
             }
         }
-        public static BanditBaseState GetAssignedBanditState(int banditId) => _banditState[banditId];
+        public static BasicEnemyBaseState GetAssignedBanditState(int banditId) => _banditState[banditId];
         public static void AssignBanditFaceDir(int forBanditId, IBanditSprite banditSprite)
         {
             //BanditCollision.cs->UpdateDetectEnemyTargets()

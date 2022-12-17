@@ -19,9 +19,10 @@ namespace DoomBreakers
 
 			playerSprite.SetBehaviourTextureFlash(0.5f, Color.red);
 
-			_behaviourTimer.StartTimer(_quickAtkWaitTime);
+			_behaviourTimer.StartTimer(_quickAtkWaitTime*2);
 			if (_behaviourTimer.HasTimerFinished())
 			{
+				
 				//AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX);
 				playerSprite.ResetTexture2DColor();
 				_targetVelocityX = 0f;

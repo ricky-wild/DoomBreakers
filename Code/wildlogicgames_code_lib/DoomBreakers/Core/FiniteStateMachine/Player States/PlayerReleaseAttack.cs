@@ -11,6 +11,7 @@ namespace DoomBreakers
 			_velocity = v; //We want to carry this on between states.
 			_transform = t;
 			_behaviourTimer = new Timer();
+			ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_JumpingDustFX, _transform, 0, 1);
 			//print("\nRelease Attack State.");
 		}
 

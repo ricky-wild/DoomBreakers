@@ -12,6 +12,7 @@ namespace DoomBreakers
 			_transform = t;
 			_behaviourTimer = new Timer();
 
+			ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_JumpingDustFX, _transform, 0, 1);
 			ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_RunningDustFX, _transform, 0, -1);
 			ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_RunningDustFX, _transform, 0, 1);
 			//print("\nHold Attack State.");

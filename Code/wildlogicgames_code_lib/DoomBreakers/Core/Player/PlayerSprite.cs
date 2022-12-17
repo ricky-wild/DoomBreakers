@@ -295,9 +295,11 @@ namespace DoomBreakers
 
 			if (!_colorSwappedFlag) //Ensure we reset internally upon failure to do so externally (ie a state change)
 			{
-				_colorSwappedTimer.StartTimer(time/2);
-				_colorSwappedFlag = true;
+                _colorSwappedTimer.Reset();
+                _colorSwappedTimer.StartTimer(time + 0.01f);
+                _colorSwappedFlag = true;
 			}
+
 
 			_colorSwapTexture2D.Apply();
 		}
@@ -310,17 +312,17 @@ namespace DoomBreakers
 				_colorSwapTexture2D.SetPixel(i, 0, _colorSwapTextureColors[i]);
 			}
 
-			if (_colorSwappedFlag)
-				_colorSwappedFlag = false;
+			if (_colorSwappedFlag) _colorSwappedFlag = false;
 
 			_colorSwapTexture2D.Apply();
 			//base.ResetTexture2DColor();
 		}
         public override void SetBehaviourTextureFlash(float time, Color colour)
         {
-            _behaviourTimer.StartTimer(time);//flash sprite colour timer.
-            if (_behaviourTimer.HasTimerFinished())
-                SetTexture2DColor(time, colour);
+            //ResetTexture2DColor();
+            //_behaviourTimer.StartTimer(time);//flash sprite colour timer.
+            //if (_behaviourTimer.HasTimerFinished())
+            SetTexture2DColor(time, colour);
         }
 
         void Update()
@@ -636,8 +638,7 @@ namespace DoomBreakers
         private void UpdateColorTextureResetInternally()
         {
             //Ensure we reset internally upon failure to do so externally (ie a state change)
-            if (!_colorSwappedFlag)
-                return;
+            if (!_colorSwappedFlag) return;
 
             if (_colorSwappedTimer.HasTimerFinished())
             {

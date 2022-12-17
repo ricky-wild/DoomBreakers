@@ -217,30 +217,26 @@ namespace DoomBreakers
 			//Then this indicates health has decreased.
 			if (_prevPlayerStats.Health > UIPlayerManager.GetPlayerStats(_playerID).Health)
 			{
-				if (!_playerStats.IsArmored())
-				{
-					_UIAnimFlag = UIAnimationFlag.UIFrame;
-					PlayUIAnimation(GetFrameAnim(UIFrameAnimID.Hit));//("P" + (_playerID + 1).ToString() + "_Hit"); //anim length 1.017 sec
-					_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
-					_prevPlayerStats.Health = _playerStats.Health;
-					_timer.StartTimer(1.0f); //We don't loop P1_Hit anim.
-					_hitFrameAnimFlag = true;
-				}
+				//if (!_playerStats.IsArmored()) return;
+				_UIAnimFlag = UIAnimationFlag.UIFrame;
+				PlayUIAnimation(GetFrameAnim(UIFrameAnimID.Hit));//("P" + (_playerID + 1).ToString() + "_Hit"); //anim length 1.017 sec
+				_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
+				_prevPlayerStats.Health = _playerStats.Health;
+				_timer.StartTimer(1.0f); //We don't loop P1_Hit anim.
+				_hitFrameAnimFlag = true;
 			}
 			//Then this indicates health has increased.
 			if (_prevPlayerStats.Health < UIPlayerManager.GetPlayerStats(_playerID).Health)
 			{
-				if (!_playerStats.IsArmored())
-				{
-					_UIAnimFlag = UIAnimationFlag.UIFrame;
-					PlayUIAnimation(GetFrameAnim(UIFrameAnimID.Heal));//("P" + (_playerID + 1).ToString() + "_Hit"); //anim length 1.017 sec
-					_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
-					_prevPlayerStats.Health = _playerStats.Health;
-					_timer.StartTimer(1.0f); //We don't loop P1_Hit anim.
-					_hitFrameAnimFlag = true;
+				//if (!_playerStats.IsArmored()) return;
+				_UIAnimFlag = UIAnimationFlag.UIFrame;
+				PlayUIAnimation(GetFrameAnim(UIFrameAnimID.Heal));//("P" + (_playerID + 1).ToString() + "_Hit"); //anim length 1.017 sec
+				_playerStats = UIPlayerManager.GetPlayerStats(_playerID);
+				_prevPlayerStats.Health = _playerStats.Health;
+				_timer.StartTimer(1.0f); //We don't loop P1_Hit anim.
+				_hitFrameAnimFlag = true;
 
-					QueueItemToTextProcess(true);
-				}
+				QueueItemToTextProcess(true);
 			}
 			//Then this indicates health has hit zero and death is upon thee.
 			if (UIPlayerManager.GetPlayerStats(_playerID).Health <= 0)//(_playerStats.Health <= 0f)
