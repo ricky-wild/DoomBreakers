@@ -9,61 +9,61 @@ namespace DoomBreakers
         protected int _quickAttackIncrement;
         protected Vector3 _velocity;
 
-        protected float ProcessPowerAttackFromPlayer(ref BaseState playerAttackState, int banditId)
+        protected float ProcessPowerAttackFromPlayer(ref BaseState playerAttackState, int enemyId)
         {
             if (IsDying()) return 0f;
             if (playerAttackState.GetType() == typeof(PlayerReleaseAttack))
             {
                 float playerAttackedButtonTime = BattleColliderManager.GetPlayerHeldAttackButtonTime();
-                SetState(new BanditHitByPowerAttack(this, _velocity, banditId));
+                SetState(new BanditHitByPowerAttack(this, _velocity, enemyId));
                 return playerAttackedButtonTime;
             }
             return 0f;
         }
-        protected bool ProcessUpwardAttackFromPlayer(ref BaseState playerAttackState, int banditId)
+        protected bool ProcessUpwardAttackFromPlayer(ref BaseState playerAttackState, int enemyId)
 		{
             if (IsDying()) return false;
             if (playerAttackState.GetType() == typeof(PlayerUpwardAttack))
 			{
-                SetState(new BanditHitByUpwardAttack(this, _velocity, banditId));
+                SetState(new BanditHitByUpwardAttack(this, _velocity, enemyId));
                 return true;
             }
             return false;
         }
-        protected bool ProcessKnockAttackFromPlayer(ref BaseState playerAttackState, int playerId, int playerFaceDir,  int banditId, int banditFaceDir)
+        protected bool ProcessKnockAttackFromPlayer(ref BaseState playerAttackState, int playerId, int playerFaceDir,  int enemyId, int banditFaceDir)
         {
             if (IsDying()) return false;
             if (playerAttackState.GetType() == typeof(PlayerKnockAttack))
             {
                 if (NotDefending())
 				{
-                    SetState(new BanditHitByKnockAttack(this, _velocity, banditId)); 
+                    SetState(new BanditHitByKnockAttack(this, _velocity, enemyId)); 
                     return true;
                 }
                 else
                 {
                     if (IsDefendingCorrectDirection(playerFaceDir, banditFaceDir))
                     {
-                        SetState(new BanditHitDefending(this, _velocity, banditId));
+                        SetState(new BanditHitDefending(this, _velocity, enemyId));
                         return false;
                     }
                     else
                     {
-                        SetState(new BanditHitByKnockAttack(this, _velocity, banditId));
+                        SetState(new BanditHitByKnockAttack(this, _velocity, enemyId));
                         return true;
                     }
                 }
             }
             return false;
         }
-        protected bool ProcessQuickAttackFromPlayer(ref BaseState playerAttackState, int playerId, int playerFaceDir, int banditId, int banditFaceDir)
+        protected bool ProcessQuickAttackFromPlayer(ref BaseState playerAttackState, int playerId, int playerFaceDir, int enemyId, int banditFaceDir)
 		{
             if (IsDying()) return false;
             if (playerAttackState.GetType() == typeof(PlayerQuickAttack))
             {
                 if (NotDefending())
 				{
-                    SetState(new BanditHitByQuickAttack(this, _velocity, banditId));
+                    SetState(new BanditHitByQuickAttack(this, _velocity, enemyId));
                     return true;
                 }
                 else
@@ -71,12 +71,12 @@ namespace DoomBreakers
                     if (IsDefendingCorrectDirection(playerFaceDir, banditFaceDir))
 					{
                         
-                        SetState(new BanditHitDefending(this, _velocity, banditId));
+                        SetState(new BanditHitDefending(this, _velocity, enemyId));
                         return false;
                     }
                     else
 					{
-                        SetState(new BanditHitByQuickAttack(this, _velocity, banditId));
+                        SetState(new BanditHitByQuickAttack(this, _velocity, enemyId));
                         return true;
 					}
                 }

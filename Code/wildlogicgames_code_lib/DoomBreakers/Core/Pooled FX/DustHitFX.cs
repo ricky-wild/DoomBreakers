@@ -11,7 +11,7 @@ namespace DoomBreakers
 	public class DustHitFX : BaseFX
 	{
 
-		private Animator _animator;
+
 
 		//public DustHitFX(int direction) => Setup(direction);
 		public override void Setup(int direction)

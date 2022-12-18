@@ -7,18 +7,19 @@ using wildlogicgames;
 namespace DoomBreakers
 {
 
-	public class ArmorObtainedFX : BaseFX
+	public class ArrowShotFX : BaseFX
 	{
 
 
-		//public ArmorObtainedFX(int direction) => Setup(direction);
+
+		//public ArrowShotFX(int direction) => Setup(direction);
 		public override void Setup(int direction)
 		{
 			base.Setup(direction);
-			_targetVelocityY = 10.5f;
+			_targetVelocityX = 50.0f;
+			_applyAlphaFadeFlag = false;
 			_animator = this.GetComponent<Animator>();
-			_animator.Play("armorGainedFX"); //FXController.controller
-			_alphaFreq = 0.025f;
+			_animator.Play("arrowShotFX"); //FXController.controller
 		}
 		public override void SetDirection(int dir) //=> base.SetDirection(dir);
 		{
@@ -32,9 +33,11 @@ namespace DoomBreakers
 		public override void Update()
 		{
 			base.Update();
-			_animator.Play("armorGainedFX");
-			_velocity.y = (_targetVelocityY * Time.deltaTime);
 
+			_animator.Play("arrowShotFX"); //FXController.controller
+
+			_targetVelocityX = _targetVelocityX * Time.deltaTime;
+			_velocity.x = (_targetVelocityX * Time.deltaTime);
 		}
 		public override void FlipSprite() => base.FlipSprite();
 		public override void ApplyTransparency() => base.ApplyTransparency();

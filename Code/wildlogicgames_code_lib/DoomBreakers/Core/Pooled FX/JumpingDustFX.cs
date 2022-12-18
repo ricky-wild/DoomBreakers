@@ -10,7 +10,7 @@ namespace DoomBreakers
 	public class JumpingDustFX : BaseFX
 	{
 
-		private Animator _animator;
+
 
 		//public JumpingDustFX(int direction) => Setup(direction);
 		public override void Setup(int direction)

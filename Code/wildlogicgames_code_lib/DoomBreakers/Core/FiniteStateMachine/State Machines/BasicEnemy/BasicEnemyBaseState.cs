@@ -15,7 +15,7 @@ namespace DoomBreakers
 		//dervived player state we create and set.
 		//</summary>
 
-		protected int _banditID;
+		protected int _enemyID;
 		protected BasicEnemyStateMachine _stateMachine;
 		protected Transform _transform;
 		protected Vector3 _velocity, _cachedVector3;
@@ -30,9 +30,9 @@ namespace DoomBreakers
 		protected float _cooldownWaitTime, _idleWaitTime, _quickAtkWaitTime;
 		protected ITimer _behaviourTimer, _cooldownTimer;
 
-		public BasicEnemyBaseState(Vector3 velocity, int banditId)
+		public BasicEnemyBaseState(Vector3 velocity, int enemyId)
 		{
-			_banditID = banditId;
+			_enemyID = enemyId;
 			_velocity = velocity;//new Vector3();
 			_moveSpeed = wildlogicgames.Utilities.GetRandomNumberInt(3, 5);//4.0f;//3.75f;//3.5f;
 			_moveSpeed = _moveSpeed - 0.5f;
@@ -58,7 +58,7 @@ namespace DoomBreakers
 			//	_detectPlatformEdge = false;
 
 			if (controller2D._collisionDetail._platformEdge) 
-				_stateMachine.SetState(new BanditJump(_stateMachine, _velocity, transform, _banditID));
+				_stateMachine.SetState(new BanditJump(_stateMachine, _velocity, transform, _enemyID));
 			
 			UpdateGravity(ref controller2D, ref animator);
 			UpdateTransform(ref controller2D);
@@ -86,6 +86,7 @@ namespace DoomBreakers
 			}
 		}
 		public virtual void IsIdle(ref Animator animator, ref IBanditCollision banditCollider) { }
+		public virtual void IsIdle(ref Animator animator) { }
 		public virtual void IsJumping(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsWaiting(ref Animator animator) { }
 		public virtual void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider) { }
@@ -99,6 +100,10 @@ namespace DoomBreakers
 		public virtual void IsHitWhileDefending(ref Animator animator, ref CharacterController2D controller2D, ref IBanditSprite banditSprite) { }
 		public virtual void IsHitByUpwardAttack(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsHitByKnockAttack(ref Animator animator, ref IBanditSprite banditSprite) { }
+		public virtual void IsIdleBowman(ref Animator animator, ref IBanditCollision banditCollider) { }
+		public virtual void IsAiming(ref Animator animator, ref IBanditCollision banditCollider,ref IBanditSprite banditSprite) { }
+		public virtual void IsShootTarget(ref Animator animator, ref IBanditSprite banditSprite) { }
+		public virtual void IsHit(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsDying(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsDead(ref Animator animator, ref IBanditSprite banditSprite) { }
 	}

@@ -6,9 +6,9 @@ namespace DoomBreakers
 	public class BanditDying : BasicEnemyBaseState
 	{
 
-		public BanditDying(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditDying(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_idleWaitTime = 1.0f; //1.520f dying anim length
@@ -29,7 +29,7 @@ namespace DoomBreakers
 			if (_behaviourTimer.HasTimerFinished())
 			{
 				Time.timeScale = 1.0f;
-				_stateMachine.SetState(new BanditDead(_stateMachine, _velocity, _banditID));
+				_stateMachine.SetState(new BanditDead(_stateMachine, _velocity, _enemyID));
 			}
 
 

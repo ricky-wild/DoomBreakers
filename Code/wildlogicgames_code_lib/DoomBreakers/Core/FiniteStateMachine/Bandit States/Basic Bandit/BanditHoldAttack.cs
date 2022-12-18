@@ -6,17 +6,17 @@ namespace DoomBreakers
 	public class BanditHoldAttack : BasicEnemyBaseState
 	{
 		private bool _releaseFlag;
-		public BanditHoldAttack(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditHoldAttack(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_quickAtkWaitTime = 0.2f;//0.133f;
 			_behaviourTimer = new Timer();
 			_cooldownTimer = new Timer();
 			_releaseFlag = false;
-			ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_RunningDustFX, _transform, _banditID, 1);
-			ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_RunningDustFX, _transform, _banditID, -1);
+			ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_RunningDustFX, _transform, _enemyID, 1);
+			ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_RunningDustFX, _transform, _enemyID, -1);
 			//print("\nQuickAttack State.");
 		}
 
@@ -30,13 +30,13 @@ namespace DoomBreakers
 			banditSprite.SetWeaponChargeTextureFXFlag(true);
 
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
-				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID, false));
+				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _enemyID, false));
 
 			_behaviourTimer.StartTimer(0.5f);
 			if (_behaviourTimer.HasTimerFinished())
 			{
-				ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_RunningDustFX, _transform, _banditID, 1);
-				ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_RunningDustFX, _transform, _banditID, -1);
+				ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_RunningDustFX, _transform, _enemyID, 1);
+				ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_RunningDustFX, _transform, _enemyID, -1);
 				banditSprite.SetBehaviourTextureFlash(0.25f, Color.white);
 				_behaviourTimer.StartTimer(0.5f);
 			}
@@ -48,7 +48,7 @@ namespace DoomBreakers
 				_releaseFlag = true;
 			}
 			if (_cooldownTimer.HasTimerFinished())
-				_stateMachine.SetState(new BanditReleaseAttack(_stateMachine, _velocity, _banditID));
+				_stateMachine.SetState(new BanditReleaseAttack(_stateMachine, _velocity, _enemyID));
 			//base.UpdateBehaviour();
 		}
 	}

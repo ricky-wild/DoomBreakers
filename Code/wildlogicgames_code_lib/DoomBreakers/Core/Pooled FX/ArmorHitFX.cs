@@ -10,7 +10,6 @@ namespace DoomBreakers
 	public class ArmorHitFX : BaseFX
 	{
 
-		private Animator _animator;
 
 		//public ArmorHitFX(int direction) => Setup(direction);
 		public override void Setup(int direction)

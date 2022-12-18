@@ -6,9 +6,9 @@ namespace DoomBreakers
 	public class BanditDead : BasicEnemyBaseState
 	{
 
-		public BanditDead(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditDead(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_idleWaitTime = 2.0f;

@@ -6,9 +6,9 @@ namespace DoomBreakers
 	public class BanditJump : BasicEnemyBaseState
 	{
 
-		public BanditJump(BasicEnemyStateMachine s, Vector3 v, Transform transform, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditJump(BasicEnemyStateMachine s, Vector3 v, Transform transform, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_transform = transform;
@@ -18,7 +18,7 @@ namespace DoomBreakers
 			_cachedVector3 = new Vector3();
 
 			AudioEventManager.PlayEnemySFX(EnemySFXID.EnemyJumpSFX);
-			ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_JumpingDustFX, _transform, _banditID, 1);
+			ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_JumpingDustFX, _transform, _enemyID, 1);
 		}
 
 		public override void IsJumping(ref Animator animator, ref IBanditSprite banditSprite)
@@ -28,7 +28,7 @@ namespace DoomBreakers
 
 			float multiplier = 1.2f;// 1.66f;
 			int trackingDir = banditSprite.GetSpriteDirection();
-			_cachedVector3 = AITargetTrackingManager.GetAssignedTargetTransform(_banditID, EnemyAI.Bandit).position;
+			_cachedVector3 = AITargetTrackingManager.GetAssignedTargetTransform(_enemyID, EnemyAI.Bandit).position;
 
 			if(_cachedVector3 != null)
 			{
@@ -42,7 +42,7 @@ namespace DoomBreakers
 			if (_velocity.y >= (_maxPowerStruckVelocityY))//Near peak of jump velocity, set falling state.
 			{
 				banditSprite.SetBehaviourTextureFlash(0.25f, Color.white);
-				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID, true));
+				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _enemyID, true));
 				return;
 			}
 			else
@@ -57,7 +57,7 @@ namespace DoomBreakers
 
 
 			//if (Mathf.Abs(_velocity.y) >= 3.0f)
-			//	_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID));
+			//	_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _enemyID));
 
 			//base.UpdateBehaviour();
 		}

@@ -7,9 +7,9 @@ namespace DoomBreakers
 	public class BanditHitByQuickAttack : BasicEnemyBaseState
 	{
 		private int _randomStateDir;
-		public BanditHitByQuickAttack(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditHitByQuickAttack(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_randomStateDir = 0;
@@ -33,9 +33,9 @@ namespace DoomBreakers
 				_randomStateDir = wildlogicgames.Utilities.GetRandomNumberInt(0, 100);
 
 				if(_randomStateDir < 60)
-					_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _banditID));
+					_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _enemyID));
 				else
-					_stateMachine.SetState(new BanditDefending(_stateMachine, _velocity, _banditID));
+					_stateMachine.SetState(new BanditDefending(_stateMachine, _velocity, _enemyID));
 			}
 
 			//base.UpdateBehaviour();

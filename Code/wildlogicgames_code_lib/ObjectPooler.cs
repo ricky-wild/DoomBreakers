@@ -12,7 +12,8 @@ namespace DoomBreakers
         Prefab_DustHitFX = 3,
         Prefab_ArmorHitFX = 4,
         Prefab_ArmorObtainedFX = 5,
-        Prefab_HealingFX = 6
+        Prefab_HealingFX = 6,
+        Prefab_ArrowShotFX = 7
     };
 
     public class ObjectPooler : MonoBehaviour
@@ -88,6 +89,7 @@ namespace DoomBreakers
             _pooledObjectsEnemyDict.Add(PrefabID.Prefab_BloodHitFX, new List<GameObject>());
             _pooledObjectsEnemyDict.Add(PrefabID.Prefab_DustHitFX, new List<GameObject>());
             _pooledObjectsEnemyDict.Add(PrefabID.Prefab_ArmorHitFX, new List<GameObject>());
+            _pooledObjectsEnemyDict.Add(PrefabID.Prefab_ArrowShotFX, new List<GameObject>());
 
             for (int i = 0; i < _poolSize; i++)
             {
@@ -96,6 +98,7 @@ namespace DoomBreakers
                 AddGameObject(PrefabID.Prefab_BloodHitFX, PoolUsageFlag.PoolingFor_Enemy);
                 AddGameObject(PrefabID.Prefab_DustHitFX, PoolUsageFlag.PoolingFor_Enemy);
                 AddGameObject(PrefabID.Prefab_ArmorHitFX, PoolUsageFlag.PoolingFor_Enemy);
+                AddGameObject(PrefabID.Prefab_ArrowShotFX, PoolUsageFlag.PoolingFor_Enemy);
             }
         }
 
@@ -301,6 +304,10 @@ namespace DoomBreakers
                     if (direction == -1) _vectorOffset.x += distanceToEnemyFootX;
                     _vectorOffset.y -= distanceToEnemyFootY;
                     obj.GetComponent<ArmorHitFX>().SetDirection(direction);
+                    break;
+                case PrefabID.Prefab_ArrowShotFX:
+                    obj.GetComponent<ArrowShotFX>().SetDirection(direction);
+                    obj.transform.rotation = positionToSpawn.rotation;
                     break;
 
             }

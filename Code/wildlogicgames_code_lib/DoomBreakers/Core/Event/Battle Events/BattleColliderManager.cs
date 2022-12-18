@@ -21,10 +21,10 @@ namespace DoomBreakers
         private static Dictionary<int, ItemBase> _playerWeapon;
         private static float _playerAttackButtonHeldTime;
 
-        //private static EnemyAI _enemyType;
-        private static int _mostRecentCollidedBanditId; //Needed for Enemy Hit By Power Attack behaviour state.
-        private static Dictionary<int, int> _banditFaceDir;
-        private static Dictionary<int, BasicEnemyBaseState> _banditState;
+
+        private static int _mostRecentCollidedBasicEnemyId; //Needed for Enemy Hit By Power Attack behaviour state.
+        private static Dictionary<int, int> _enemyFaceDir;
+        private static Dictionary<int, BasicEnemyBaseState> _basicEnemyState;
 
 
         public static BattleColliderManager _instance
@@ -57,10 +57,10 @@ namespace DoomBreakers
             if (_playerWeapon == null)
                 _playerWeapon = new Dictionary<int, ItemBase>();
 
-            if (_banditFaceDir == null)
-                _banditFaceDir = new Dictionary<int, int>();
-            if (_banditState == null)
-                _banditState = new Dictionary<int, BasicEnemyBaseState>();
+            if (_enemyFaceDir == null)
+                _enemyFaceDir = new Dictionary<int, int>();
+            if (_basicEnemyState == null)
+                _basicEnemyState = new Dictionary<int, BasicEnemyBaseState>();
 
             _mostRecentCollidedPlayerId = 0;
             _playerAttackButtonHeldTime = 0f;
@@ -171,44 +171,44 @@ namespace DoomBreakers
         //This is so far, AssignBanditState(), AssignBanditFaceDir() and TriggerEvent("ReportCollisionWithSomething").
         //We'll overload this from Player use for Bandit use.
         //</summary>
-        public static void AssignCollisionDetails(string eventName, ref BasicEnemyBaseState banditState, int forBanditId, IBanditSprite banditSprite)
+        public static void AssignCollisionDetails(string eventName, ref BasicEnemyBaseState banditState, int forBanditId, int faceDir)
         {
-            AssignBanditFaceDir(forBanditId, banditSprite);
+            AssignBanditFaceDir(forBanditId, faceDir);
             AssignBanditState(ref banditState, forBanditId);
             BaseTriggerEvent(eventName);
         }
-        public static void AssignBanditState(ref BasicEnemyBaseState banditState, int banditId)
+        public static void AssignBanditState(ref BasicEnemyBaseState banditState, int enemyId)
         {
-            if (!_banditState.ContainsKey(banditId))
-                _banditState.Add(banditId, banditState);
+            if (!_basicEnemyState.ContainsKey(enemyId))
+                _basicEnemyState.Add(enemyId, banditState);
             else
             {
-                if (banditState.GetType() != _banditState[banditId].GetType())
+                if (banditState.GetType() != _basicEnemyState[enemyId].GetType())
                 {
-                    _banditState.Remove(banditId);
-                    _banditState.Add(banditId, banditState);
+                    _basicEnemyState.Remove(enemyId);
+                    _basicEnemyState.Add(enemyId, banditState);
                 }
             }
         }
-        public static BasicEnemyBaseState GetAssignedBanditState(int banditId) => _banditState[banditId];
-        public static void AssignBanditFaceDir(int forBanditId, IBanditSprite banditSprite)
+        public static BasicEnemyBaseState GetAssignedBanditState(int enemyId) => _basicEnemyState[enemyId];
+        public static void AssignBanditFaceDir(int forBanditId, int faceDir)
         {
             //BanditCollision.cs->UpdateDetectEnemyTargets()
 
-            _mostRecentCollidedBanditId = forBanditId;
-            if (!_banditFaceDir.ContainsKey(forBanditId))
-                _banditFaceDir.Add(forBanditId, banditSprite.GetSpriteDirection());
+            _mostRecentCollidedBasicEnemyId = forBanditId;
+            if (!_enemyFaceDir.ContainsKey(forBanditId))
+                _enemyFaceDir.Add(forBanditId, faceDir);
             else
             {
-                if (_banditFaceDir[forBanditId] != banditSprite.GetSpriteDirection())
+                if (_enemyFaceDir[forBanditId] != faceDir)
                 {
-                    _banditFaceDir.Remove(forBanditId);
-                    _banditFaceDir.Add(forBanditId, banditSprite.GetSpriteDirection());
+                    _enemyFaceDir.Remove(forBanditId);
+                    _enemyFaceDir.Add(forBanditId, faceDir);
                 }
             }
         }
-        public static int GetAssignedBanditFaceDir(int forBanditId) => _banditFaceDir[forBanditId];
-        public static int GetRecentCollidedBanditId() => _mostRecentCollidedBanditId;
+        public static int GetAssignedBanditFaceDir(int forBanditId) => _enemyFaceDir[forBanditId];
+        public static int GetRecentCollidedBanditId() => _mostRecentCollidedBasicEnemyId;
 
 
 

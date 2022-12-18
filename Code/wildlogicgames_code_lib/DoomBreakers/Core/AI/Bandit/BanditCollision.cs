@@ -8,12 +8,13 @@ namespace DoomBreakers
 
     public class BanditCollision : MonoBehaviour, IBanditCollision
     {
-        private int _banditID;
+        private int _enemyID;
         public enum CollisionTargetPurpose
 		{
             noPurpose = 0,
             toPersue = 1,
-            toAttack = 2
+            toAttack = 2,
+            toShoot = 3
 		};
         private CollisionTargetPurpose _collisionTargetPurpose; //Flag for player collision purpose. UpdateDetectEnemyTargets()
 
@@ -38,25 +39,38 @@ namespace DoomBreakers
         private BanditStats _banditStats;
 
 
-        public BanditCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints, ref BanditStats banditStats,int banditId)
-        {
-            _banditID = banditId;
-            _collider2d = collider2D;
+        public BanditCollision(Collider2D collider2D, ref Transform[] arrayAtkPoints, 
+            ref BanditStats banditStats,int enemyId)// => Setup(collider2D, ref arrayAtkPoints, ref banditStats, enemyId);
+		{
+            //Bandit 
             _attackPoints = arrayAtkPoints;
-            _banditStats = banditStats;
+            Setup(collider2D, ref banditStats, enemyId);
+        }
+        public BanditCollision(Collider2D collider2D, ref Transform shootDetectionPoint,
+            ref BanditStats banditStats, int enemyId) 
+		{
+            //Bandit Archer
+            _attackPoints = new Transform[1];
+            _attackPoints[0] = shootDetectionPoint;
+            Setup(collider2D, ref banditStats, enemyId);
+        }
 
+        private void Setup(Collider2D collider2D, ref BanditStats banditStats, int enemyId)
+		{
+            SetupClassVars(collider2D, ref banditStats, enemyId);
             SetupLayerMasks();
             SetupAttackRadius();
             SetupCompareTags();
-
+        }
+        private void SetupClassVars(Collider2D collider2D, ref BanditStats banditStats, int enemyId)
+		{
+            _enemyID = enemyId;
+            _collider2d = collider2D;         
+            _banditStats = banditStats;
             _collider2d.enabled = true;
             _detectTargetCollisionEnabled = false;
             _collisionTargetPurpose = CollisionTargetPurpose.noPurpose;
-            //_eventListener = new Action(TestMethod);
         }
-        //public void TestMethod(){print("TestMethod() activated via event handler!");}
-        //public void SetOnEnabled() {//EventManager.StartListening("BanditHitByPlayer", _eventListener);}
-        //public void SetOnDisabled(){//EventManager.StopListening("BanditHitByPlayer", _eventListener);}
         public void SetupLayerMasks()
         {
             _enemyLayerMasks[0] = LayerMask.NameToLayer(_playerLayerMaskStr);
@@ -102,16 +116,23 @@ namespace DoomBreakers
             for (int i = 0; i < _enemyLayerMasks.Length; i++)
             {
                 DetermineCollisionPurpose(ref banditState, i);
+                if (_enemyTargetsHit == null) return;
                 foreach (Collider2D enemy in _enemyTargetsHit)
                 {
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player)))
                     {
                         int playerID = enemy.GetComponent<Player>()._playerID;
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
-                            AITargetTrackingManager.AssignTargetTransform("ReportDetectionWithPlayerForBandit" + _banditID.ToString(), enemy.transform, _banditID, EnemyAI.Bandit);
+                            AITargetTrackingManager.AssignTargetTransform("ReportDetectionWithPlayerForBandit" + _enemyID.ToString(), enemy.transform, _enemyID, EnemyAI.Bandit);
 
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toAttack)
-                            BattleColliderManager.AssignCollisionDetails("ReportCollisionWithPlayerFor" + playerID.ToString(), ref banditState, _banditID, banditSprite);
+                            BattleColliderManager.AssignCollisionDetails("ReportCollisionWithPlayerFor" + playerID.ToString(), 
+                                ref banditState, _enemyID, banditSprite.GetSpriteDirection());
+
+                        if (_collisionTargetPurpose == CollisionTargetPurpose.toShoot)
+						{
+                            AITargetTrackingManager.AssignTargetTransform("ReportDetectionWithPlayerForBanditArcher" + _enemyID.ToString(), enemy.transform, _enemyID, EnemyAI.Bandit);
+                        }
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2)))
                     { }
@@ -132,8 +153,12 @@ namespace DoomBreakers
 
         private void DetermineCollisionPurpose(ref BasicEnemyBaseState banditState, int i)
         {
-
-
+            if(banditState.GetType() == typeof(BanditArcherAim))
+			{
+                _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, 12.0f, LayerMask.GetMask(_playerLayerMaskStr));
+                _collisionTargetPurpose = CollisionTargetPurpose.toShoot;
+                return;
+            }
             if (banditState.GetType() == typeof(BanditIdle))
             {
                 _enemyTargetsHit = Physics2D.OverlapCircleAll(_attackPoints[0].position, 12.0f, LayerMask.GetMask(_playerLayerMaskStr));
@@ -189,7 +214,7 @@ namespace DoomBreakers
 
         public void EnableTargetCollisionDetection()
         {
-            _detectTargetCollisionEnabled = true;
+            if(!_detectTargetCollisionEnabled) _detectTargetCollisionEnabled = true;
         }
 
 

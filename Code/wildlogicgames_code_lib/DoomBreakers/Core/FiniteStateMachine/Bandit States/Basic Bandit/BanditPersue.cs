@@ -6,9 +6,9 @@ namespace DoomBreakers
 	public class BanditPersue : BasicEnemyBaseState
 	{
 
-		public BanditPersue(BasicEnemyStateMachine s, Vector3 v, Transform transform, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditPersue(BasicEnemyStateMachine s, Vector3 v, Transform transform, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_transform = transform;
 			_velocity = v; //We want to carry this on between states.
@@ -33,12 +33,12 @@ namespace DoomBreakers
 
 			_behaviourTimer.StartTimer(1.0f);
 			if(_behaviourTimer.HasTimerFinished()) 
-				ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_RunningDustFX, _transform, _banditID, banditSprite.GetSpriteDirection());
+				ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_RunningDustFX, _transform, _enemyID, banditSprite.GetSpriteDirection());
 
 			DetectFaceDirection(ref banditSprite, ref banditCollider);
 
 			int trackingDir = 0; //Face direction either -1 left, or 1 right.
-			_cachedVector3 = AITargetTrackingManager.GetAssignedTargetTransform(_banditID, EnemyAI.Bandit).position;
+			_cachedVector3 = AITargetTrackingManager.GetAssignedTargetTransform(_enemyID, EnemyAI.Bandit).position;
 
 			if (_cachedVector3.x > _transform.position.x)
 				trackingDir = 1;
@@ -71,15 +71,15 @@ namespace DoomBreakers
 		{
 			CheckSetForFallState();
 			if (_transform.position.y < _cachedVector3.y - _attackDist)
-				_stateMachine.SetState(new BanditJump(_stateMachine, _velocity, _transform, _banditID));
+				_stateMachine.SetState(new BanditJump(_stateMachine, _velocity, _transform, _enemyID));
 			else
-				_stateMachine.SetState(new BanditQuickAttack(_stateMachine, _velocity, _banditID));
+				_stateMachine.SetState(new BanditQuickAttack(_stateMachine, _velocity, _enemyID));
 		}
 		private void CheckSetForFallState()
 		{
 			if (Mathf.Abs(_velocity.y) >= 3.0f)
 			{
-				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID, false));
+				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _enemyID, false));
 				return;
 			}
 		}

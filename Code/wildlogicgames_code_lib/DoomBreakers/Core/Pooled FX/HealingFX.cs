@@ -10,7 +10,7 @@ namespace DoomBreakers
 	public class HealingFX : BaseFX
 	{
 
-		private Animator _animator;
+
 
 		//public HealingFX(int direction) => Setup(direction);
 		public override void Setup(int direction)

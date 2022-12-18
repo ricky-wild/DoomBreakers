@@ -10,6 +10,7 @@ namespace DoomBreakers
 	{
 		protected Transform _transform;
 		protected Vector3 _velocity;
+		protected Animator _animator;
 		protected SpriteRenderer _spriteRenderer;
 		protected int _direction;
 		protected float _targetVelocityX, _targetVelocityY;
@@ -17,6 +18,7 @@ namespace DoomBreakers
 		protected Color _colour;
 		protected float _alpha;
 		protected float _alphaFreq;
+		protected bool _applyAlphaFadeFlag;
 
 		protected bool _process;
 
@@ -30,8 +32,11 @@ namespace DoomBreakers
 			_targetVelocityX = 0f;
 			_targetVelocityY = 0f;
 			_spriteRenderer = this.GetComponent<SpriteRenderer>();
+			//_animator = this.GetComponent<Animator>();
+			//_animator.Play(""); //FXController.controller
 			_alpha = 1.0f;
 			_alphaFreq = 0.005f;
+			_applyAlphaFadeFlag = true;
 			if (_spriteRenderer != null)
 			{
 				_colour = _spriteRenderer.color;
@@ -81,6 +86,7 @@ namespace DoomBreakers
 		}
 		public virtual void ApplyTransparency()
 		{
+			if (!_applyAlphaFadeFlag) return;
 			_alpha -= _alphaFreq;
 			_colour.a = _alpha;
 			_spriteRenderer.color = _colour;

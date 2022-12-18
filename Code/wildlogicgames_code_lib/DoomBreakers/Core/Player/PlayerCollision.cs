@@ -161,12 +161,8 @@ namespace DoomBreakers
 
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Enemy))) 
                     {
-                        if (enemy.GetComponent<Bandit>() == null) //Guard clause.
-                            return;
-
-                        int banditID = enemy.GetComponent<Bandit>()._banditID;
-                        BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBandit" + banditID.ToString(), 
-                                                ref playerState, playerId, playerSprite, _playerEquipment.GetWeapon());
+                        ProcessAttackCollisionBandit(enemy, ref playerState, playerId, ref playerSprite);
+                        ProcessAttackCollisionBanditArcher(enemy, ref playerState, playerId, ref playerSprite);
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Container)))
 					{
@@ -202,7 +198,25 @@ namespace DoomBreakers
                 return;
             }
         }
-        
+        private void ProcessAttackCollisionBandit(Collider2D enemy, ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite)
+		{
+            if (enemy.GetComponent<Bandit>() == null) //Guard clause.
+                return;
+
+            int banditID = enemy.GetComponent<Bandit>()._enemyID;
+            BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBandit" + banditID.ToString(),
+                                    ref playerState, playerId, playerSprite, _playerEquipment.GetWeapon());
+        }
+        private void ProcessAttackCollisionBanditArcher(Collider2D enemy, ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite)
+		{
+            if (enemy.GetComponent<BanditArcher>() == null) //Guard clause.
+                return;
+
+            int banditID = enemy.GetComponent<BanditArcher>()._enemyID;
+            BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBanditArcher" + banditID.ToString(),
+                                    ref playerState, playerId, playerSprite, _playerEquipment.GetWeapon());
+        }
+
 
         public void UpdateEquipmentTargets(ref IPlayerEquipment playerEquipment)
         {
@@ -273,6 +287,8 @@ namespace DoomBreakers
             }
             return;
         }
+
+
 
         private void ProcessHealthCollisions(ref PlayerStats playerStat, ref IPlayerSprite playerSprite)
         {
@@ -352,6 +368,8 @@ namespace DoomBreakers
 
             return;
         }
+
+
 
         private void ProcessCurrencyCollisions(ref PlayerStats playerStat)
         {
@@ -440,6 +458,7 @@ namespace DoomBreakers
         }
 
 
+
         private void ProcessCollisionWithBarrel(Collider2D collision, ref IPlayerSprite playerSprite)
         {
             if (collision.GetComponent<Barrel>() == null) //Exists on Enemy Layer, Tag=Container
@@ -451,6 +470,10 @@ namespace DoomBreakers
 
             return;
         }
+        
+        
+        
+        
         public void OnTriggerEnter2D(Collider2D collision)
 		{
             if (collision.CompareTag(GetCompareTag(CompareTags.Item)))

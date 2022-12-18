@@ -7,9 +7,9 @@ namespace DoomBreakers
 	public class BanditDefending : BasicEnemyBaseState
 	{
 
-		public BanditDefending(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditDefending(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_idleWaitTime = wildlogicgames.Utilities.GetRandomNumberInt(1, 4);
@@ -25,7 +25,7 @@ namespace DoomBreakers
 			_behaviourTimer.StartTimer(_idleWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
 			{
-				_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _banditID));
+				_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _enemyID));
 			}
 			//base.UpdateBehaviour();
 		}

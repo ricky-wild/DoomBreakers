@@ -271,9 +271,9 @@ namespace DoomBreakers
 		{
             //print("\nPlayer.cs= AttackedByBandit() called!");
 
-            int banditId = BattleColliderManager.GetRecentCollidedBanditId();
-            int banditFaceDir = BattleColliderManager.GetAssignedBanditFaceDir(banditId);
-            BasicEnemyBaseState attackingBanditState = BattleColliderManager.GetAssignedBanditState(banditId);
+            int enemyId = BattleColliderManager.GetRecentCollidedBanditId();
+            int banditFaceDir = BattleColliderManager.GetAssignedBanditFaceDir(enemyId);
+            BasicEnemyBaseState attackingBanditState = BattleColliderManager.GetAssignedBanditState(enemyId);
 
             if (IsIgnoreDamage())
                 return;

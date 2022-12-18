@@ -6,9 +6,9 @@ namespace DoomBreakers
 	public class BanditHitByUpwardAttack : BasicEnemyBaseState
 	{
 
-		public BanditHitByUpwardAttack(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditHitByUpwardAttack(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_maxPowerStruckVelocityY = 8.0f; //10.0f for lowest impact. 14.0f for average. 16.0f for maximum impact.
@@ -26,7 +26,7 @@ namespace DoomBreakers
 			{
 				banditSprite.SetBehaviourTextureFlash(0.1f, Color.red);
 				//_velocity.x = 0f;
-				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID, false));
+				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _enemyID, false));
 				return;
 			}
 			else

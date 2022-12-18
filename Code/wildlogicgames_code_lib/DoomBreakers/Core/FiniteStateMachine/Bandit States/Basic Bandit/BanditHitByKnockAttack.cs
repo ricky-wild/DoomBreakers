@@ -6,9 +6,9 @@ namespace DoomBreakers
 	public class BanditHitByKnockAttack : BasicEnemyBaseState
 	{
 
-		public BanditHitByKnockAttack(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditHitByKnockAttack(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_maxPowerStruckVelocityX = 10.0f;
@@ -42,7 +42,7 @@ namespace DoomBreakers
 			if (Mathf.Abs(_velocity.x) >= _maxPowerStruckVelocityX)
 			{
 				banditSprite.SetBehaviourTextureFlash(0.1f, Color.red);
-				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID, false));
+				_stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _enemyID, false));
 				return;
 			}
 			//else

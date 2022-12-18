@@ -6,9 +6,9 @@ namespace DoomBreakers
 	public class BanditReleaseAttack : BasicEnemyBaseState
 	{
 
-		public BanditReleaseAttack(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditReleaseAttack(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_behaviourTimer = new Timer();
@@ -31,10 +31,10 @@ namespace DoomBreakers
 
 
 			_behaviourTimer.StartTimer(1.0f); 
-			if (_behaviourTimer.HasTimerFinished()) _stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _banditID));
+			if (_behaviourTimer.HasTimerFinished()) _stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _enemyID));
 			
 			
-			if (Mathf.Abs(_velocity.y) >= 3.0f) _stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _banditID, false));
+			if (Mathf.Abs(_velocity.y) >= 3.0f) _stateMachine.SetState(new BanditFall(_stateMachine, _velocity, _enemyID, false));
 
 			//base.UpdateBehaviour();
 		}

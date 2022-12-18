@@ -7,9 +7,9 @@ namespace DoomBreakers
 	public class BanditHitDefending : BasicEnemyBaseState
 	{
 
-		public BanditHitDefending(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, banditId: id)//=> _stateMachine = s; 
+		public BanditHitDefending(BasicEnemyStateMachine s, Vector3 v, int id) : base(velocity: v, enemyId: id)//=> _stateMachine = s; 
 		{
-			_banditID = id;
+			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_idleWaitTime = 0.44f;
@@ -27,8 +27,8 @@ namespace DoomBreakers
 			_behaviourTimer.StartTimer(_idleWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
 			{
-				ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_DustHitFX, _transform, _banditID, banditSprite.GetSpriteDirection());
-				_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _banditID));
+				ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_DustHitFX, _transform, _enemyID, banditSprite.GetSpriteDirection());
+				_stateMachine.SetState(new BanditIdle(_stateMachine, _velocity, _enemyID));
 			}
 			//base.UpdateBehaviour();
 		}

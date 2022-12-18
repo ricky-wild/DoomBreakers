@@ -11,7 +11,7 @@ namespace DoomBreakers
 	public class BloodHitFX : BaseFX
 	{
 
-		private Animator _animator;
+
 
 		//public BloodHitFX(int direction) => Setup(direction);
 		public override void Setup(int direction)

@@ -8,7 +8,7 @@ namespace DoomBreakers
     {
 
         private SpriteColourIndex _spriteColourIndex;
-        private int _banditID, _spriteFaceDirection;
+        private int _enemyID, _spriteFaceDirection;
         private ITimer _colorSwappedTimer;
         private bool _colorSwappedFlag;
 
@@ -22,7 +22,7 @@ namespace DoomBreakers
         public BanditSprite(SpriteRenderer spriteRenderer, int banditID)
         {
             _spriteRenderer = spriteRenderer;
-            _banditID = banditID;
+            _enemyID = banditID;
             _spriteFaceDirection = 1; //1 = face right, -1 = face left.
 
             _weaponChargeTimerFlag = false;
@@ -32,7 +32,7 @@ namespace DoomBreakers
         public void Setup(SpriteRenderer spriteRenderer, int banditID)
         {
             _spriteRenderer = spriteRenderer;
-            _banditID = banditID;
+            _enemyID = banditID;
             _spriteFaceDirection = 1; //1 = face right, -1 = face left.
 
             _behaviourTimer = this.gameObject.AddComponent<Timer>();
@@ -71,7 +71,7 @@ namespace DoomBreakers
         }
         public void ApplyCustomTexture2DColours()
         {
-            SetupTexture2DColorSwap("_SwapTexBandit", _banditID);
+            SetupTexture2DColorSwap("_SwapTexBandit", _enemyID);
 
             int skinOption = wildlogicgames.Utilities.GetRandomNumberInt(0, 6);
             //switch (MenuManager._instance.GetPlayerCustomSkinId(_playerID))
