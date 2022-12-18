@@ -11,9 +11,9 @@ namespace DoomBreakers
 			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			_idleWaitTime = 1.0f;
+			_idleWaitTime = 1.5f;
 			_behaviourTimer = new Timer();
-			//print("\nIdle State.");
+
 		}
 
 		public override void IsIdleBowman(ref Animator animator, ref IBanditCollision banditCollider)//Bandit.cs use.
@@ -21,7 +21,7 @@ namespace DoomBreakers
 			animator.Play("Idle");//, 0, 0.0f);
 			_velocity.x = 0f;
 
-			_behaviourTimer.Reset();
+
 			_behaviourTimer.StartTimer(_idleWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
 			{

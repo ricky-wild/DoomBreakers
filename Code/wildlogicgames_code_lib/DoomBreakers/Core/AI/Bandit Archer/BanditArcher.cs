@@ -73,7 +73,7 @@ namespace DoomBreakers
         {
             _banditAnimator.SetAnimatorController(BanditAnimatorController.Bandit_with_bow_and_arrows_controller);
 
-            SetState(new BanditArcherAim(this, _velocity, _enemyID));
+            SetState(new BanditArcherIdle(this, _velocity, _enemyID));
         }
         void Update()
         {
@@ -85,14 +85,18 @@ namespace DoomBreakers
         {
             _state.IsIdleBowman(ref _animator, ref _banditCollider);
             _state.IsAiming(ref _animator, ref _banditCollider, ref _banditSprite);
-            _state.IsShootTarget(ref _animator, ref _banditSprite);
+            _state.IsShootTarget(ref _animator, ref _banditSprite, ref _banditCollider);
             _state.IsHit(ref _animator, ref _banditSprite);
             _state.IsDying(ref _animator, ref _banditSprite);
             _state.IsDead(ref _animator, ref _banditSprite);
 
             _state.UpdateBehaviour(ref _controller2D, ref _animator, ref _transform);
         }
-        public void UpdateCollisions() => _banditCollider.UpdateCollision(ref _state, _banditSprite);
+        public void UpdateCollisions() //=> _banditCollider.UpdateCollision(ref _state, _banditSprite);
+		{
+            if (IsDying()) return;
+            _banditCollider.UpdateCollision(ref _state, _banditSprite);
+        }
         private void UpdateStats()
         {
             if (!_banditStats.Process()) return;
@@ -116,6 +120,8 @@ namespace DoomBreakers
         }
         private void AttackedByPlayer()
         {
+            if (IsDying()) return;
+
             int playerId = BattleColliderManager.GetRecentCollidedPlayerId();
             int playerFaceDir = BattleColliderManager.GetAssignedPlayerFaceDir(playerId);
             BaseState attackingPlayerState = BattleColliderManager.GetAssignedPlayerState(playerId);
@@ -132,6 +138,8 @@ namespace DoomBreakers
 
                 playerAttackDamage = weaponDervived.Damage();
             }
+            AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX); 
+            ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_BloodHitFX, _transform, _enemyID, _banditSprite.GetSpriteDirection());
             SetState(new BanditArcherHit(this, _velocity, _enemyID));
             _banditStats.Health -= playerAttackDamage;
             _healthDisplayTimer.StartTimer(1.0f);
@@ -144,7 +152,7 @@ namespace DoomBreakers
         {
 
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(this.transform.position, 14.0f);
+            Gizmos.DrawWireSphere(this.transform.position, 12.0f);
 
         }
     }

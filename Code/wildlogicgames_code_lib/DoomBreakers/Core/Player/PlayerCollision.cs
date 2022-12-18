@@ -14,7 +14,8 @@ namespace DoomBreakers
         Item = 5,
         Container = 6,
         Health = 7,
-        Currency = 8
+        Currency = 8,
+        Arrow = 9
     };
 
     public enum C2D
@@ -121,6 +122,8 @@ namespace DoomBreakers
             _compareTagStrings[6] = "Container";
             _compareTagStrings[7] = "Health";
             _compareTagStrings[8] = "Currency";//oops
+
+            _compareTagStrings[9] = "Arrow";
         }
 
         public string GetCompareTag(CompareTags compareTagId) => _compareTagStrings[(int)compareTagId];
@@ -215,6 +218,13 @@ namespace DoomBreakers
             int banditID = enemy.GetComponent<BanditArcher>()._enemyID;
             BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBanditArcher" + banditID.ToString(),
                                     ref playerState, playerId, playerSprite, _playerEquipment.GetWeapon());
+        }
+        private void ProcessAttackCollisionArrow(Collider2D enemy)
+		{
+            if (enemy.GetComponent<ArrowShotFX>() == null) //Guard clause.
+                return;
+
+            //BattleColliderManager.TriggerEvent("ReportCollisionWithArrow");
         }
 
 

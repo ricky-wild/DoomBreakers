@@ -102,7 +102,7 @@ namespace DoomBreakers
 		public virtual void IsHitByKnockAttack(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsIdleBowman(ref Animator animator, ref IBanditCollision banditCollider) { }
 		public virtual void IsAiming(ref Animator animator, ref IBanditCollision banditCollider,ref IBanditSprite banditSprite) { }
-		public virtual void IsShootTarget(ref Animator animator, ref IBanditSprite banditSprite) { }
+		public virtual void IsShootTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider) { }
 		public virtual void IsHit(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsDying(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsDead(ref Animator animator, ref IBanditSprite banditSprite) { }

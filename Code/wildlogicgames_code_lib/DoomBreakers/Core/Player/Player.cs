@@ -64,16 +64,19 @@ namespace DoomBreakers
             _staminaTimer.StartTimer(0.05f); //increment stamina every 20th of a sec.
 
             _actionListener[0] = new Action(AttackedByBandit);//AttackedByBandit()
+            _actionListener[1] = new Action(AttackedByArrow);//AttackedByArrow()
         }
         private void OnEnable()
         {
             ////Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
             //BattleColliderManager.Subscribe("ReportCollisionWithPlayer" + _playerID.ToString(), _actionListener);
             BattleColliderManager.Subscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener[0]);
+            BattleColliderManager.Subscribe("ReportCollisionWithArrowForPlayer" + _playerID.ToString(), _actionListener[1]);
         }
         private void OnDisable()
         {
             BattleColliderManager.Unsubscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener[0]);
+            BattleColliderManager.Unsubscribe("ReportCollisionWithArrowForPlayer" + _playerID.ToString(), _actionListener[1]);
         }
         private void Awake()
 		{
@@ -313,6 +316,31 @@ namespace DoomBreakers
                 }
             }
             if(process) UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
+        }
+        private void AttackedByArrow()
+		{
+            if (IsIgnoreDamage())
+                return;
+
+            double arrowAttackDamage = 0.1;//0.0025;
+            bool process = false;
+
+            if(process = ProcessArrowAttack(_playerSprite.GetSpriteDirection(),ref _transform))
+			{
+                if (!_playerStats.IsArmored())
+                {
+                    ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_BloodHitFX, _transform, _playerID, _playerSprite.GetSpriteDirection());
+                    _playerStats.Health -= arrowAttackDamage;
+                    AudioEventManager.PlayEnemySFX(EnemySFXID.EnemyHitSFX);//AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX);
+                }
+                else
+                {
+                    ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_ArmorHitFX, _transform, _playerID, _playerSprite.GetSpriteDirection());
+                    _playerStats.Defence -= arrowAttackDamage;
+                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerArmorHitSFX);
+                }
+            }
+            if (process) UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
         }
         private void UpdateStats() //Encapsulate all of this into the PlayerStat class.
 		{

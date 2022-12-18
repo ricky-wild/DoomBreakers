@@ -111,6 +111,8 @@ namespace DoomBreakers
 
         public void UpdateCollisions()
 		{
+            if (IsDying()) return;
+
             _banditCollider.UpdateCollision(ref _state, _banditSprite);
         }
         private void UpdateStats()
@@ -148,8 +150,8 @@ namespace DoomBreakers
         private void AttackedByPlayer()
 		{
             //print("\nBandit.cs= AttackedByPlayer() called!");
+            if (IsDying()) return;
 
-            
             int playerId = BattleColliderManager.GetRecentCollidedPlayerId();
             int playerFaceDir = BattleColliderManager.GetAssignedPlayerFaceDir(playerId);
             BaseState attackingPlayerState = BattleColliderManager.GetAssignedPlayerState(playerId);
@@ -177,7 +179,6 @@ namespace DoomBreakers
                 AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX); //AudioEventManager.PlayEnemySFX(EnemySFXID.EnemyHitSFX);
                 ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_BloodHitFX, _transform, _enemyID, _banditSprite.GetSpriteDirection());
                 _banditStats.Health -= playerQuickAttackDamage;
-                AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX); //AudioEventManager.PlayEnemySFX(EnemySFXID.EnemyHitSFX);
             }
             _playerAttackedButtonTime = ProcessPowerAttackFromPlayer(ref attackingPlayerState, _enemyID);
             if(_playerAttackedButtonTime != 0f) _banditStats.Health -= playerPowerAttackDamage;

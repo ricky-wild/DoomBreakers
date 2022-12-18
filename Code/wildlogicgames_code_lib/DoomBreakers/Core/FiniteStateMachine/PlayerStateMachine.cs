@@ -109,7 +109,23 @@ namespace DoomBreakers
             return false;
 
         }
+        protected bool ProcessArrowAttack(int playerFaceDir, ref Transform t)
+		{
+            if (!IsDefendingSelf())
+            {
+                SetState(new PlayerHitByQuickAttack(this, _velocity));
+                return true;
+            }
+            else
+			{
+                ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_DustHitFX, t, 0, playerFaceDir);
+                AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerDefenseHitSFX);
+                SetState(new PlayerHitDefending(this, _velocity));
+                return false;
+            }
 
+            //return false;
+        }
         protected bool ProcessQuickAttackFromBandit(ref BasicEnemyBaseState attackingBanditState, int banditFaceDir, int playerFaceDir, ref Transform t)
 		{
             if (attackingBanditState.GetType() == typeof(BanditQuickAttack))

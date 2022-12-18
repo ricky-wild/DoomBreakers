@@ -12,9 +12,10 @@ namespace DoomBreakers
 			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			_idleWaitTime = 2.0f;
+			_idleWaitTime = 1.25f;
 			_behaviourTimer = new Timer();
-			//print("\nIdle State.");
+
+
 		}
 
 		public override void IsAiming(ref Animator animator, ref IBanditCollision banditCollider, ref IBanditSprite banditSprite)
@@ -22,18 +23,19 @@ namespace DoomBreakers
 			animator.Play("Aim");//, 0, 0.0f);
 			_velocity.x = 0f;
 
-			
+
 
 			_behaviourTimer.StartTimer(_idleWaitTime);
 			if (_behaviourTimer.HasTimerFinished())
 			{
-				_behaviourTimer.Reset();
-				_behaviourTimer.StartTimer(_idleWaitTime);
-				banditCollider.EnableTargetCollisionDetection();
+				//_behaviourTimer.Reset();
+				//_behaviourTimer.StartTimer(_idleWaitTime);
+				banditCollider.EnableTargetCollisionDetection(); //BanditCollision.cs->Finds Player->BanditArcher.cs->DetectedPlayer->BanditArcherShoot.cs
 				//AudioEventManager.PlayEnemySFX(EnemySFXID.EnemyQuickAttackSFX);
-				//_stateMachine.SetState(new BanditArcherIdle(_stateMachine, _velocity, _enemyID));
+				_stateMachine.SetState(new BanditArcherIdle(_stateMachine, _velocity, _enemyID));
 			}
 		}
+
 	}
 }
 

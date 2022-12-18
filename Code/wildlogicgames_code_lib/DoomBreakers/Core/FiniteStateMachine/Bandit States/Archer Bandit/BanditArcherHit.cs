@@ -31,7 +31,7 @@ namespace DoomBreakers
 				_targetVelocityX = 0f;
 				_randomStateDir = wildlogicgames.Utilities.GetRandomNumberInt(0, 100);
 
-				if (_randomStateDir < 70)
+				if (_randomStateDir < 60)
 					_stateMachine.SetState(new BanditArcherAim(_stateMachine, _velocity, _enemyID));
 				else
 					_stateMachine.SetState(new BanditArcherIdle(_stateMachine, _velocity, _enemyID));
