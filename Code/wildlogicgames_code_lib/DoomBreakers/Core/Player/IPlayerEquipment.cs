@@ -8,9 +8,9 @@ namespace DoomBreakers
 		void RemoveArmor();
 		bool NewEquipmentGained();
 		void NewEquipmentGained(bool flag);
-		bool ApplySword(ItemBase playerEquip);
-		bool ApplyShield(ItemBase playerEquip);
-		bool ApplyArmor(ItemBase playerEquip);
+
+		bool ApplyEquipment(ItemBase playerEquip);
+
 		ItemBase GetTorsoEquip();
 		ItemBase GetLeftHandEquip();
 		ItemBase GetRightHandEquip();
@@ -19,10 +19,12 @@ namespace DoomBreakers
 
 		EquipmentMaterialType GetArmorMaterialType();
 		EquipmentMaterialType GetSwordMaterialType();
+		EquipmentMaterialType GetMaceMaterialType();
 		EquipmentMaterialType GetShieldMaterialType();
 
 		bool IsBroadsword(EquipHand equipHand);//bool isLeftHand);
 		bool IsLongsword(EquipHand equipHand);//bool isLeftHand);
+		bool IsMorningstarMace(EquipHand equipHand);//bool isLeftHand);
 		bool IsShield(EquipHand equipHand);//bool isLeftHand);
 		bool IsArmor();
 		bool IsEmptyHanded(EquipHand equipHand);//bool isLeftHand);

@@ -345,7 +345,7 @@ namespace DoomBreakers
             ApplyCustomTexture2DColours();
             ApplyArmorColours();
             ApplyShieldColours();
-            ApplySwordColours();
+            ApplyWeaponColours();
 
             //_colorSwapTexture2D.Apply();
             _newEquipmentColorFlag = false;
@@ -451,13 +451,17 @@ namespace DoomBreakers
 
             return false;
 		}
-        private void ApplySwordColours()
+        private void ApplyWeaponColours()
         {
-            if (!SafeToApplySwordColor())
+            if (!SafeToApplyWeaponColor())
                 return;
 
+            EquipmentMaterialType equipMaterialType = EquipmentMaterialType.None;
 
-            switch (_playerEquipment.GetSwordMaterialType())
+            if (_playerEquipment.GetSwordMaterialType() != EquipmentMaterialType.None) equipMaterialType = _playerEquipment.GetSwordMaterialType();
+            if (_playerEquipment.GetMaceMaterialType() != EquipmentMaterialType.None) equipMaterialType = _playerEquipment.GetMaceMaterialType();
+
+            switch (equipMaterialType)
             {
                 case EquipmentMaterialType.Bronze:
                     SwapTexture2DColor(SpriteColourIndex.Sword_Standard_a, ColorFromInt(0xe4e6c9));
@@ -499,7 +503,7 @@ namespace DoomBreakers
 
             _colorSwapTexture2D.Apply();
         }
-        private bool SafeToApplySwordColor()
+        private bool SafeToApplyWeaponColor()
         {
             if (_playerEquipment == null)
                 return false;
@@ -510,6 +514,10 @@ namespace DoomBreakers
             if (_playerEquipment.IsLongsword(EquipHand.Left_Hand))
                 return true;
             if (_playerEquipment.IsLongsword(EquipHand.Right_Hand))
+                return true;
+            if (_playerEquipment.IsMorningstarMace(EquipHand.Left_Hand))
+                return true;
+            if (_playerEquipment.IsMorningstarMace(EquipHand.Right_Hand))
                 return true;
 
             return false;

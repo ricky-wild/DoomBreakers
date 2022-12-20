@@ -20,7 +20,9 @@ namespace DoomBreakers
 		UIRightHandSword = 2,
 		UILeftHandShield = 3,
 		UIRightHandShield = 4,
-		UITorsoEquip = 5
+		UILeftHandMace = 5,
+		UIRightHandMace = 6,
+		UITorsoEquip = 7
 	}
 	public class PlayerUI : MonoBehaviour
 	{
@@ -190,6 +192,8 @@ namespace DoomBreakers
 
 			if (_UIAnimFlag == UIAnimationFlag.UILeftHandSword) PlayUIAnimation("sword");
 			if (_UIAnimFlag == UIAnimationFlag.UIRightHandSword) PlayUIAnimation("sword");
+			if (_UIAnimFlag == UIAnimationFlag.UILeftHandMace) PlayUIAnimation("mace");
+			if (_UIAnimFlag == UIAnimationFlag.UIRightHandMace) PlayUIAnimation("mace");
 			if (_UIAnimFlag == UIAnimationFlag.UILeftHandShield) PlayUIAnimation("shield");
 			if (_UIAnimFlag == UIAnimationFlag.UIRightHandShield) PlayUIAnimation("shield");
 			if (_UIAnimFlag == UIAnimationFlag.UITorsoEquip)
@@ -311,18 +315,28 @@ namespace DoomBreakers
 				case UIAnimationFlag.UIFrame:
 					_UIFrameAnim.Play(animName);//"P1_Hit", "P1_Idle", "P1_Heal", "P1_Dead"
 					break;
+
 				case UIAnimationFlag.UILeftHandSword:
 					_leftHandEquipAnim.Play(animName);//"nothing","sword","shield"
 					break;
 				case UIAnimationFlag.UIRightHandSword:
 					_rightHandEquipAnim.Play(animName);//"nothing","sword","shield"
 					break;
+
+				case UIAnimationFlag.UILeftHandMace:
+					_leftHandEquipAnim.Play(animName);//"nothing","sword","shield","mace"
+					break;
+				case UIAnimationFlag.UIRightHandMace:
+					_rightHandEquipAnim.Play(animName);//"nothing","sword","shield","mace"
+					break;
+
 				case UIAnimationFlag.UILeftHandShield:
 					_leftHandEquipAnim.Play(animName);//"nothing","sword","shield"
 					break;
 				case UIAnimationFlag.UIRightHandShield:
 					_rightHandEquipAnim.Play(animName);//"nothing","sword","shield"
 					break;
+
 				case UIAnimationFlag.UITorsoEquip:
 					_torsoEquipAnim.Play(animName);
 					break;
@@ -385,6 +399,22 @@ namespace DoomBreakers
 
 						if (weaponDervived.GetSwordType() == EquipmentWeaponType.Broadsword) weaponType = "BROADSWORD";
 						if (weaponDervived.GetSwordType() == EquipmentWeaponType.Longsword) weaponType = "LONGSWORD";
+
+						if (weaponDervived.GetMaterialType() == EquipmentMaterialType.Bronze) weaponMaterial = "BRONZE ";
+						if (weaponDervived.GetMaterialType() == EquipmentMaterialType.Iron) weaponMaterial = "IRON ";
+						if (weaponDervived.GetMaterialType() == EquipmentMaterialType.Steel) weaponMaterial = "STEEL ";
+						if (weaponDervived.GetMaterialType() == EquipmentMaterialType.Ebony) weaponMaterial = "EBONY ";
+
+						_itemText.text = weaponMaterial + weaponType;
+					}
+					if (itemBase.GetType() == typeof(Mace))
+					{
+						Mace weaponDervived = itemBase as Mace;
+						string weaponType = "";
+						string weaponMaterial = "";
+
+						if (weaponDervived.GetMaceType() == EquipmentWeaponType.MorningstarMace) weaponType = "MORNINGSTAR";
+
 
 						if (weaponDervived.GetMaterialType() == EquipmentMaterialType.Bronze) weaponMaterial = "BRONZE ";
 						if (weaponDervived.GetMaterialType() == EquipmentMaterialType.Iron) weaponMaterial = "IRON ";

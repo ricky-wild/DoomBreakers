@@ -8,11 +8,11 @@ namespace DoomBreakers
 	{
 		private Transform[] _healthDisplayTransform; //index 0 & 1 are the heart fill (0 black, 1 red), 2 in the outer rim that holds these.
 		private Transform[] _bleedDisplayTransform; //index 0 & 1 are the bleed fill (0 black, 1 red), 2 in the outer rim that holds these.
+		private Transform[] _bludgeonDisplayTransform;
 		private Vector3 _displayScale;
 		private bool _process;
+		private ITimer _healthDisplayTimer, _bleedingTimer, _bludgeoningTimer;
 
-		private ITimer _bleedTimer;
-		private float _bleedDamageTimeIncrement;
 
 		public override double Health 
 		{ 
@@ -30,6 +30,16 @@ namespace DoomBreakers
 			{
 				SetBleedFillBar(value);
 				base.Bleeding = value;
+				//Health -= Health / 1000; //Moved to Main Update() loop.
+			}
+		}
+		public override double Bludgeoning
+		{
+			get => base.Bludgeoning;
+			set
+			{
+				SetBludgeonFillBar(value);
+				base.Bludgeoning = value;
 				//Health -= Health / 1000; //Moved to Main Update() loop.
 			}
 		}
@@ -68,10 +78,28 @@ namespace DoomBreakers
 			if (display) _bleedDisplayTransform[2].localScale = _displayScale; 
 			if (!display) _bleedDisplayTransform[2].localScale = Vector3.zero;
 		}
-		public BanditStats(ref Transform[] healthTransforms, ref Transform[] bleedTransforms, double h, double s, double d) : base(health: h, stamina: s, defence: d)
+		private void SetBludgeonFillBar(double fillAmount)
 		{
+			DisplayBludgeonFillBar(true);
+			fillAmount = Mathf.Clamp01((float)fillAmount);
+
+			//Scale the fillImage accordingly.
+			var newScale = _bludgeonDisplayTransform[1].localScale;
+			newScale.x = _bludgeonDisplayTransform[0].localScale.x * (float)fillAmount;
+			newScale.y = _bludgeonDisplayTransform[0].localScale.y * (float)fillAmount;
+			_bludgeonDisplayTransform[1].localScale = newScale;
+		}
+		public void DisplayBludgeonFillBar(bool display)
+		{
+			if (display) _bludgeonDisplayTransform[2].localScale = _displayScale;
+			if (!display) _bludgeonDisplayTransform[2].localScale = Vector3.zero;
+		}
+		public BanditStats(ref Transform[] healthTransforms, ref Transform[] bleedTransforms, ref Transform[] bludgeonTransforms, double h, double s, double d) : base(health: h, stamina: s, defence: d)
+		{
+			
 			_healthDisplayTransform = healthTransforms;
 			_bleedDisplayTransform = bleedTransforms;
+			_bludgeonDisplayTransform = bludgeonTransforms;
 			_displayScale = new Vector3();
 			_displayScale = _healthDisplayTransform[2].localScale;
 
@@ -82,14 +110,68 @@ namespace DoomBreakers
 			_process = true;
 			_bleedTimer = new Timer();
 			_bleedDamageTimeIncrement = 0.44f;
+			_bludgeonTimer = new Timer();
+			_bludgeonDamageTimeIncrement = 2.0f;
+
+			_healthDisplayTimer = new Timer(); //this.gameObject.AddComponent<Timer>();
+			_bleedingTimer = new Timer(); //this.gameObject.AddComponent<Timer>();
+			_bludgeoningTimer = new Timer(); //this.gameObject.AddComponent<Timer>();
+
 			DisplayHealthFillBar(false);
 			DisplayBleedFillBar(false);
+			DisplayBludgeonFillBar(false);
 		}
+		
 		//public override void Update() //=> base.Update();
-		//{
-		//	base.Update();
-		//	UpdateBleedingDamage();
-		//}
+
+
+		public void UpdateStatus(ref BanditStateMachine banditStateMachine, ref Vector3 velocity, int enemyId, bool setDeath)
+		{
+			if (!Process()) return;
+
+			if (_healthDisplayTimer.HasTimerFinished()) DisplayHealthFillBar(false);
+
+
+			if (Health <= 0f)
+			{
+				if (setDeath)//SafeToSetDying()
+				{
+					UIPlayerManager.TriggerEvent("ReportUIPlayerKillScoreEvent");
+					banditStateMachine.SetState(new BanditDying(banditStateMachine, velocity, enemyId));
+					DisplayHealthFillBar(false);
+					DisplayBleedFillBar(false);
+					DisplayBludgeonFillBar(false);
+					Disable();
+				}
+				return;
+			}
+			if (IsBleeding())
+			{
+				UpdateBleedingDamage();
+				if (_bleedingTimer.HasTimerFinished())
+				{
+					//_banditSprite.SetBehaviourTextureFlash(0.25f, Color.red);// _bleedingTimer.StartTimer(0.05f);
+					if (Bleeding > 0.01f) Bleeding -= 0.01f;
+					if (Bleeding < 0.01f) IsBleeding(false);
+
+					_bleedingTimer.StartTimer(0.05f);
+				}
+			}
+			if (IsBludgeoning())
+			{
+				UpdateBludgeoningDamage();
+				if (_bludgeoningTimer.HasTimerFinished())
+				{
+					//_banditSprite.SetBehaviourTextureFlash(0.25f, Color.red);// _bleedingTimer.StartTimer(0.1f);
+					if (Bludgeoning > 0.01f) Bludgeoning -= 0.0025f;
+					if (Bludgeoning < 0.01f) IsBludgeoning(false);
+
+					_bleedingTimer.StartTimer(0.1f);
+				}
+			}
+		}
+		public void SetHealthDisplayTimer(float time) => _healthDisplayTimer.StartTimer(time);
+
 
 		public override bool IsArmored() => _armored;
 		public override void IsArmored(bool b) => base.IsArmored(b);
@@ -104,6 +186,19 @@ namespace DoomBreakers
 		public override void UpdateBleedingDamage() //=> base.UpdateBleedingDamage();
 		{
 			base.UpdateBleedingDamage();
+		}
+
+
+		public override bool IsBludgeoning() => base.IsBludgeoning();
+		public override void IsBludgeoning(bool b) //=> base.IsBleeding(b);
+		{
+			base.IsBludgeoning(b);
+			DisplayBludgeonFillBar(b);
+			if (b) _bludgeonTimer.StartTimer(_bludgeonDamageTimeIncrement);
+		}
+		public override void UpdateBludgeoningDamage() //=> base.UpdateBleedingDamage();
+		{
+			base.UpdateBludgeoningDamage();
 		}
 	}
 }

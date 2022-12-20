@@ -9,18 +9,19 @@ namespace DoomBreakers
 	public enum ItemAnimationState
 	{
 		Empty = -1,
-		IdleBroadSword = 0,
-		IdleLongsword = 1,
-		IdleShield = 2,
-		IdleBreastplate = 3,
-		IdleApple = 4,
-		IdleChicken = 5,
-		IdleFish = 6,
-		IdleGoldcoin = 7,
-		IdleRuby = 8,
-		IdleEmerald = 9,
-		IdleSapphire = 10,
-		IdleDiamond = 11
+		IdleMace = 5,
+		IdleBroadSword = 6,
+		IdleLongsword = 7,
+		IdleShield = 8,
+		IdleBreastplate = 9,//3
+		IdleApple = 10,//4
+		IdleChicken = 11,
+		IdleFish = 12,
+		IdleGoldcoin = 13,
+		IdleRuby = 14,
+		IdleEmerald = 15,
+		IdleSapphire = 16,
+		IdleDiamond = 17 //11
 	}
     public class ItemAnimator : Character2DBaseAnimator
 	{
@@ -65,6 +66,9 @@ namespace DoomBreakers
 		{
 			switch (_animationState)
 			{
+				case ItemAnimationState.IdleMace:
+					_animator.Play("Mace");//, 0, 0.0f);
+					break;
 				case ItemAnimationState.IdleBroadSword:
 					_animator.Play("Sword");//, 0, 0.0f);
 					break;

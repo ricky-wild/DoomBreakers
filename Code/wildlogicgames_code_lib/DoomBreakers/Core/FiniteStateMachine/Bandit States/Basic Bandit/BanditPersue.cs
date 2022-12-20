@@ -27,7 +27,7 @@ namespace DoomBreakers
 			//print("\nPersue State.");
 		}
 
-		public override void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider)
+		public override void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider, ref BanditStats banditStats)
 		{
 			animator.Play("Run");//, 0, 0.0f);
 
@@ -51,27 +51,31 @@ namespace DoomBreakers
 				if (_transform.position.x > _cachedVector3.x + _attackDist)
 					_targetVelocityX = -(_randSpeedModifier * (_moveSpeed * _sprintSpeed));
 				else
-					CheckSetForJumpOrAttackState();
+					CheckSetForJumpOrAttackState(ref banditStats);
 			}
 			if (trackingDir == 1)
 			{
 				if (_transform.position.x < _cachedVector3.x - _attackDist)
 					_targetVelocityX = _randSpeedModifier * (_moveSpeed * _sprintSpeed);
 				else
-					CheckSetForJumpOrAttackState();
+					CheckSetForJumpOrAttackState(ref banditStats);
 			}
 
-			_velocity.x = _targetVelocityX;
+			if (!banditStats.IsBludgeoning()) _velocity.x = _targetVelocityX;
+			if (banditStats.IsBludgeoning()) _velocity.x = _targetVelocityX/4;
 
 			CheckSetForFallState();
 
 			//base.UpdateBehaviour();
 		}
-		private void CheckSetForJumpOrAttackState()
+		private void CheckSetForJumpOrAttackState(ref BanditStats banditStats)
 		{
 			CheckSetForFallState();
-			if (_transform.position.y < _cachedVector3.y - _attackDist)
-				_stateMachine.SetState(new BanditJump(_stateMachine, _velocity, _transform, _enemyID));
+			if (_transform.position.y < _cachedVector3.y - (_attackDist*1.25f))
+			{
+				if(!banditStats.IsBludgeoning())
+					_stateMachine.SetState(new BanditJump(_stateMachine, _velocity, _transform, _enemyID));
+			}
 			else
 				_stateMachine.SetState(new BanditQuickAttack(_stateMachine, _velocity, _enemyID));
 		}

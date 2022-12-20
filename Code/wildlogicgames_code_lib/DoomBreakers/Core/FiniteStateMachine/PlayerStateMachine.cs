@@ -109,6 +109,15 @@ namespace DoomBreakers
             return false;
 
         }
+        protected bool SafeToProcessCollisions()
+		{
+            if (IsDying())
+                return false;
+            if (_state.GetType() == typeof(PlayerExhausted))
+                return false;
+
+            return true;
+		}
         protected bool ProcessArrowAttack(int playerFaceDir, ref Transform t)
 		{
             if (!IsDefendingSelf())

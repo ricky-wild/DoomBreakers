@@ -5,6 +5,7 @@ namespace DoomBreakers
 {
 	public class Barrel : ContainerBase
 	{
+		private Transform _transform;
 		private bool _destroyFlag;
 		public override void Awake()
 		{
@@ -14,6 +15,7 @@ namespace DoomBreakers
 		{
 			base.Initialize(spriteRenderer, animator, animController);
 
+			_transform = this.transform;
 			//Resources/ContainerAnimControllers/Barrel/Barrel.controller
 			_containerAnimator = new ContainerAnimator(animator, "ContainerAnimControllers", "Barrel", "Barrel");
 			_timer = this.gameObject.AddComponent<Timer>();
@@ -21,13 +23,14 @@ namespace DoomBreakers
 			_destroyFlag = false;
 		}
 
-		public void IsHit()// => _containerAnimator.PlayAnimation(ContainerAnimationState.Container_Hit);
+		public void IsHit(int playerId, int faceDir)// => _containerAnimator.PlayAnimation(ContainerAnimationState.Container_Hit);
 		{
 			_containerHealth -= 1;
 
 			if(_containerHealth > 0)
 			{
 				_containerBehaviour.IsHit();
+				ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_DustHitFX, _transform, playerId, faceDir);
 				AudioEventManager.PlayPropSFX(PropSFXID.PropHitSFX);
 				_containerAnimator.PlayAnimation(ContainerAnimationState.Container_Hit);
 				_timer.StartTimer(0.2f);

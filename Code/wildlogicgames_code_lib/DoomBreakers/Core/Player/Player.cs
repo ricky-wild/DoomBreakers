@@ -13,6 +13,8 @@ namespace DoomBreakers
     [RequireComponent(typeof(CharacterController2D))]//[RequireComponent(typeof(Controller2D))]
     public class Player : PlayerStateMachine, IPlayer
     {
+        private PlayerStateMachine _stateMachine;
+
         [Header("Player ID")]
         [Tooltip("ID ranges from 0 to 3")]  //Max 4 players.
         public int _playerID;               //Set in editor per player.
@@ -36,12 +38,13 @@ namespace DoomBreakers
         private PlayerAnimator _playerAnimator;
         private IPlayerSprite _playerSprite;
         private PlayerStats _playerStats;
-        private ITimer _buttonHeldTimer, _staminaTimer;
+        private ITimer _buttonHeldTimer;
 
         private Action[] _actionListener = new Action[2];
 
         private void InitializePlayer()
 		{
+            _stateMachine = this;
             _controller2D = this.GetComponent<CharacterController2D>();//this.GetComponent<Controller2D>();
             _controller2D.IgnoreEdgeDetection(true);
             _rewirdInputPlayer = ReInput.players.GetPlayer(_playerID);
@@ -60,8 +63,7 @@ namespace DoomBreakers
             _playerSprite.Setup(this.GetComponent<SpriteRenderer>(), _playerID);
 
             _buttonHeldTimer = new Timer();
-            _staminaTimer = new Timer();
-            _staminaTimer.StartTimer(0.05f); //increment stamina every 20th of a sec.
+
 
             _actionListener[0] = new Action(AttackedByBandit);//AttackedByBandit()
             _actionListener[1] = new Action(AttackedByArrow);//AttackedByArrow()
@@ -69,7 +71,7 @@ namespace DoomBreakers
         private void OnEnable()
         {
             ////Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
-            //BattleColliderManager.Subscribe("ReportCollisionWithPlayer" + _playerID.ToString(), _actionListener);
+
             BattleColliderManager.Subscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener[0]);
             BattleColliderManager.Subscribe("ReportCollisionWithArrowForPlayer" + _playerID.ToString(), _actionListener[1]);
         }
@@ -85,9 +87,7 @@ namespace DoomBreakers
 
 		void Start()
         {
-            //_playerEquipment.ApplySword(PlayerEquipType.Broadsword_Steel, PlayerItem.IsBroadsword);
-            _playerAnimator.SetAnimatorController(ref _playerEquipment);//AnimatorController.Player_with_broadsword_with_shield_controller, false);
-
+            _playerAnimator.SetAnimatorController(ref _playerEquipment);
             SetState(new PlayerIdle(this, _inputVector2));
         }
 
@@ -253,22 +253,10 @@ namespace DoomBreakers
         }
         public void UpdateCollisions()
 		{
-            if (IsDying())
-                return;
-            if (_state.GetType() == typeof(PlayerExhausted))
-                return;
+            if (!SafeToProcessCollisions()) return;
 
-            _playerCollider.UpdateCollision(ref _state, _playerID, ref _playerEquipment, ref _playerSprite, ref _playerStats);
-            if(_playerEquipment.NewEquipmentGained())
-			{
-                ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_ArmorObtainedFX, _transform, _playerID, _playerSprite.GetSpriteDirection());
-                AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerEquippedSFX);
-                SetState(new PlayerGainedEquipment(this, _velocity, _transform));
-                _playerAnimator.SetAnimatorController(ref _playerEquipment);
-                _playerEquipment.NewEquipmentGained(false);
-			}
-            if (_playerCollider.SignalItemPickupCollision()) _playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Pickup);
-            if (!_playerCollider.SignalItemPickupCollision()) _playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Idle);
+            _playerCollider.UpdateCollision(ref _state, ref _stateMachine, ref _velocity, _playerID, ref _playerAnimator,
+                ref _playerEquipment, ref _playerSprite, ref _playerStats);
         }
         private void AttackedByBandit()
 		{
@@ -342,55 +330,12 @@ namespace DoomBreakers
             }
             if (process) UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
         }
-        private void UpdateStats() //Encapsulate all of this into the PlayerStat class.
+        private void UpdateStats() //=> _playerStats.UpdateStatus();
 		{
-            if (!_playerStats.Process()) return;
-            UpdateHealth();
-            UpdateStamina();
-            UpdateDefense();
+            bool SetDeath = SafeToSetDying(); //if(!SafeToSetDying()) return;
+            _playerStats.UpdateStatus(ref _stateMachine, ref _transform, ref _playerAnimator, ref _playerEquipment, ref _playerStats,
+                ref _playerIndicatorAnimator, ref _velocity, _playerID, SetDeath);
         }
-        private void UpdateHealth()
-		{
-            if (_playerStats.Health <= 0f)
-            {
-                if (SafeToSetDying())
-                {
-                    AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerDeathSFX);
-                    _playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Dead);
-                    SetState(new PlayerDying(this, _velocity));
-                    UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
-                    _playerStats.Disable();
-                }
-            }
-        }
-        private void UpdateStamina()
-		{
-            if (_staminaTimer.HasTimerFinished())
-            {
-                _playerStats.Stamina += 0.008; //magic numbers are bad.
-                UIPlayerManager.TriggerEvent("ReportUIPlayerStatEvent", ref _playerStats, _playerID);
-                _staminaTimer.StartTimer(0.05f);
-            }
-            if (_playerStats.Stamina <= 0f)
-            {
-                //if (SafeToSetTired())
-                _playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Tired);
-                SetState(new PlayerExhausted(this, _velocity, _transform));
-            }
-        }
-		private void UpdateDefense()
-		{
-			if(_playerStats.Defence <= 0 && _playerStats.IsArmored())
-			{
-                AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerArmorBrokenSFX);
-                SetState(new PlayerBrokenEquipment(this, _velocity, _transform));
-                _playerStats.IsArmored(false);
-                _playerEquipment.RemoveArmor();
-                _playerAnimator.SetAnimatorController(ref _playerEquipment);
-			}
-		}
-
-        private void AudioEventMethod() { }
 
         private void OnDrawGizmosSelected()
         {

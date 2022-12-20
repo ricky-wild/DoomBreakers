@@ -10,6 +10,7 @@ namespace DoomBreakers
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
 			_behaviourTimer = new Timer();
+			AudioEventManager.StopPlayerSFX(PlayerSFXID.PlayerChargeAttackSFX);
 			//print("\nHitByQuickAttack State.");
 		}
 		public override void IsHitByQuickAttack(ref Animator animator, ref IPlayerSprite playerSprite, ref Vector2 input)

@@ -23,7 +23,8 @@ namespace DoomBreakers
 	{
         None = -1,
         Broadsword = 0,
-        Longsword = 1
+        Longsword = 1,
+        MorningstarMace = 2
 	};
     public enum EquipmentArmorType
 	{

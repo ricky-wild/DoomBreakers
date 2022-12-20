@@ -48,7 +48,7 @@ namespace DoomBreakers
             _banditSprite = this.gameObject.AddComponent<BanditSprite>();
             _banditSprite.Setup(this.GetComponent<SpriteRenderer>(), _enemyID);
 
-            _banditStats = new BanditStats(ref _healthTransform, ref _healthTransform, 100.0, 100.0, 0.0);
+            _banditStats = new BanditStats(ref _healthTransform, ref _healthTransform, ref _healthTransform, 100.0, 100.0, 0.0);
             _healthDisplayTimer = this.gameObject.AddComponent<Timer>();
             _bleedingTimer = this.gameObject.AddComponent<Timer>();
             _banditStats.DisplayBleedFillBar(false);
@@ -90,7 +90,7 @@ namespace DoomBreakers
             _state.IsDying(ref _animator, ref _banditSprite);
             _state.IsDead(ref _animator, ref _banditSprite);
 
-            _state.UpdateBehaviour(ref _controller2D, ref _animator, ref _transform);
+            _state.UpdateBehaviour(ref _controller2D, ref _animator, ref _transform, ref _banditStats);
         }
         public void UpdateCollisions() //=> _banditCollider.UpdateCollision(ref _state, _banditSprite);
 		{
@@ -138,6 +138,15 @@ namespace DoomBreakers
 
                 playerAttackDamage = weaponDervived.Damage();
             }
+            if (itemBase.GetType() == typeof(Mace))
+            {
+                //ItemBase itemBase = BattleColliderManager.GetAssignedPlayerWeapon(playerId);
+                Mace weaponDervived = itemBase as Mace;
+
+                playerAttackDamage = weaponDervived.Damage();
+
+            }
+
             AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX); 
             ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_BloodHitFX, _transform, _enemyID, _banditSprite.GetSpriteDirection());
             SetState(new BanditArcherHit(this, _velocity, _enemyID));

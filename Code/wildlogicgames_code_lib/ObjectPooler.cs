@@ -290,8 +290,8 @@ namespace DoomBreakers
                     obj.GetComponent<BloodHitFX>().SetDirection(direction);
                     break;
                 case PrefabID.Prefab_DustHitFX:
-                    distanceToEnemyFootX = 0.5f;
-                    distanceToEnemyFootY = 0.5f;
+                    distanceToEnemyFootX = 1.0f;
+                    distanceToEnemyFootY = 1.0f;
                     if (direction == 1) _vectorOffset.x += distanceToEnemyFootX;
                     if (direction == -1) _vectorOffset.x -= distanceToEnemyFootX;
                     _vectorOffset.y -= distanceToEnemyFootY;

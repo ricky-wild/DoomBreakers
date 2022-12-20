@@ -134,13 +134,30 @@ namespace DoomBreakers
 
         void Update() 
         { }
-        public void UpdateCollision(ref BaseState playerState, int playerId, ref IPlayerEquipment playerEquipment, ref IPlayerSprite playerSprite, ref PlayerStats playerStat)
+        public void UpdateCollision(ref BaseState playerState, ref PlayerStateMachine stateMachine, ref Vector3 velocity, int playerId, 
+           ref PlayerAnimator playerAnimator ,ref IPlayerEquipment playerEquipment, ref IPlayerSprite playerSprite, ref PlayerStats playerStat)
 		{
+
+            UpdateEquipmentGained(ref stateMachine, ref velocity, ref playerAnimator, ref playerSprite, ref playerEquipment);
             UpdateDetectEnemyTargets(ref playerState, playerId, ref playerSprite);
             ProcessEquipmentCollisions();
             UpdateEquipmentTargets(ref playerEquipment);
             ProcessHealthCollisions(ref playerStat, ref playerSprite);
             ProcessCurrencyCollisions(ref playerStat);
+        }
+        private void UpdateEquipmentGained(ref PlayerStateMachine stateMachine, ref Vector3 velocity, ref PlayerAnimator playerAnimator, 
+            ref IPlayerSprite playerSprite, ref IPlayerEquipment playerEquipment)
+		{
+            if (playerEquipment.NewEquipmentGained())
+            {
+                ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_ArmorObtainedFX, _transform, _playerID, playerSprite.GetSpriteDirection());
+                AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerEquippedSFX);
+                stateMachine.SetState(new PlayerGainedEquipment(stateMachine, velocity, _transform));
+                playerAnimator.SetAnimatorController(ref _playerEquipment);
+                _playerEquipment.NewEquipmentGained(false);
+            }
+            if (SignalItemPickupCollision()) playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Pickup);
+            if (!SignalItemPickupCollision()) playerAnimator.PlayIndicatorAnimation(IndicatorAnimID.Idle);
         }
         public void UpdateDetectEnemyTargets(ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite)
         {
@@ -254,6 +271,7 @@ namespace DoomBreakers
             if (collision.CompareTag(GetCompareTag(CompareTags.Item)))
             {
                 ProcessCollisionWithSword(collision);
+                ProcessCollisionWithMace(collision);
                 ProcessCollisionWithShield(collision);
                 ProcessCollisionWithArmor(collision);
             }
@@ -263,10 +281,23 @@ namespace DoomBreakers
             if (collision.GetComponent<Sword>() == null)//Exists on Items Layer, Tag=Item
                 return; //Then NOT a Sword. Get outta here!
 
-            if(_playerEquipment.ApplySword(collision.GetComponent<Sword>()))
+            if(_playerEquipment.ApplyEquipment(collision.GetComponent<Sword>()))
 			{
                 //UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.Sword,_playerID);
                 collision.GetComponent<Sword>().Destroy();
+                _equipCollisionEnabled = true; //Flag so we update players equipment.
+            }
+            return;
+        }
+        private void ProcessCollisionWithMace(Collider2D collision)
+        {
+            if (collision.GetComponent<Mace>() == null)//Exists on Items Layer, Tag=Item
+                return; //Then NOT a Mace. Get outta here!
+
+            if (_playerEquipment.ApplyEquipment(collision.GetComponent<Mace>()))
+            {
+
+                collision.GetComponent<Mace>().Destroy();
                 _equipCollisionEnabled = true; //Flag so we update players equipment.
             }
             return;
@@ -276,7 +307,7 @@ namespace DoomBreakers
             if (collision.GetComponent<Shield>() == null)
                 return; //Then NOT a Shield. Get outta here!
 
-            if(_playerEquipment.ApplyShield(collision.GetComponent<Shield>()))
+            if(_playerEquipment.ApplyEquipment(collision.GetComponent<Shield>()))
 			{
                 //UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandShield, _playerID);
                 collision.GetComponent<Shield>().Destroy();
@@ -289,7 +320,7 @@ namespace DoomBreakers
             if (collision.GetComponent<Breastplate>() == null)
                 return; //Then NOT a Armor. Get outta here!
 
-            if(_playerEquipment.ApplyArmor(collision.GetComponent<Breastplate>()))
+            if(_playerEquipment.ApplyEquipment(collision.GetComponent<Breastplate>()))
 			{
                 //UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.Sword, _playerID);
                 collision.GetComponent<Breastplate>().Destroy();
@@ -474,8 +505,8 @@ namespace DoomBreakers
             if (collision.GetComponent<Barrel>() == null) //Exists on Enemy Layer, Tag=Container
                 return; //Then NOT a Barrel. Get outta here!
 
-            ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_DustHitFX, _transform, _playerID, playerSprite.GetSpriteDirection());
-            collision.GetComponent<Barrel>().IsHit();
+            //ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_DustHitFX, _transform, _playerID, playerSprite.GetSpriteDirection());
+            collision.GetComponent<Barrel>().IsHit(_playerID, playerSprite.GetSpriteDirection());
 
 
             return;

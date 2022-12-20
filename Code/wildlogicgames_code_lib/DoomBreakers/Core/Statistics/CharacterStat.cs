@@ -13,22 +13,27 @@ namespace DoomBreakers
 		protected const double _minDefence = 0;
 		protected const double _maxBleeding = 1.0;
 		protected const double _minBleeding = 0;
+		protected const double _maxBludgeoning = 1.0;
+		protected const double _minBludgeoning = 0;
 
 
 		protected double _health;
 		protected double _stamina;
 		protected double _defence;
 		protected double _bleeding;
+		protected double _bludgeoning;
 
 		protected int _currency;
 
 		protected bool _armored;
 		protected bool _isBleeding;
+		protected bool _isBludgeoning;
 
-		private ITimer _bleedTimer;
-		private float _bleedDamageTimeIncrement;
+		protected ITimer _bleedTimer;
+		protected float _bleedDamageTimeIncrement;
 
-
+		protected ITimer _bludgeonTimer;
+		protected float _bludgeonDamageTimeIncrement;
 
 		public CharacterStat(double health, double stamina, double defence)
 		{
@@ -41,6 +46,8 @@ namespace DoomBreakers
 			_currency = 0;
 			_bleedTimer = new Timer();
 			_bleedDamageTimeIncrement = 0.44f;
+			_bludgeonTimer = new Timer();
+			_bludgeonDamageTimeIncrement = 2.0f;
 		}
 		public virtual double Health
 		{
@@ -110,6 +117,21 @@ namespace DoomBreakers
 				return _bleeding;
 			}
 		}
+		public virtual double Bludgeoning
+		{
+			set
+			{
+				_bludgeoning = value;
+				if (_bludgeoning < _minBludgeoning)
+					_bludgeoning = _minBludgeoning;
+				if (_bludgeoning > _maxBludgeoning)
+					_bludgeoning = _maxBludgeoning;
+			}
+			get
+			{
+				return _bludgeoning;
+			}
+		}
 		public virtual int Currency
 		{
 			set => _currency = value;
@@ -143,6 +165,29 @@ namespace DoomBreakers
 				Health -= Health / 100;//250;// 500;// 1000;
 				_bleedTimer.Reset();
 				_bleedTimer.StartTimer(_bleedDamageTimeIncrement);
+			}
+		}
+
+
+		public virtual bool IsBludgeoning() => _isBludgeoning;
+		public virtual void IsBludgeoning(bool b)
+		{
+			_isBludgeoning = b;
+			if (b) 
+			{
+				_bludgeoning = _maxBludgeoning;
+				_bludgeonTimer.Reset();
+			}
+			else _bludgeoning = _minBludgeoning;
+		}
+		public virtual void UpdateBludgeoningDamage()
+		{
+			if (!_isBludgeoning) return;
+			if (_bludgeonTimer.HasTimerFinished())
+			{
+				Health -= Health / 500;//250;// 500;// 1000;
+				_bludgeonTimer.Reset();
+				_bludgeonTimer.StartTimer(_bludgeonDamageTimeIncrement);
 			}
 		}
 

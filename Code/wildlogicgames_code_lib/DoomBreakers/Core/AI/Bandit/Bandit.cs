@@ -12,6 +12,8 @@ namespace DoomBreakers
 
     public class Bandit : BanditStateMachine, IEnemy
     {
+        private BanditStateMachine _stateMachine;
+
         [Header("Bandit ID")]
         [Tooltip("ID ranges from 0 to ?")]  //Max ? enemies.
         public int _enemyID;               //Set in editor per enemy?
@@ -25,6 +27,10 @@ namespace DoomBreakers
         [Tooltip("The transforms used representing enemy bleeding")]
         public Transform[] _bleedTransform;
 
+        [Header("Bludgeon Meter")]
+        [Tooltip("The transforms used representing enemy bludgeon")]
+        public Transform[] _bludgeonTransform;
+
         [Header("Enemy Attack Points")]
         [Tooltip("Vectors that represent point of attack radius")]
         public Transform[] _attackPoints; //1=quickATK, 2=powerATK, 3=upwardATK
@@ -36,12 +42,13 @@ namespace DoomBreakers
         private BanditAnimator _banditAnimator;
         private IBanditSprite _banditSprite;
         private float _playerAttackedButtonTime;
-        private ITimer _healthDisplayTimer, _bleedingTimer;
+        
 
         private Action[] _actionListener = new Action[2];
 
         private void InitializeBandit()
         {
+            _stateMachine = this;
             _transform = this.transform;
             _controller2D = this.GetComponent<CharacterController2D>();
             _animator = this.GetComponent<Animator>();
@@ -50,9 +57,8 @@ namespace DoomBreakers
             _banditAnimator = new BanditAnimator(this.GetComponent<Animator>(), "EnemyAnimControllers", "HumanoidBandit", "Bandit_with_nothing_controller");
             _banditSprite = this.gameObject.AddComponent<BanditSprite>();
             _banditSprite.Setup(this.GetComponent<SpriteRenderer>(), _enemyID);
-            _banditStats = new BanditStats(ref _healthTransform, ref _bleedTransform, 100.0, 100.0, 0.0);
-            _healthDisplayTimer = this.gameObject.AddComponent<Timer>();
-            _bleedingTimer = this.gameObject.AddComponent<Timer>();
+            _banditStats = new BanditStats(ref _healthTransform, ref _bleedTransform, ref _bludgeonTransform, 100.0, 100.0, 0.0);
+
 
 
             _actionListener[0] = new Action(AttackedByPlayer);//AttackedByPlayer()
@@ -90,7 +96,7 @@ namespace DoomBreakers
             _state.IsJumping(ref _animator, ref _banditSprite);
             _state.IsWaiting(ref _animator);
             _state.IsFalling(ref _animator, ref _controller2D, ref _banditSprite);
-            _state.IsPersueTarget(ref _animator, ref _banditSprite, ref _banditCollider);
+            _state.IsPersueTarget(ref _animator, ref _banditSprite, ref _banditCollider, ref _banditStats);
             _state.IsDefending(ref _animator, ref _controller2D, ref _banditSprite);
             
             _state.IsQuickAttack(ref _animator, ref _banditCollider, ref _banditSprite, ref _quickAttackIncrement);
@@ -106,7 +112,7 @@ namespace DoomBreakers
             _state.IsDying(ref _animator, ref _banditSprite);
             _state.IsDead(ref _animator, ref _banditSprite);
 
-            _state.UpdateBehaviour(ref _controller2D, ref _animator, ref _transform);
+            _state.UpdateBehaviour(ref _controller2D, ref _animator, ref _transform, ref _banditStats);
         }
 
         public void UpdateCollisions()
@@ -115,38 +121,12 @@ namespace DoomBreakers
 
             _banditCollider.UpdateCollision(ref _state, _banditSprite);
         }
-        private void UpdateStats()
+        private void UpdateStats() //=> _banditStats.UpdateStatus(ref _stateMachine, ref _velocity, _enemyID);
 		{
-            if (!_banditStats.Process()) return;
-
-            if(_healthDisplayTimer.HasTimerFinished())
-                _banditStats.DisplayHealthFillBar(false);
-
-            if (_banditStats.Health <= 0f)
-            {
-                if(SafeToSetDying())
-				{
-                    UIPlayerManager.TriggerEvent("ReportUIPlayerKillScoreEvent");
-                    SetState(new BanditDying(this, _velocity, _enemyID));
-                    _banditStats.DisplayHealthFillBar(false);
-                    _banditStats.DisplayBleedFillBar(false);
-                    _banditStats.Disable();
-                }
-                return;
-            }
-            if (_banditStats.IsBleeding()) 
-			{
-                _banditStats.UpdateBleedingDamage();
-                if (_bleedingTimer.HasTimerFinished())
-                {
-                    if (_banditStats.Bleeding > 0.01f) _banditStats.Bleeding -= 0.01f;
-                    if (_banditStats.Bleeding < 0.01f) _banditStats.IsBleeding(false);
-
-                    _bleedingTimer.StartTimer(0.05f);
-                }
-
-			}
+            bool SetDeath = SafeToSetDying(); //SafeToSetDying()
+            _banditStats.UpdateStatus(ref _stateMachine, ref _velocity, _enemyID, SetDeath);
         }
+
         private void AttackedByPlayer()
 		{
             //print("\nBandit.cs= AttackedByPlayer() called!");
@@ -170,9 +150,22 @@ namespace DoomBreakers
                 playerQuickAttackDamage = weaponDervived.Damage();
                 playerPowerAttackDamage += weaponDervived.Damage();
             }
-            else
-                return;
+            if (itemBase.GetType() == typeof(Mace))
+            {
+                //ItemBase itemBase = BattleColliderManager.GetAssignedPlayerWeapon(playerId);
+                Mace weaponDervived = itemBase as Mace;
 
+                playerQuickAttackDamage = weaponDervived.Damage();
+                playerPowerAttackDamage += weaponDervived.Damage();
+            }
+
+            int randomChanceOfBleed = wildlogicgames.Utilities.GetRandomNumberInt(0, 100);
+            bool bleed = false;
+            if (randomChanceOfBleed < 30) bleed = true;
+
+            int randomChanceOfBludgeon = wildlogicgames.Utilities.GetRandomNumberInt(0, 100);
+            bool bludgeon = false;
+            if (randomChanceOfBludgeon < 30) bludgeon = true;
 
             if (ProcessQuickAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _enemyID, _banditSprite.GetSpriteDirection()))
 			{
@@ -180,15 +173,29 @@ namespace DoomBreakers
                 ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_BloodHitFX, _transform, _enemyID, _banditSprite.GetSpriteDirection());
                 _banditStats.Health -= playerQuickAttackDamage;
             }
+
+
             _playerAttackedButtonTime = ProcessPowerAttackFromPlayer(ref attackingPlayerState, _enemyID);
-            if(_playerAttackedButtonTime != 0f) _banditStats.Health -= playerPowerAttackDamage;
+            if (_playerAttackedButtonTime != 0f)
+            {
+                _banditStats.Health -= playerPowerAttackDamage;
+
+                if (bludgeon && itemBase.GetType() == typeof(Mace))
+                    if (!_banditStats.IsBludgeoning()) _banditStats.IsBludgeoning(true);
+            }
+
+
             if (ProcessUpwardAttackFromPlayer(ref attackingPlayerState, _enemyID))
 			{
                 AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerHitSFX);
                 ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_BloodHitFX, _transform, _enemyID, _banditSprite.GetSpriteDirection());
                 _banditStats.Health -= playerQuickAttackDamage;
-                if (!_banditStats.IsBleeding()) _banditStats.IsBleeding(true);
+
+                if (bleed && itemBase.GetType() == typeof(Sword))
+                    if (!_banditStats.IsBleeding()) _banditStats.IsBleeding(true);
             }
+
+
             if(ProcessKnockAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _enemyID, _banditSprite.GetSpriteDirection()))
 			{
                 ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_BloodHitFX, _transform, _enemyID, _banditSprite.GetSpriteDirection());
@@ -196,8 +203,15 @@ namespace DoomBreakers
                 AudioEventManager.PlayPlayerSFX(PlayerSFXID.PlayerPowerAttackSFX);
                 _controller2D.IgnoreEdgeDetection(true);
 
+                if (bludgeon && itemBase.GetType() == typeof(Mace))
+                    if (!_banditStats.IsBludgeoning()) _banditStats.IsBludgeoning(true);
+
+                if (bleed && itemBase.GetType() == typeof(Sword))
+                    if (!_banditStats.IsBleeding()) _banditStats.IsBleeding(true);
             }
-            _healthDisplayTimer.StartTimer(1.0f);
+
+            _banditStats.SetHealthDisplayTimer(1.0f);
+            //_healthDisplayTimer.StartTimer(1.0f);
         }
         private void DetectedAnPlayer()
 		{

@@ -9,8 +9,9 @@ namespace DoomBreakers
         Empty_None = 0,
         IsBroadsword = 1,
         IsLongsword = 2,
-        IsShield = 3,
-        IsBreastPlate = 4
+        IsMace = 3,
+        IsShield = 9,
+        IsBreastPlate = 10
 	};
 
     public enum EquipHand
@@ -60,126 +61,151 @@ namespace DoomBreakers
 		}
 
         public ItemBase GetMostRecentEquipment() => _mostRecentEquipGained;
-        
 
-        public bool ApplySword(ItemBase playerEquip)
+
+
+
+        public bool ApplyEquipment(ItemBase playerEquip)
 		{
-            //Now determine where we apply this equipment.
-
-            if (!IsEquipSword(playerEquip))
-                return false;
-
-
-            //NO EQUIPMENT APPLY SWORD.
-            if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
-            {
-                _mostRecentEquipGained = _leftHandEquip = playerEquip;
-                UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandSword, _playerID);
-                return true;
-            }
-
-            //SHIELD IN LEFT HAND, EQUIP SWORD IN RIGHT HAND.
-            if (IsShield(EquipHand.Left_Hand))
+            if (IsEquipMace(playerEquip))
 			{
-                if (IsEmptyHanded(EquipHand.Right_Hand))
-				{
-                    _mostRecentEquipGained = _rightHandEquip = playerEquip;
-                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandSword, _playerID);
+                //NO EQUIPMENT APPLY SWORD.
+                if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
+                {
+                    _mostRecentEquipGained = _leftHandEquip = playerEquip;
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandMace, _playerID);
                     return true;
                 }
+
+                //SHIELD IN LEFT HAND, EQUIP SWORD IN RIGHT HAND.
+                if (IsShield(EquipHand.Left_Hand))
+                {
+                    if (IsEmptyHanded(EquipHand.Right_Hand))
+                    {
+                    }
+                    _mostRecentEquipGained = _rightHandEquip = playerEquip;
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandMace, _playerID);
+                    return true;
+                }
+
+                ////SHIELD IN RIGHT HAND, EQUIP SWORD IN LEFT HAND.
+                if (IsShield(EquipHand.Right_Hand))
+                {
+                    if (IsEmptyHanded(EquipHand.Left_Hand))
+                    {
+                    }
+                    _mostRecentEquipGained = _leftHandEquip = playerEquip;
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandMace, _playerID);
+                    return true;
+                }
+
+                if (ApplyMaceForLeftHand(playerEquip)) return true;
+                if (ApplyMaceForRightHand(playerEquip)) return true;
             }
 
-            //SHIELD IN RIGHT HAND, EQUIP SWORD IN LEFT HAND.
-            if (IsShield(EquipHand.Right_Hand))
-            {
-                if (IsEmptyHanded(EquipHand.Left_Hand))
-				{
+            if (IsEquipSword(playerEquip))
+			{
+                //NO EQUIPMENT APPLY SWORD.
+                if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
+                {
                     _mostRecentEquipGained = _leftHandEquip = playerEquip;
                     UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandSword, _playerID);
                     return true;
                 }
+
+                //SHIELD IN LEFT HAND, EQUIP SWORD IN RIGHT HAND.
+                if (IsShield(EquipHand.Left_Hand))
+                {
+                    if (IsEmptyHanded(EquipHand.Right_Hand))
+                    {
+                    }
+                    _mostRecentEquipGained = _rightHandEquip = playerEquip;
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandSword, _playerID);
+                    return true;
+                }
+
+                //SHIELD IN RIGHT HAND, EQUIP SWORD IN LEFT HAND.
+                if (IsShield(EquipHand.Right_Hand))
+                {
+                    if (IsEmptyHanded(EquipHand.Left_Hand))
+                    {
+                    }
+                    _mostRecentEquipGained = _leftHandEquip = playerEquip;
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandSword, _playerID);
+                    return true;
+                }
+
+				if (ApplySwordForLeftHand(playerEquip)) return true;
+				if (ApplySwordForRightHand(playerEquip)) return true;
+			}
+
+            if (IsEquipShield(playerEquip))
+            {
+                if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
+                {
+                    _mostRecentEquipGained = _leftHandEquip = playerEquip;
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandShield, _playerID);
+                    return true;
+                }
+
+                if (IsEmptyHanded(EquipHand.Left_Hand) && !IsShield(EquipHand.Right_Hand))
+                {
+                    _mostRecentEquipGained = _leftHandEquip = playerEquip;
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandShield, _playerID);
+                    return true;
+                }
+                if (IsEmptyHanded(EquipHand.Right_Hand) && !IsShield(EquipHand.Left_Hand))
+                {
+                    _mostRecentEquipGained = _rightHandEquip = playerEquip;
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandShield, _playerID);
+
+                }
+                if (ApplyShieldForLeftHand(playerEquip)) return true;
+                if (ApplyShieldForRightHand(playerEquip)) return true;
             }
 
-
-
-            if (ApplySwordForLeftHand(playerEquip))
-                return true;
-            if (ApplySwordForRightHand(playerEquip))
-                return true;
-
-
-            if (IsBroadsword(EquipHand.Left_Hand))          //No Dual Weapons
-				return false;
-			if (IsBroadsword(EquipHand.Right_Hand))         //No Dual Weapons
-                return false;
-			if (IsLongsword(EquipHand.Left_Hand))           //No Dual Weapons
-				return false;
-			if (IsLongsword(EquipHand.Right_Hand))          //No Dual Weapons
-				return false;
+            if (IsEquipArmor(playerEquip))
+			{
+                if (!IsArmor())
+                {
+                    _mostRecentEquipGained = _torsoEquipment = playerEquip;
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UITorsoEquip, _playerID);
+                    return true;
+                }
+                else
+                {
+                    //if(IsArmorBetterThanCurrent(playerEquip))
+                    _mostRecentEquipGained = _torsoEquipment = playerEquip;
+                    UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UITorsoEquip, _playerID);
+                    return true;
+                }
+            }
 
             return false;
         }
+
         private bool ApplySwordForLeftHand(ItemBase playerEquip)
 		{
             if (IsSword(EquipHand.Left_Hand))
             {
-                //if (IsSwordBetterThanCurrent(playerEquip, EquipHand.Left_Hand))
-                _mostRecentEquipGained = _leftHandEquip = playerEquip;
-                UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandSword, _playerID);
-                return true;
             }
-            return false;
+            _mostRecentEquipGained = _leftHandEquip = playerEquip;
+            UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandSword, _playerID);
+            return true;
+            //return false;
         }
         private bool ApplySwordForRightHand(ItemBase playerEquip)
         {
             if (IsSword(EquipHand.Right_Hand))
             {
-                //if (IsSwordBetterThanCurrent(playerEquip, EquipHand.Right_Hand))
-                _mostRecentEquipGained = _rightHandEquip = playerEquip;
-                UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandSword, _playerID);
-                return true;
             }
-            return false;
+            _mostRecentEquipGained = _rightHandEquip = playerEquip;
+            UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandSword, _playerID);
+            return true;
+            //return false;
         }
-        public bool ApplyShield(ItemBase playerEquip)
-		{
-            if (!IsEquipShield(playerEquip))
-                return false;
+        
 
-
-            if (IsEmptyHanded(EquipHand.Left_Hand) && IsEmptyHanded(EquipHand.Right_Hand))
-            {
-                _mostRecentEquipGained =_leftHandEquip = playerEquip;
-                UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandShield, _playerID);
-                return true;
-            }
-
-            if (IsEmptyHanded(EquipHand.Left_Hand) && !IsShield(EquipHand.Right_Hand))
-            {
-                _mostRecentEquipGained = _leftHandEquip = playerEquip;
-                UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandShield, _playerID);
-                return true;
-            }
-            if (IsEmptyHanded(EquipHand.Right_Hand) && !IsShield(EquipHand.Left_Hand))
-            {
-                _mostRecentEquipGained = _rightHandEquip = playerEquip;
-                UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandShield, _playerID);
-                return true;
-            }
-
-            if (ApplyShieldForLeftHand(playerEquip))
-                return true;
-            if (ApplyShieldForRightHand(playerEquip))
-                return true;
-
-            if (IsShield(EquipHand.Left_Hand))          //No Dual Shields
-                return false;
-            if (IsShield(EquipHand.Right_Hand))         //No Dual Shields
-                return false;
-
-
-            return false;
-        }
         private bool ApplyShieldForLeftHand(ItemBase playerEquip)
         {
             if (IsShield(EquipHand.Left_Hand))
@@ -202,31 +228,42 @@ namespace DoomBreakers
             }
             return false;
         }
-        public bool ApplyArmor(ItemBase playerEquip)
-		{
-            if (!IsEquipArmor(playerEquip))
-                return false;
 
-            if(!IsArmor())
-			{
-                _mostRecentEquipGained = _torsoEquipment = playerEquip;
-                UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UITorsoEquip, _playerID);
-                return true;
-			}
-            else
-			{
-                //if(IsArmorBetterThanCurrent(playerEquip))
-                _mostRecentEquipGained = _torsoEquipment = playerEquip;
-                UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UITorsoEquip, _playerID);
-                return true;
+
+        private bool ApplyMaceForLeftHand(ItemBase playerEquip)
+        {
+            if (IsMace(EquipHand.Left_Hand))
+            {
             }
-
-
+            _mostRecentEquipGained = _leftHandEquip = playerEquip;
+            UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UILeftHandMace, _playerID);
+            return true;
             //return false;
         }
+        private bool ApplyMaceForRightHand(ItemBase playerEquip)
+        {
+            if (IsMace(EquipHand.Right_Hand))
+            {
+            }
+            _mostRecentEquipGained = _rightHandEquip = playerEquip;
+            UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.UIRightHandMace, _playerID);
+            return true;
+            //return false;
+        }
+
+
+
+
         private bool IsEquipSword(ItemBase equip)
 		{
             if (equip.GetType() == typeof(Sword))
+                return true;
+
+            return false;
+        }
+        private bool IsEquipMace(ItemBase equip)
+        {
+            if (equip.GetType() == typeof(Mace))
                 return true;
 
             return false;
@@ -244,6 +281,7 @@ namespace DoomBreakers
             return false;
         }
 
+        
         public ItemBase GetTorsoEquip()
 		{
             return _torsoEquipment;
@@ -258,9 +296,11 @@ namespace DoomBreakers
         }
         public ItemBase GetWeapon()
 		{
-            if (_leftHandEquip.GetType() == typeof(Sword))
+            if (_leftHandEquip.GetType() == typeof(Sword) ||
+                _leftHandEquip.GetType() == typeof(Mace))
                 return _leftHandEquip;
-            if (_rightHandEquip.GetType() == typeof(Sword))
+            if (_rightHandEquip.GetType() == typeof(Sword) ||
+                _rightHandEquip.GetType() == typeof(Mace))
                 return _rightHandEquip;
 
             return null;// new EmptyHand(EquipmentWeaponType.None, EquipmentMaterialType.None);
@@ -303,6 +343,20 @@ namespace DoomBreakers
             }
             return EquipmentMaterialType.None;
         }
+        public EquipmentMaterialType GetMaceMaterialType()
+        {
+            if (_leftHandEquip.GetType() == typeof(Mace))
+            {
+                Mace Mace = (Mace)_leftHandEquip;
+                return Mace.GetMaterialType();
+            }
+            if (_rightHandEquip.GetType() == typeof(Mace))
+            {
+                Mace Mace = (Mace)_rightHandEquip;
+                return Mace.GetMaterialType();
+            }
+            return EquipmentMaterialType.None;
+        }
 
         public bool IsSword(EquipHand equipHand)
         {
@@ -314,6 +368,21 @@ namespace DoomBreakers
             if (equipHand == EquipHand.Right_Hand)
             {
                 if (_rightHandEquip.GetType() == typeof(Sword))
+                    return true;
+            }
+
+            return false;
+        }
+        public bool IsMace(EquipHand equipHand)
+        {
+            if (equipHand == EquipHand.Left_Hand)
+            {
+                if (_leftHandEquip.GetType() == typeof(Mace))
+                    return true;
+            }
+            if (equipHand == EquipHand.Right_Hand)
+            {
+                if (_rightHandEquip.GetType() == typeof(Mace))
                     return true;
             }
 
@@ -344,6 +413,31 @@ namespace DoomBreakers
 
             return false;
 		}
+        public bool IsMorningstarMace(EquipHand equipHand)
+        {
+            if (equipHand == EquipHand.Left_Hand)
+            {
+
+                if (_leftHandEquip.GetType() == typeof(Mace))
+                {
+                    Mace Mace = (Mace)_leftHandEquip;
+                    if (Mace.GetMaceType() == EquipmentWeaponType.MorningstarMace)
+                        return true;
+                }
+
+            }
+            if (equipHand == EquipHand.Right_Hand)
+            {
+                if (_rightHandEquip.GetType() == typeof(Mace))
+                {
+                    Mace Mace = (Mace)_rightHandEquip;
+                    if (Mace.GetMaceType() == EquipmentWeaponType.MorningstarMace)
+                        return true;
+                }
+            }
+
+            return false;
+        }
         public bool IsLongsword(EquipHand equipHand)
         {
             if (equipHand == EquipHand.Left_Hand)

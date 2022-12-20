@@ -52,13 +52,15 @@ namespace DoomBreakers
 			_quickAtkWaitTime = 0.133f;
 		}
 
-		public virtual void UpdateBehaviour(ref CharacterController2D controller2D, ref Animator animator, ref Transform transform)
+		public virtual void UpdateBehaviour(ref CharacterController2D controller2D, ref Animator animator, ref Transform transform, ref BanditStats banditStats)
 		{
 			//if (this.GetType() == typeof(BanditHitByKnockAttack)) //Want player to purposely knock down pit. (make a 60/40 success rate check maybe)
 			//	_detectPlatformEdge = false;
 
-			if (controller2D._collisionDetail._platformEdge) 
-				_stateMachine.SetState(new BanditJump(_stateMachine, _velocity, transform, _enemyID));
+			if (controller2D._collisionDetail._platformEdge)
+			{
+				if (!banditStats.IsBludgeoning()) _stateMachine.SetState(new BanditJump(_stateMachine, _velocity, transform, _enemyID));
+			}
 			
 			UpdateGravity(ref controller2D, ref animator);
 			UpdateTransform(ref controller2D);
@@ -89,7 +91,7 @@ namespace DoomBreakers
 		public virtual void IsIdle(ref Animator animator) { }
 		public virtual void IsJumping(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsWaiting(ref Animator animator) { }
-		public virtual void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider) { }
+		public virtual void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider, ref BanditStats banditStats) { }
 		public virtual void IsFalling(ref Animator animator, ref CharacterController2D controller2D, ref IBanditSprite banditSprite) { }
 		public virtual void IsDefending(ref Animator animator, ref CharacterController2D controller2D, ref IBanditSprite banditSprite) { }
 		public virtual void IsQuickAttack(ref Animator animator, ref IBanditCollision banditCollider, ref IBanditSprite banditSprite, ref int quickAttackIncrement) { }
