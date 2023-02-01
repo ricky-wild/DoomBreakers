@@ -18,7 +18,10 @@ namespace DoomBreakers
 		public override void IsMoving(ref Animator animator, ref Vector2 input, ref IPlayerSprite playerSprite, ref PlayerCollision playerCollider)
 		{
 			animator.Play("Run");
+
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed));
+
+			if (LevelEventManager.IsEndOfLevel()) _velocity.x = 1.5f;
 
 			_behaviourTimer.StartTimer(1.0f);
 			if (_behaviourTimer.HasTimerFinished())

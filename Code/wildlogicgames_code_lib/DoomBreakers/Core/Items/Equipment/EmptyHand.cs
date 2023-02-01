@@ -17,6 +17,9 @@ namespace DoomBreakers
 		private AnimationState _animState; //Apply as appropriate based on _playerEquip.
 		private IEquipmentSprite _emptySprite;
 
+		private double _damageValue;
+		public double Damage() => _damageValue;
+
 		public EquipmentWeaponType GetSwordType()
 		{
 			return _weaponType;
@@ -51,7 +54,7 @@ namespace DoomBreakers
 		public override void Start()
 		{
 			base.Start();
-
+			_damageValue = 0;
 			//SetupSword();
 		}
 		public override void Update()

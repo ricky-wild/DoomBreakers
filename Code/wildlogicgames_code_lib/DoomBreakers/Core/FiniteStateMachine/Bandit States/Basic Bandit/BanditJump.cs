@@ -28,7 +28,13 @@ namespace DoomBreakers
 
 			float multiplier = 1.2f;// 1.66f;
 			int trackingDir = banditSprite.GetSpriteDirection();
-			_cachedVector3 = AITargetTrackingManager.GetAssignedTargetTransform(_enemyID, EnemyAI.Bandit).position;
+			if (AITargetTrackingManager._instance != null)
+			{
+				Transform t = AITargetTrackingManager.GetAssignedTargetTransform(_enemyID, EnemyAI.Bandit);
+
+				if(t != null) _cachedVector3 = t.position;
+
+			}
 
 			if(_cachedVector3 != null)
 			{

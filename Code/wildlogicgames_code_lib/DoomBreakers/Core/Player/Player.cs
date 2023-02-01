@@ -40,10 +40,13 @@ namespace DoomBreakers
         private PlayerStats _playerStats;
         private ITimer _buttonHeldTimer;
 
-        private Action[] _actionListener = new Action[2];
+        private Action[] _actionListener = new Action[3];
+
+        private bool _setup;
 
         private void InitializePlayer()
 		{
+            _setup = false;
             _stateMachine = this;
             _controller2D = this.GetComponent<CharacterController2D>();//this.GetComponent<Controller2D>();
             _controller2D.IgnoreEdgeDetection(true);
@@ -67,6 +70,9 @@ namespace DoomBreakers
 
             _actionListener[0] = new Action(AttackedByBandit);//AttackedByBandit()
             _actionListener[1] = new Action(AttackedByArrow);//AttackedByArrow()
+            _actionListener[2] = new Action(CampsiteReachedEvent);//CampsiteReachedEvent()
+
+            
         }
         private void OnEnable()
         {
@@ -74,11 +80,13 @@ namespace DoomBreakers
 
             BattleColliderManager.Subscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener[0]);
             BattleColliderManager.Subscribe("ReportCollisionWithArrowForPlayer" + _playerID.ToString(), _actionListener[1]);
+            LevelEventManager.Subscribe("CampsiteReachedEvent", _actionListener[2]);
         }
         private void OnDisable()
         {
             BattleColliderManager.Unsubscribe("ReportCollisionWithPlayerFor" + _playerID.ToString(), _actionListener[0]);
             BattleColliderManager.Unsubscribe("ReportCollisionWithArrowForPlayer" + _playerID.ToString(), _actionListener[1]);
+            LevelEventManager.Unsubscribe("CampsiteReachedEvent", _actionListener[2]);
         }
         private void Awake()
 		{
@@ -90,9 +98,20 @@ namespace DoomBreakers
             _playerAnimator.SetAnimatorController(ref _playerEquipment);
             SetState(new PlayerIdle(this, _inputVector2));
         }
+        private void Setup()
+		{
+            if (_playerID == 0)
+			{
+                LevelEventManager.ActivateStartLevel(_transform); //Only call once from Player 1.
+            }
+            _setup = true;
+        }
 
         void Update()
         {
+            if (!_setup) Setup();
+
+
             UpdateInput();
             UpdateStateBehaviours();
             UpdateCollisions();
@@ -109,6 +128,8 @@ namespace DoomBreakers
                 return;
             if (_state.GetType() == typeof(PlayerGainedEquipment))
                 return;
+            if (LevelEventManager.IsStartOfLevel()) return;
+            if (LevelEventManager.IsEndOfLevel()) return;
 
             _inputVector2.x = _rewirdInputPlayer.GetAxis("MoveHorizontal");
             _inputVector2.y = _rewirdInputPlayer.GetAxis("MoveVertical");
@@ -249,7 +270,7 @@ namespace DoomBreakers
 
             _state.IsDying(ref _animator, ref _playerSprite);
             _state.IsDead(ref _animator, ref _playerSprite);
-            _state.UpdateBehaviour(ref _controller2D, ref _animator);
+            _state.UpdateBehaviour(ref _controller2D, ref _animator, ref _state);
         }
         public void UpdateCollisions()
 		{
@@ -269,8 +290,13 @@ namespace DoomBreakers
             if (IsIgnoreDamage())
                 return;
 
-            double banditQuickAttackDamage = 0.01;//0.0025;
-            double banditPowerAttackDamage = 0.0175;
+            BanditStats tempStat = new BanditStats(0,0,0);
+            tempStat = BattleColliderManager.GetAssignedBanditStatus(enemyId);
+
+            //if (tempStat == null) return;
+
+            double banditQuickAttackDamage = tempStat.QuickAttackDamage;
+            double banditPowerAttackDamage = tempStat.PowerAttackDamage;
             bool process = false;
 
             if(process = ProcessQuickAttackFromBandit(ref attackingBanditState, banditFaceDir, _playerSprite.GetSpriteDirection(), ref _transform))
@@ -336,6 +362,10 @@ namespace DoomBreakers
             _playerStats.UpdateStatus(ref _stateMachine, ref _transform, ref _playerAnimator, ref _playerEquipment, ref _playerStats,
                 ref _playerIndicatorAnimator, ref _velocity, _playerID, SetDeath);
         }
+        private void CampsiteReachedEvent()
+		{
+            print("\nCampsiteReachedEvent() Trigger from Player.cs - do work here.");
+		}
 
         private void OnDrawGizmosSelected()
         {

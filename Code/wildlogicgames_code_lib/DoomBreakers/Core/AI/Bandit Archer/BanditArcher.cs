@@ -29,7 +29,7 @@ namespace DoomBreakers
         private CharacterController2D _controller2D;
         private Animator _animator;
 
-        private IBanditCollision _banditCollider;
+        private ArcherCollision _banditCollider;
         private BanditAnimator _banditAnimator;
         private IBanditSprite _banditSprite;
         private float _playerAttackedButtonTime;
@@ -37,13 +37,13 @@ namespace DoomBreakers
 
         private Action[] _actionListener = new Action[2];
 
-        private void InitializeBanditArcher()
+        public void InitializeBanditArcher()
         {
             _transform = this.transform;
             _controller2D = this.GetComponent<CharacterController2D>();
             _animator = this.GetComponent<Animator>();
 
-            _banditCollider = new BanditCollision(this.GetComponent<Collider2D>(), ref _transform, ref _banditStats, _enemyID);
+            _banditCollider = new ArcherCollision(this.GetComponent<Collider2D>(), ref _transform, ref _banditStats, _enemyID);
             _banditAnimator = new BanditAnimator(this.GetComponent<Animator>(), "EnemyAnimControllers", "HumanoidBandit", "Bandit_with_bow&arrows_controller");
             _banditSprite = this.gameObject.AddComponent<BanditSprite>();
             _banditSprite.Setup(this.GetComponent<SpriteRenderer>(), _enemyID);
@@ -55,19 +55,24 @@ namespace DoomBreakers
 
             _actionListener[0] = new Action(AttackedByPlayer);//AttackedByPlayer()
             _actionListener[1] = new Action(DetectedAnPlayer);//DetectedAnPlayer()
-        }
-        private void OnEnable()
-        {
-            //Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
+
+            //OnEnable()
+            //this.gameObject.SetActive(true);
             BattleColliderManager.Subscribe("ReportCollisionWithBanditArcher" + _enemyID.ToString(), _actionListener[0]);
             AITargetTrackingManager.Subscribe("ReportDetectionWithPlayerForBanditArcher" + _enemyID.ToString(), _actionListener[1]);
         }
+        private void OnEnable()
+        {
+			//Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
+			//BattleColliderManager.Subscribe("ReportCollisionWithBanditArcher" + _enemyID.ToString(), _actionListener[0]);
+			//AITargetTrackingManager.Subscribe("ReportDetectionWithPlayerForBanditArcher" + _enemyID.ToString(), _actionListener[1]);
+		}
         private void OnDisable()
         {
             BattleColliderManager.Unsubscribe("ReportCollisionWithBanditArcher" + _enemyID.ToString(), _actionListener[0]);
             AITargetTrackingManager.Unsubscribe("ReportDetectionWithPlayerForBanditArcher" + _enemyID.ToString(), _actionListener[1]);
         }
-        private void Awake() => InitializeBanditArcher();
+        //private void Awake() => InitializeBanditArcher();
 
         void Start()
         {
@@ -84,9 +89,9 @@ namespace DoomBreakers
         public void UpdateStateBehaviours()
         {
             _state.IsIdleBowman(ref _animator, ref _banditCollider);
-            _state.IsAiming(ref _animator, ref _banditCollider, ref _banditSprite);
-            _state.IsShootTarget(ref _animator, ref _banditSprite, ref _banditCollider);
-            _state.IsHit(ref _animator, ref _banditSprite);
+            _state.IsAiming(ref _animator, ref _banditCollider, ref _banditSprite, ref _transform);
+            _state.IsShootTarget(ref _animator, ref _banditSprite, ref _banditCollider, ref _aimTransform);
+            _state.IsArcherHit(ref _animator, ref _banditSprite);
             _state.IsDying(ref _animator, ref _banditSprite);
             _state.IsDead(ref _animator, ref _banditSprite);
 
@@ -95,7 +100,7 @@ namespace DoomBreakers
         public void UpdateCollisions() //=> _banditCollider.UpdateCollision(ref _state, _banditSprite);
 		{
             if (IsDying()) return;
-            _banditCollider.UpdateCollision(ref _state, _banditSprite);
+            _banditCollider.UpdateCollision(ref _state, _banditSprite, ref _banditStats);
         }
         private void UpdateStats()
         {
@@ -155,7 +160,7 @@ namespace DoomBreakers
         }
 
         //AITargetTrackingManager.Subscribe("ReportDetectionWithPlayerForBanditArcher")
-        private void DetectedAnPlayer() => SetState(new BanditArcherShoot(this, _velocity, ref _transform, ref _aimTransform, _enemyID));
+        private void DetectedAnPlayer() => SetState(new BanditArcherShoot(this, _velocity, ref _transform, ref _aimTransform, AITargetTrackingManager.GetAssignedTargetTransform(_enemyID, EnemyAI.BanditArcher), _enemyID));
 
         private void OnDrawGizmosSelected()
         {

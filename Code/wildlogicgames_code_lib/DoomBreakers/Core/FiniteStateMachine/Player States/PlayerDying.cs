@@ -25,6 +25,7 @@ namespace DoomBreakers
 			{
 				Time.timeScale = 1.0f;
 				_stateMachine.SetState(new PlayerDead(_stateMachine, _velocity));
+				Application.Quit();
 			}
 
 			//base.UpdateBehaviour();

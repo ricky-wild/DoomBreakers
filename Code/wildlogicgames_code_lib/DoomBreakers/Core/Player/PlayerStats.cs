@@ -10,6 +10,8 @@ namespace DoomBreakers
 		private int _killCount;
 		private ITimer _buttonHeldTimer, _staminaTimer;
 
+		private double _weaponDamage;
+
 		private bool _process;
 		public bool Process() => _process;
 		public void Disable() => _process = false;
@@ -24,6 +26,13 @@ namespace DoomBreakers
 			_staminaTimer = new Timer();
 			_staminaTimer.StartTimer(0.05f); //increment stamina every 20th of a sec.
 		}
+
+		public override double WeaponDamage { get => base.WeaponDamage; set => base.WeaponDamage = value; }
+
+		public override double QuickAttackDamage => _baseQuickAttackDamage + WeaponDamage;
+		public override double PowerAttackDamage => _basePowerAttackDamage + WeaponDamage;
+		public override double KnockAttackDamage => _baseKnockAttackDamage + WeaponDamage;
+		public override double UpwardAttackDamage => _baseUpwardAttackDamage + WeaponDamage;
 
 		public void UpdateStatus(ref PlayerStateMachine playerStateMachine, ref Transform transform, ref PlayerAnimator playerAnimator, 
 			ref IPlayerEquipment playerEquipment, ref PlayerStats playerStats,ref Animator indicatorAnimator, ref Vector3 velocity, 

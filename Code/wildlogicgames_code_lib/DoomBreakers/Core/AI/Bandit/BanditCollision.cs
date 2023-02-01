@@ -103,12 +103,12 @@ namespace DoomBreakers
 
         void Update() { }
 
-        public void UpdateCollision(ref BasicEnemyBaseState banditState, IBanditSprite banditSprite)
+        public void UpdateCollision(ref BasicEnemyBaseState banditState, IBanditSprite banditSprite, ref BanditStats banditStats)
         {
-            UpdateDetectEnemyTargets(ref banditState, banditSprite);
+            UpdateDetectEnemyTargets(ref banditState, banditSprite, ref banditStats);
 
         }
-        public void UpdateDetectEnemyTargets(ref BasicEnemyBaseState banditState, IBanditSprite banditSprite)
+        public void UpdateDetectEnemyTargets(ref BasicEnemyBaseState banditState, IBanditSprite banditSprite, ref BanditStats banditStats)
         {
             if (!_detectTargetCollisionEnabled)
                 return;
@@ -119,19 +119,35 @@ namespace DoomBreakers
                 if (_enemyTargetsHit == null) return;
                 foreach (Collider2D enemy in _enemyTargetsHit)
                 {
-                    if (enemy.CompareTag(GetCompareTag(CompareTags.Player)))
+					//if (!enemy.CompareTag(GetCompareTag(CompareTags.Player)))
+					//{
+					//	//For BanditArcherAim.cs use. So the enemy doesn't continue to shoot at player even when they're
+					//	//significantly further away.
+					//	AITargetTrackingManager.AssignTargetTransform("ReportDetectionWithPlayerForBanditArcher" + _enemyID.ToString(), null, _enemyID, EnemyAI.BanditArcher);
+					//}
+					if (enemy.CompareTag(GetCompareTag(CompareTags.Player)))
                     {
                         int playerID = enemy.GetComponent<Player>()._playerID;
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toPersue)
+						{
                             AITargetTrackingManager.AssignTargetTransform("ReportDetectionWithPlayerForBandit" + _enemyID.ToString(), enemy.transform, _enemyID, EnemyAI.Bandit);
+                            _detectTargetCollisionEnabled = false;
+                            return;
+                        }
 
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toAttack)
-                            BattleColliderManager.AssignCollisionDetails("ReportCollisionWithPlayerFor" + playerID.ToString(), 
-                                ref banditState, _enemyID, banditSprite.GetSpriteDirection());
+						{
+                            BattleColliderManager.AssignCollisionDetails("ReportCollisionWithPlayerFor" + playerID.ToString(),
+                                                                            ref banditState, _enemyID, banditSprite.GetSpriteDirection(), ref banditStats);
+                            _detectTargetCollisionEnabled = false;
+                            return;
+                        }
 
                         if (_collisionTargetPurpose == CollisionTargetPurpose.toShoot)
 						{
-                            AITargetTrackingManager.AssignTargetTransform("ReportDetectionWithPlayerForBanditArcher" + _enemyID.ToString(), enemy.transform, _enemyID, EnemyAI.Bandit);
+                            AITargetTrackingManager.AssignTargetTransform("ReportDetectionWithPlayerForBanditArcher" + _enemyID.ToString(), enemy.transform, _enemyID, EnemyAI.BanditArcher);
+                            _detectTargetCollisionEnabled = false;
+                            return;
                         }
                     }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player2)))
@@ -140,7 +156,8 @@ namespace DoomBreakers
                     { }
                     if (enemy.CompareTag(GetCompareTag(CompareTags.Player4)))
                     { }
-                    //if (enemy.CompareTag("FallenFlag")) _banditStats.Health -= _banditStats.Health;
+                    if (enemy.CompareTag("FallenFlag")) 
+                        _banditStats.Health -= _banditStats.Health;
 
 
                     //if (enemy.CompareTag(GetCompareTag(CompareTags.Enemy))){}

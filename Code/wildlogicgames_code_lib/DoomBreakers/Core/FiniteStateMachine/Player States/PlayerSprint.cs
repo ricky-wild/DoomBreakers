@@ -19,6 +19,7 @@ namespace DoomBreakers
 		{
 			animator.Play("Sprint");
 			_velocity.x = (input.x * (_moveSpeed * _sprintSpeed));
+			if (LevelEventManager.IsEndOfLevel()) _stateMachine.SetState(new PlayerMove(_stateMachine, _velocity, _transform, ref playerSprite));
 			DetectFaceDirection(ref playerSprite, ref playerCollider);
 
 			

@@ -13,6 +13,8 @@ namespace DoomBreakers
 		private bool _process;
 		private ITimer _healthDisplayTimer, _bleedingTimer, _bludgeoningTimer;
 
+		private double _banditQuickAttackDamage = 0.008;
+		private double _banditPowerAttackDamage = 0.01;
 
 		public override double Health 
 		{ 
@@ -94,6 +96,10 @@ namespace DoomBreakers
 			if (display) _bludgeonDisplayTransform[2].localScale = _displayScale;
 			if (!display) _bludgeonDisplayTransform[2].localScale = Vector3.zero;
 		}
+
+		public BanditStats(double h, double s, double d) : base(health: h, stamina: s, defence: d)
+		{
+		}
 		public BanditStats(ref Transform[] healthTransforms, ref Transform[] bleedTransforms, ref Transform[] bludgeonTransforms, double h, double s, double d) : base(health: h, stamina: s, defence: d)
 		{
 			
@@ -106,6 +112,7 @@ namespace DoomBreakers
 			_health = h;
 			_stamina = s;
 			_defence = d;
+
 
 			_process = true;
 			_bleedTimer = new Timer();
@@ -121,8 +128,10 @@ namespace DoomBreakers
 			DisplayBleedFillBar(false);
 			DisplayBludgeonFillBar(false);
 		}
-		
+
 		//public override void Update() //=> base.Update();
+		public override double QuickAttackDamage => _baseQuickAttackDamage + _banditQuickAttackDamage;
+		public override double PowerAttackDamage => _basePowerAttackDamage + _banditPowerAttackDamage;
 
 
 		public void UpdateStatus(ref BanditStateMachine banditStateMachine, ref Vector3 velocity, int enemyId, bool setDeath)

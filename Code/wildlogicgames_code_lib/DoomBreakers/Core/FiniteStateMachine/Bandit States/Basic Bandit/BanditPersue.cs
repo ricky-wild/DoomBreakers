@@ -1,4 +1,4 @@
-﻿
+﻿using wildlogicgames;
 using UnityEngine;
 
 namespace DoomBreakers
@@ -16,9 +16,9 @@ namespace DoomBreakers
 			_detectPlatformEdge = true;
 
 			_randSpeedModifier = wildlogicgames.Utilities.GetRandomNumberInt(1, 3);
-			if (_randSpeedModifier == 1) _attackDist = 1.6f;
-			if (_randSpeedModifier == 2) _attackDist = 1.8f;
-			if (_randSpeedModifier == 3) _attackDist = 2.1f;
+			if (_randSpeedModifier == 1) _attackDist = 1.8f;
+			if (_randSpeedModifier == 2) _attackDist = 2.0f;
+			if (_randSpeedModifier == 3) _attackDist = 2.25f;
 
 			_randSpeedModifier = wildlogicgames.Utilities.GetRandomNumberInt(1, 3);
 			_randSpeedModifier = (_randSpeedModifier / 2.15f); 
@@ -27,7 +27,8 @@ namespace DoomBreakers
 			//print("\nPersue State.");
 		}
 
-		public override void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider, ref BanditStats banditStats)
+		public override void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider, ref BanditStats banditStats,
+			ref CharacterController2D controller2D)
 		{
 			animator.Play("Run");//, 0, 0.0f);
 
@@ -38,7 +39,12 @@ namespace DoomBreakers
 			DetectFaceDirection(ref banditSprite, ref banditCollider);
 
 			int trackingDir = 0; //Face direction either -1 left, or 1 right.
-			_cachedVector3 = AITargetTrackingManager.GetAssignedTargetTransform(_enemyID, EnemyAI.Bandit).position;
+			if (AITargetTrackingManager._instance != null) _cachedVector3 = AITargetTrackingManager.GetAssignedTargetTransform(_enemyID, EnemyAI.Bandit).position;
+			if (_cachedVector3 == null)
+			{
+				_cachedVector3 = _transform.position;
+				_cachedVector3.x -= 2.0f;
+			}
 
 			if (_cachedVector3.x > _transform.position.x)
 				trackingDir = 1;
@@ -63,6 +69,12 @@ namespace DoomBreakers
 
 			if (!banditStats.IsBludgeoning()) _velocity.x = _targetVelocityX;
 			if (banditStats.IsBludgeoning()) _velocity.x = _targetVelocityX/4;
+
+			bool collisionLeft = controller2D._collisionDetail._collidedDirection[2];
+			bool collisionRight = controller2D._collisionDetail._collidedDirection[3];
+
+			if (collisionLeft) _stateMachine.SetState(new BanditJump(_stateMachine, _velocity, _transform, _enemyID));//return;
+			if (collisionRight) _stateMachine.SetState(new BanditJump(_stateMachine, _velocity, _transform, _enemyID));//return;
 
 			CheckSetForFallState();
 

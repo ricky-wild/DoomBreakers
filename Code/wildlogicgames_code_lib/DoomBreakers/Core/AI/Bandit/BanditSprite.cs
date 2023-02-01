@@ -240,12 +240,7 @@ namespace DoomBreakers
             _colorSwapTexture2D.Apply();
 
         }
-        public override void SetBehaviourTextureFlash(float time, Color colour)
-        {
-            //behaviourTimer.StartTimer(time);//flash sprite colour timer.
-            //if (_behaviourTimer.HasTimerFinished())
-            SetTexture2DColor(time, colour);
-        }
+        public override void SetBehaviourTextureFlash(float time, Color colour) => SetTexture2DColor(time, colour);
         private void UpdateColorTextureResetInternally()
         {
             //Ensure we reset internally upon failure to do so externally (ie a state change)

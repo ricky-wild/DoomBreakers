@@ -91,7 +91,8 @@ namespace DoomBreakers
 		public virtual void IsIdle(ref Animator animator) { }
 		public virtual void IsJumping(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsWaiting(ref Animator animator) { }
-		public virtual void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider, ref BanditStats banditStats) { }
+		public virtual void IsPersueTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider, ref BanditStats banditStats,
+			ref CharacterController2D controller2D) { }
 		public virtual void IsFalling(ref Animator animator, ref CharacterController2D controller2D, ref IBanditSprite banditSprite) { }
 		public virtual void IsDefending(ref Animator animator, ref CharacterController2D controller2D, ref IBanditSprite banditSprite) { }
 		public virtual void IsQuickAttack(ref Animator animator, ref IBanditCollision banditCollider, ref IBanditSprite banditSprite, ref int quickAttackIncrement) { }
@@ -102,10 +103,11 @@ namespace DoomBreakers
 		public virtual void IsHitWhileDefending(ref Animator animator, ref CharacterController2D controller2D, ref IBanditSprite banditSprite) { }
 		public virtual void IsHitByUpwardAttack(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsHitByKnockAttack(ref Animator animator, ref IBanditSprite banditSprite) { }
-		public virtual void IsIdleBowman(ref Animator animator, ref IBanditCollision banditCollider) { }
-		public virtual void IsAiming(ref Animator animator, ref IBanditCollision banditCollider,ref IBanditSprite banditSprite) { }
-		public virtual void IsShootTarget(ref Animator animator, ref IBanditSprite banditSprite, ref IBanditCollision banditCollider) { }
+		public virtual void IsIdleBowman(ref Animator animator, ref ArcherCollision banditCollider) { }
+		public virtual void IsAiming(ref Animator animator, ref ArcherCollision banditCollider,ref IBanditSprite banditSprite, ref Transform transform) { }
+		public virtual void IsShootTarget(ref Animator animator, ref IBanditSprite banditSprite, ref ArcherCollision banditCollider, ref Transform arrowAimTransform) { }
 		public virtual void IsHit(ref Animator animator, ref IBanditSprite banditSprite) { }
+		public virtual void IsArcherHit(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsDying(ref Animator animator, ref IBanditSprite banditSprite) { }
 		public virtual void IsDead(ref Animator animator, ref IBanditSprite banditSprite) { }
 	}

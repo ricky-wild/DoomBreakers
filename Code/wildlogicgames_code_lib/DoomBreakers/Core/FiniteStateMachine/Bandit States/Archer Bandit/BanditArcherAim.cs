@@ -12,27 +12,40 @@ namespace DoomBreakers
 			_enemyID = id;
 			_stateMachine = s;
 			_velocity = v; //We want to carry this on between states.
-			_idleWaitTime = 1.25f;
+			_idleWaitTime = 0.25f;
 			_behaviourTimer = new Timer();
 
 
 		}
 
-		public override void IsAiming(ref Animator animator, ref IBanditCollision banditCollider, ref IBanditSprite banditSprite)
+		public override void IsAiming(ref Animator animator, ref ArcherCollision banditCollider, ref IBanditSprite banditSprite, ref Transform transform)
 		{
 			animator.Play("Aim");//, 0, 0.0f);
 			_velocity.x = 0f;
 
 
 
-			_behaviourTimer.StartTimer(_idleWaitTime);
-			if (_behaviourTimer.HasTimerFinished())
+
+			//_behaviourTimer.StartTimer(_idleWaitTime);
+			//if (_behaviourTimer.HasTimerFinished())
+			banditCollider.EnableTargetCollisionDetection(); //BanditCollision.cs->Finds Player->BanditArcher.cs->DetectedPlayer->BanditArcherShoot.cs
+
+			if (AITargetTrackingManager._instance != null)
 			{
-				//_behaviourTimer.Reset();
-				//_behaviourTimer.StartTimer(_idleWaitTime);
-				banditCollider.EnableTargetCollisionDetection(); //BanditCollision.cs->Finds Player->BanditArcher.cs->DetectedPlayer->BanditArcherShoot.cs
-				//AudioEventManager.PlayEnemySFX(EnemySFXID.EnemyQuickAttackSFX);
-				_stateMachine.SetState(new BanditArcherIdle(_stateMachine, _velocity, _enemyID));
+				Transform targetTransform = AITargetTrackingManager.GetAssignedTargetTransform(_enemyID, EnemyAI.BanditArcher);//.position;
+
+				if (targetTransform != null)
+					_stateMachine.SetState(new BanditArcherShoot(_stateMachine, _velocity, ref transform, ref targetTransform, targetTransform, _enemyID));
+
+				if (!banditCollider.IsDisableShootFlag())
+				{
+
+				}
+				//if (!banditCollider.IsDisableShootFlag())
+				//{
+				//	_stateMachine.SetState(new BanditArcherIdle(_stateMachine, _velocity, _enemyID));
+				//}
+
 			}
 		}
 

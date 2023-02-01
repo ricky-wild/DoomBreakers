@@ -105,7 +105,7 @@ namespace DoomBreakers
 
 		private bool _hitFrameAnimFlag;
 
-		private Action[] _actionListener = new Action[4];
+		private Action[] _actionListener = new Action[5];
 
 		private void InitializeUI()
 		{
@@ -125,8 +125,8 @@ namespace DoomBreakers
 			_healthUIImage.fillAmount = 1.0f;
 			_staminaUIImage.fillAmount = 1.0f;
 			_defenseUIImage.fillAmount = 0.0f;
-			_playerStats = new PlayerStats(1, 1, 0);
-			_prevPlayerStats = new PlayerStats(1, 1, 0);
+			_playerStats = new PlayerStats(100, 100, 0);
+			_prevPlayerStats = new PlayerStats(100, 100, 0);
 
 			_UIframeAnimStr[0] = "P" + (_playerID + 1).ToString() + "_Idle";
 			_UIframeAnimStr[1] = "P" + (_playerID + 1).ToString() + "_Hit";
@@ -148,6 +148,7 @@ namespace DoomBreakers
 			_actionListener[1] = new Action(UIPlayerEquipEvent);//UIPlayerEquipEvent()
 			_actionListener[2] = new Action(UIPlayerKillScoreEvent);//UIPlayerKillScoreEvent()
 			_actionListener[3] = new Action(UIPlayerGoldScoreEvent);//UIPlayerGoldScoreEvent()
+			_actionListener[4] = new Action(UIPlayerDamageEvent);//UIPlayerDamageEvent()
 		}
 		private void SetupTextToScreenSpace()
 		{
@@ -170,6 +171,7 @@ namespace DoomBreakers
 
 		private void Awake() => InitializeUI();
 
+		private void UIPlayerDamageEvent() => QueueBattleToTextProcess();
 		private void UIPlayerGoldScoreEvent()
 		{
 			//Used for communicating player currency count.PlayerCollision.cs->ProcessCollisionWithGoldCoin() ect.
@@ -280,6 +282,7 @@ namespace DoomBreakers
 			UIPlayerManager.Subscribe("ReportUIPlayerEquipEvent", _actionListener[1]);
 			UIPlayerManager.Subscribe("ReportUIPlayerKillScoreEvent", _actionListener[2]);
 			UIPlayerManager.Subscribe("ReportUIPlayerGoldscoreEvent", _actionListener[3]);
+			UIPlayerManager.Subscribe("ReportUIPlayerDamageEvent", _actionListener[4]);
 		}
 		private void OnDisable()
 		{
@@ -287,6 +290,7 @@ namespace DoomBreakers
 			UIPlayerManager.Unsubscribe("ReportUIPlayerEquipEvent", _actionListener[1]);
 			UIPlayerManager.Unsubscribe("ReportUIPlayerKillScoreEvent", _actionListener[2]);
 			UIPlayerManager.Unsubscribe("ReportUIPlayerGoldscoreEvent", _actionListener[3]);
+			UIPlayerManager.Unsubscribe("ReportUIPlayerDamageEvent", _actionListener[4]);
 		}
 
 		void Start() { }
@@ -367,15 +371,17 @@ namespace DoomBreakers
 		{
 			_UIItemTextToScreenSpace._forHealthFlag = forHealth;
 			_UIItemTextToScreenSpace._displayFlag = true;
+			_textItemDisplayTimer.Reset();
+			_textItemDisplayTimer.StartTimer(2.0f);
 
-			if (!forHealth) _textItemDisplayTimer.StartTimer(1.0f);
-			if (forHealth) _textItemDisplayTimer.StartTimer(0.5f);
+			if (!forHealth) _textItemDisplayTimer.StartTimer(2.0f);
+			if (forHealth) _textItemDisplayTimer.StartTimer(1.5f);
 		}
 		private void UpdateUIItemTextToScreenSpace()
 		{
 			if (!_UIItemTextToScreenSpace._displayFlag) return;
 
-			if(_textItemDisplayTimer.HasTimerFinished())
+			if (_textItemDisplayTimer.HasTimerFinished())
 			{
 				_itemText.text = "";
 				_UIItemTextToScreenSpace._displayFlag = false;
@@ -384,7 +390,7 @@ namespace DoomBreakers
 				return;
 			}
 
-			if(!_UIItemTextToScreenSpace._forHealthFlag)
+			if (!_UIItemTextToScreenSpace._forHealthFlag)
 			{
 				if (!_UIItemTextToScreenSpace._getStringForTextFlag)
 				{
@@ -482,7 +488,7 @@ namespace DoomBreakers
 		private void QueueBattleToTextProcess()
 		{
 			_UIBattleTextToScreenSpace._displayFlag = true;
-			_textBattleDisplayTimer.StartTimer(0.5f);
+			_textBattleDisplayTimer.StartTimer(0.15f);
 		}
 		private void UpdateUIBattleTextToScreenSpace()
 		{
@@ -500,6 +506,35 @@ namespace DoomBreakers
 			if (!_UIBattleTextToScreenSpace._getStringForTextFlag)
 			{
 
+				double damageDealtVal = 0;
+				string damageDealthStr = "";
+
+				BaseState attackingPlayerState = BattleColliderManager.GetAssignedPlayerState(_playerID);
+				PlayerStats tempStat = BattleColliderManager.GetAssignedPlayerStatus(_playerID);
+
+				//if (tempStat == null) return;
+
+				if (attackingPlayerState.GetType() == typeof(PlayerQuickAttack)) 
+					damageDealtVal = tempStat.QuickAttackDamage;
+				if (attackingPlayerState.GetType() == typeof(PlayerReleaseAttack))
+					damageDealtVal = tempStat.PowerAttackDamage;
+				if (attackingPlayerState.GetType() == typeof(PlayerKnockAttack))
+					damageDealtVal = tempStat.KnockAttackDamage;
+				if (attackingPlayerState.GetType() == typeof(PlayerUpwardAttack))
+					damageDealtVal = tempStat.UpwardAttackDamage;
+
+				//double value = 3.14;
+				//string str = string.Format("{0:F2}", value); // Outputs "3.14"
+				//{ 0:N}: formats the number with a thousand separator
+				//{ 0:P}: formats the number as a percentage
+				//{ 0:C}: formats the number as a currency value
+				//{ 0:D}: formats the number as a decimal
+				//{ 0:X}: formats the number as a hexadecimal value
+
+				damageDealtVal = damageDealtVal * 100;
+				damageDealtVal = Math.Round(damageDealtVal, 2);
+				damageDealthStr = string.Format("{0:D}", damageDealtVal.ToString("F2"));
+				_battleText.text = damageDealthStr;// damageDealtVal.ToString();
 
 				_UIBattleTextToScreenSpace._getStringForTextFlag = true;
 			}

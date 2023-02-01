@@ -46,7 +46,7 @@ namespace DoomBreakers
 
         private Action[] _actionListener = new Action[2];
 
-        private void InitializeBandit()
+        public void InitializeBandit()
         {
             _stateMachine = this;
             _transform = this.transform;
@@ -64,19 +64,23 @@ namespace DoomBreakers
             _actionListener[0] = new Action(AttackedByPlayer);//AttackedByPlayer()
             _actionListener[1] = new Action(DetectedAnPlayer);//DetectedAnPlayer()
 
+            //OnEnable()
+            //this.gameObject.SetActive(true);
+            BattleColliderManager.Subscribe("ReportCollisionWithBandit" + _enemyID.ToString(), _actionListener[0]);
+            AITargetTrackingManager.Subscribe("ReportDetectionWithPlayerForBandit" + _enemyID.ToString(), _actionListener[1]);
         }
         private void OnEnable()
         {
             //Bandit.cs->BanditCollision.cs->enemy.GetComponent<Player>()->BattleColliderManager.TriggerEvent("ReportCollisionWithPlayer"); 
-            BattleColliderManager.Subscribe("ReportCollisionWithBandit" + _enemyID.ToString(), _actionListener[0]);
-            AITargetTrackingManager.Subscribe("ReportDetectionWithPlayerForBandit" + _enemyID.ToString(), _actionListener[1]);
+            //BattleColliderManager.Subscribe("ReportCollisionWithBandit" + _enemyID.ToString(), _actionListener[0]);
+            //AITargetTrackingManager.Subscribe("ReportDetectionWithPlayerForBandit" + _enemyID.ToString(), _actionListener[1]);
         }
         private void OnDisable()
         {
-            BattleColliderManager.Unsubscribe("ReportCollisionWithBandit" + _enemyID.ToString(), _actionListener[0]);
-            AITargetTrackingManager.Unsubscribe("ReportDetectionWithPlayerForBandit" + _enemyID.ToString(), _actionListener[1]);
-        }
-        private void Awake() => InitializeBandit();
+			BattleColliderManager.Unsubscribe("ReportCollisionWithBandit" + _enemyID.ToString(), _actionListener[0]);
+			AITargetTrackingManager.Unsubscribe("ReportDetectionWithPlayerForBandit" + _enemyID.ToString(), _actionListener[1]);
+		}
+        //private void Awake() => InitializeBandit();
         
         void Start()
         {
@@ -96,7 +100,7 @@ namespace DoomBreakers
             _state.IsJumping(ref _animator, ref _banditSprite);
             _state.IsWaiting(ref _animator);
             _state.IsFalling(ref _animator, ref _controller2D, ref _banditSprite);
-            _state.IsPersueTarget(ref _animator, ref _banditSprite, ref _banditCollider, ref _banditStats);
+            _state.IsPersueTarget(ref _animator, ref _banditSprite, ref _banditCollider, ref _banditStats, ref _controller2D);
             _state.IsDefending(ref _animator, ref _controller2D, ref _banditSprite);
             
             _state.IsQuickAttack(ref _animator, ref _banditCollider, ref _banditSprite, ref _quickAttackIncrement);
@@ -119,13 +123,21 @@ namespace DoomBreakers
 		{
             if (IsDying()) return;
 
-            _banditCollider.UpdateCollision(ref _state, _banditSprite);
+            _banditCollider.UpdateCollision(ref _state, _banditSprite, ref _banditStats);
         }
         private void UpdateStats() //=> _banditStats.UpdateStatus(ref _stateMachine, ref _velocity, _enemyID);
 		{
+            if (IsDying()) return;
             bool SetDeath = SafeToSetDying(); //SafeToSetDying()
             _banditStats.UpdateStatus(ref _stateMachine, ref _velocity, _enemyID, SetDeath);
-        }
+
+			//OnDisable()
+			//if (SetDeath)
+			//{
+			//	BattleColliderManager.Unsubscribe("ReportCollisionWithBandit" + _enemyID.ToString(), _actionListener[0]);
+			//	AITargetTrackingManager.Unsubscribe("ReportDetectionWithPlayerForBandit" + _enemyID.ToString(), _actionListener[1]);
+			//}
+		}
 
         private void AttackedByPlayer()
 		{
@@ -136,36 +148,24 @@ namespace DoomBreakers
             int playerFaceDir = BattleColliderManager.GetAssignedPlayerFaceDir(playerId);
             BaseState attackingPlayerState = BattleColliderManager.GetAssignedPlayerState(playerId);
 
-            double playerQuickAttackDamage = 0.0025;
-            double playerPowerAttackDamage = 0.01;
+            PlayerStats tempStat = BattleColliderManager.GetAssignedPlayerStatus(playerId);
+
+            //if (tempStat == null) return;
+
+            double playerQuickAttackDamage = tempStat.QuickAttackDamage; //Includes weapon damage
+            double playerPowerAttackDamage = tempStat.PowerAttackDamage; //Includes weapon damage
+
+            int randomChanceOfBleed = wildlogicgames.Utilities.GetRandomNumberInt(0, 100);
+            bool bleed = false;
+            if (randomChanceOfBleed < 8) bleed = true;
+
+            int randomChanceOfBludgeon = wildlogicgames.Utilities.GetRandomNumberInt(0, 100);
+            bool bludgeon = false;
+            if (randomChanceOfBludgeon < 8) bludgeon = true;
 
             ItemBase itemBase = BattleColliderManager.GetAssignedPlayerWeapon(playerId);
             if (itemBase == null) return;
 
-            if (itemBase.GetType() == typeof(Sword))
-            {
-                //ItemBase itemBase = BattleColliderManager.GetAssignedPlayerWeapon(playerId);
-                Sword weaponDervived = itemBase as Sword;
-
-                playerQuickAttackDamage = weaponDervived.Damage();
-                playerPowerAttackDamage += weaponDervived.Damage();
-            }
-            if (itemBase.GetType() == typeof(Mace))
-            {
-                //ItemBase itemBase = BattleColliderManager.GetAssignedPlayerWeapon(playerId);
-                Mace weaponDervived = itemBase as Mace;
-
-                playerQuickAttackDamage = weaponDervived.Damage();
-                playerPowerAttackDamage += weaponDervived.Damage();
-            }
-
-            int randomChanceOfBleed = wildlogicgames.Utilities.GetRandomNumberInt(0, 100);
-            bool bleed = false;
-            if (randomChanceOfBleed < 30) bleed = true;
-
-            int randomChanceOfBludgeon = wildlogicgames.Utilities.GetRandomNumberInt(0, 100);
-            bool bludgeon = false;
-            if (randomChanceOfBludgeon < 30) bludgeon = true;
 
             if (ProcessQuickAttackFromPlayer(ref attackingPlayerState, playerId, playerFaceDir, _enemyID, _banditSprite.GetSpriteDirection()))
 			{

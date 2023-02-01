@@ -54,10 +54,17 @@ namespace DoomBreakers
 			}
 
 
-			bool collisionBelow = controller2D._collisionDetail._collidedDirection[0];
+			bool collisionBelow = controller2D._collisionDetail._collidedDirection[0];//0 below , 2 left, 3 right
+			//bool collisionLeft = controller2D._collisionDetail._collidedDirection[2];
+			//bool collisionRight = controller2D._collisionDetail._collidedDirection[3];
+
+			//if (collisionLeft) _stateMachine.SetState(new BanditPersue(_stateMachine, _velocity, _transform, _enemyID));//return;
+			//if (collisionRight) _stateMachine.SetState(new BanditPersue(_stateMachine, _velocity, _transform, _enemyID));//return;
 
 			if (collisionBelow) //Means we're finished jumping/falling.
 			{
+				//_behaviourTimer.StartTimer(1.0f);
+				//if (!_behaviourTimer.HasTimerFinished()) return;
 
 				ObjectPooler._instance.InstantiateForEnemy(PrefabID.Prefab_JumpingDustFX, _transform, _enemyID, banditSprite.GetSpriteDirection());
 				_velocity.x = 0f;

@@ -15,7 +15,9 @@ namespace DoomBreakers
         Container = 6,
         Health = 7,
         Currency = 8,
-        Arrow = 9
+        Arrow = 9,
+        Platform = 10,
+        Rest = 11
     };
 
     public enum C2D
@@ -225,7 +227,8 @@ namespace DoomBreakers
 
             int banditID = enemy.GetComponent<Bandit>()._enemyID;
             BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBandit" + banditID.ToString(),
-                                    ref playerState, playerId, playerSprite, _playerEquipment.GetWeapon());
+                                    ref playerState, playerId, playerSprite, _playerEquipment.GetWeapon(), ref _playerStats);
+            UIPlayerManager.TriggerEvent("ReportUIPlayerDamageEvent");
         }
         private void ProcessAttackCollisionBanditArcher(Collider2D enemy, ref BaseState playerState, int playerId, ref IPlayerSprite playerSprite)
 		{
@@ -234,7 +237,8 @@ namespace DoomBreakers
 
             int banditID = enemy.GetComponent<BanditArcher>()._enemyID;
             BattleColliderManager.AssignCollisionDetails("ReportCollisionWithBanditArcher" + banditID.ToString(),
-                                    ref playerState, playerId, playerSprite, _playerEquipment.GetWeapon());
+                                    ref playerState, playerId, playerSprite, _playerEquipment.GetWeapon(), ref _playerStats);
+            UIPlayerManager.TriggerEvent("ReportUIPlayerDamageEvent");
         }
         private void ProcessAttackCollisionArrow(Collider2D enemy)
 		{
@@ -278,12 +282,15 @@ namespace DoomBreakers
         }
         private void ProcessCollisionWithSword(Collider2D collision)
 		{
+
             if (collision.GetComponent<Sword>() == null)//Exists on Items Layer, Tag=Item
                 return; //Then NOT a Sword. Get outta here!
 
-            if(_playerEquipment.ApplyEquipment(collision.GetComponent<Sword>()))
+            Sword tempSword = collision.GetComponent<Sword>();
+
+            if (_playerEquipment.ApplyEquipment(tempSword))
 			{
-                //UIPlayerManager.TriggerEvent("ReportUIPlayerEquipEvent", UIAnimationFlag.Sword,_playerID);
+                _playerStats.WeaponDamage = tempSword.Damage();
                 collision.GetComponent<Sword>().Destroy();
                 _equipCollisionEnabled = true; //Flag so we update players equipment.
             }
@@ -294,9 +301,11 @@ namespace DoomBreakers
             if (collision.GetComponent<Mace>() == null)//Exists on Items Layer, Tag=Item
                 return; //Then NOT a Mace. Get outta here!
 
-            if (_playerEquipment.ApplyEquipment(collision.GetComponent<Mace>()))
-            {
+            Mace tempMace = collision.GetComponent<Mace>();
 
+            if (_playerEquipment.ApplyEquipment(tempMace))
+            {
+                _playerStats.WeaponDamage = tempMace.Damage();
                 collision.GetComponent<Mace>().Destroy();
                 _equipCollisionEnabled = true; //Flag so we update players equipment.
             }
@@ -306,6 +315,7 @@ namespace DoomBreakers
         {
             if (collision.GetComponent<Shield>() == null)
                 return; //Then NOT a Shield. Get outta here!
+
 
             if(_playerEquipment.ApplyEquipment(collision.GetComponent<Shield>()))
 			{
@@ -507,7 +517,7 @@ namespace DoomBreakers
 
             //ObjectPooler._instance.InstantiateForPlayer(PrefabID.Prefab_DustHitFX, _transform, _playerID, playerSprite.GetSpriteDirection());
             collision.GetComponent<Barrel>().IsHit(_playerID, playerSprite.GetSpriteDirection());
-
+            UIPlayerManager.TriggerEvent("ReportUIPlayerDamageEvent");
 
             return;
         }
@@ -533,6 +543,8 @@ namespace DoomBreakers
                 _currencyPickupEnabled = true;
 			}
             if (collision.CompareTag("FallenFlag")) _playerStats.Health -= _playerStats.Health;
+            if (collision.CompareTag("CampsiteFlag")) LevelEventManager.ActivateCampsite(collision.GetComponent<Campsite>()._campsiteID);
+            if (collision.CompareTag("EndActFlag")) LevelEventManager.ActivateEndLevel(_transform);
         }
         //void OnTriggerStay2D(Collider2D collision) => ProcessCollisionFlags(collision); //unreliable. We use ProcessItemCollision() instead.
         void OnTriggerExit2D(Collider2D collision)

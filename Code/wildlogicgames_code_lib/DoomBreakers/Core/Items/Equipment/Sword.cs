@@ -40,18 +40,18 @@ namespace DoomBreakers
 				case EquipmentWeaponType.Broadsword:
 					_swordID = PlayerItem.IsBroadsword;
 					_animState = ItemAnimationState.IdleBroadSword;
-					_damageValue = 0.065;
+					_damageValue = 0.03;
 					break;
 				case EquipmentWeaponType.Longsword:
 					_swordID = PlayerItem.IsLongsword;
 					_animState = ItemAnimationState.IdleLongsword;
-					_damageValue = 0.07;
+					_damageValue = 0.04;
 					break;
 			}
 			if (_materialType == EquipmentMaterialType.Bronze) _damageValue += 0.01;
 			if (_materialType == EquipmentMaterialType.Iron) _damageValue += 0.02;
-			if (_materialType == EquipmentMaterialType.Steel) _damageValue += 0.0275;
-			if (_materialType == EquipmentMaterialType.Ebony) _damageValue += 0.0325;
+			if (_materialType == EquipmentMaterialType.Steel) _damageValue += 0.03;
+			if (_materialType == EquipmentMaterialType.Ebony) _damageValue += 0.04;
 
 
 		}

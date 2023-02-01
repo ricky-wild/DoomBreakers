@@ -42,9 +42,9 @@ namespace DoomBreakers
 
 
 		}
-		public virtual void UpdateBehaviour(ref CharacterController2D controller2D, ref Animator animator)
+		public virtual void UpdateBehaviour(ref CharacterController2D controller2D, ref Animator animator, ref BaseState state)
 		{
-			UpdateGravity(ref controller2D, ref animator);
+			UpdateGravity(ref controller2D, ref animator, ref state);
 			UpdateTransform(ref controller2D);		
 		}
 		private void UpdateTransform(ref CharacterController2D controller2D)
@@ -52,7 +52,7 @@ namespace DoomBreakers
 			//if(_controller2D == null) return;
 			controller2D.UpdateMovement(_velocity * Time.deltaTime, _velocity, false);
 		}
-		private void UpdateGravity(ref CharacterController2D controller2D, ref Animator animator)
+		private void UpdateGravity(ref CharacterController2D controller2D, ref Animator animator, ref BaseState state)
 		{
 			//if (_controller2D == null) return;
 
@@ -61,7 +61,10 @@ namespace DoomBreakers
 			if (!collisionBelow)
 			{
 				//animator.Play("Fall");
-				_velocity.y += _gravity * Time.deltaTime;
+				if (state.GetType() != typeof(PlayerDying))
+					_velocity.y += _gravity * Time.deltaTime;
+				else
+					_velocity.y += (_gravity * Time.deltaTime)/4;
 			}
 
 			if (collisionBelow)
@@ -73,6 +76,8 @@ namespace DoomBreakers
 				}
 
 			}
+
+			if (state.GetType() == typeof(PlayerDead)) _velocity.y = 0f;
 		}
 		public virtual void IsIdle(ref Animator animator, ref IPlayerSprite playerSprite) { }
 

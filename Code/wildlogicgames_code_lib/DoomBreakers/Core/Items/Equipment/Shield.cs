@@ -44,8 +44,9 @@ namespace DoomBreakers
 		}
 		public override void Awake()
 		{
-			Initialize(this.GetComponent<SpriteRenderer>(), this.GetComponent<Animator>(), 
-				PlayerAnimatorController.Weapon_equipment_to_pickup, ItemAnimationState.IdleShield, _shieldID, _materialType);
+			//PlayerEquipGenerator.cs
+			//Initialize(this.GetComponent<SpriteRenderer>(), this.GetComponent<Animator>(), 
+			//	PlayerAnimatorController.Weapon_equipment_to_pickup, ItemAnimationState.IdleShield, _shieldID, _materialType);
 		}
 		public override void Initialize(SpriteRenderer spriteRenderer, Animator animator, PlayerAnimatorController animController,
 										ItemAnimationState animationState, PlayerItem itemType, EquipmentMaterialType equipMaterialType)

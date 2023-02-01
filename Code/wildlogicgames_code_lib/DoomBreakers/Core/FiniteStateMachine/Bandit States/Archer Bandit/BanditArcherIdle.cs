@@ -16,7 +16,7 @@ namespace DoomBreakers
 
 		}
 
-		public override void IsIdleBowman(ref Animator animator, ref IBanditCollision banditCollider)//Bandit.cs use.
+		public override void IsIdleBowman(ref Animator animator, ref ArcherCollision banditCollider)//Bandit.cs use.
 		{
 			animator.Play("Idle");//, 0, 0.0f);
 			_velocity.x = 0f;

@@ -25,6 +25,12 @@ namespace DoomBreakers
 
 		protected int _currency;
 
+		protected double _currentWeaponDamage;
+		protected const double _baseQuickAttackDamage = 0.002;
+		protected const double _basePowerAttackDamage = 0.01;
+		protected const double _baseKnockAttackDamage = 0.004;
+		protected const double _baseUpwardAttackDamage = 0.003;
+
 		protected bool _armored;
 		protected bool _isBleeding;
 		protected bool _isBludgeoning;
@@ -65,7 +71,6 @@ namespace DoomBreakers
 				return _health;
 			}
 		}
-
 		public virtual double Stamina
 		{
 			set
@@ -82,7 +87,6 @@ namespace DoomBreakers
 				return _stamina;
 			}
 		}
-
 		public virtual double Defence
 		{
 			set
@@ -132,6 +136,21 @@ namespace DoomBreakers
 				return _bludgeoning;
 			}
 		}
+
+
+		public virtual double WeaponDamage
+		{
+			set => _currentWeaponDamage = value;
+			get => _currentWeaponDamage;
+		}
+
+		public virtual double QuickAttackDamage => _baseQuickAttackDamage;
+		public virtual double PowerAttackDamage => _basePowerAttackDamage;
+		public virtual double KnockAttackDamage => _baseKnockAttackDamage;
+		public virtual double UpwardAttackDamage => _baseUpwardAttackDamage;
+
+
+
 		public virtual int Currency
 		{
 			set => _currency = value;

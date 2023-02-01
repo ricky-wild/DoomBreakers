@@ -17,14 +17,14 @@ namespace DoomBreakers
 			//print("\nHitByQuickAttack State.");
 		}
 
-		public override void IsHit(ref Animator animator, ref IBanditSprite banditSprite)
+		public override void IsArcherHit(ref Animator animator, ref IBanditSprite banditSprite)
 		{
 
 			animator.Play("Hit");//, 0, 0.0f);
 
 			banditSprite.SetBehaviourTextureFlash(0.5f, Color.red);
 
-			_behaviourTimer.StartTimer(_quickAtkWaitTime*2);
+			_behaviourTimer.StartTimer(0.75f);
 			if (_behaviourTimer.HasTimerFinished())
 			{
 				banditSprite.ResetTexture2DColor();
